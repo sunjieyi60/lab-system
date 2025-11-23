@@ -8,12 +8,12 @@ import xyz.jasenon.lab.common.entity.BaseEntity;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class LaboratoryContactUser extends BaseEntity {
+public class DeptUser extends BaseEntity {
 
     /**
-     * 实验室编号
+     * 部门ID
      */
-    private Long laboratoryId;
+    private Long deptId;
 
     /**
      * 用户ID

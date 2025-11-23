@@ -6,8 +6,11 @@ import xyz.jasenon.lab.common.entity.BaseEntity;
 
 @Getter
 @Setter
-public class DepartMent extends BaseEntity {
+public class Dept extends BaseEntity {
 
+    /**
+     * 部门名称
+     */
     private String deptName;
 
 }

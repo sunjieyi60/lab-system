@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.common.entity.device;
+package xyz.jasenon.lab.common.entity.record;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,29 +7,31 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class Access extends Device {
-    public Access() {
-        this.deviceType = DeviceType.Access;
-    }
+public class LightRecord extends BaseRecord {
 
     /**
-     * 门禁地址
+     * 地址
      */
     private Integer address;
 
     /**
-     * 门禁ID
+     * 设备id
      */
     private Integer selfId;
 
     /**
-     * rs485网关ID
+     * 是否开启
      */
-    private Long rs485GatewayId;
+    private Boolean isOpen;
 
     /**
      * 是否锁定
      */
     private Boolean isLock;
+
+    /**
+     * 订阅主题
+     */
+    private String acceptTopic;
 
 }

@@ -4,10 +4,12 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 
 @Getter
 @Setter
+@Accessors(chain = true)
 public class Laboratory extends BaseEntity {
 
     /**
@@ -21,7 +23,7 @@ public class Laboratory extends BaseEntity {
     private String laboratoryName;
 
     /**
-     * 实验室负责人
+     * 实验室部门
      */
     private List<Long> belongToDepts;
 

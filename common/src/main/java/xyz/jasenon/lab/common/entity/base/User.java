@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 import xyz.jasenon.lab.common.entity.handler.Md5Encrypt;
 
 @Getter
 @Setter
+@Accessors(chain = true)
 public class User extends BaseEntity {
 
     /**
