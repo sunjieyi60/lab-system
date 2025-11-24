@@ -83,6 +83,13 @@
                 <version>${mybatis.plus.version}</version>
             </dependency>
 
+            <!--https://mvnrepository.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter -->
+            <dependency>
+                <groupId>com.github.yulichang</groupId>
+                <artifactId>mybatis-plus-join-boot-starter</artifactId>
+                <version>1.5.4</version>
+            </dependency>
+
             <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>

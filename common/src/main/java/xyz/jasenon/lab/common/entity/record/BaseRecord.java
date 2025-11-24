@@ -9,9 +9,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
+@Accessors(fluent = true)
 public class BaseRecord {
 
     /**
@@ -31,5 +33,10 @@ public class BaseRecord {
      */
     @TableField(exist = false)
     private Origin origin;
+
+    /**
+     * rs485Id: RS485网关ID，非数据库字段
+     */
+    private Long rs485Id;
 
 }

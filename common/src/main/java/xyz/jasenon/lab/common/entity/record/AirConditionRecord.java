@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@Accessors(chain = true)
+@Accessors(fluent = true)
 public class AirConditionRecord extends BaseRecord {
 
     /**
@@ -48,10 +48,5 @@ public class AirConditionRecord extends BaseRecord {
      * 错误码: 0:正常,1:设备故障,2:通信失败
      */
     private Integer errorCode;
-
-    /**
-     * mqtt主题
-     */
-    private String acceptTopic;
 
 }

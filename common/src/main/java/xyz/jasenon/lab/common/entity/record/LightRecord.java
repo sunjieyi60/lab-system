@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@Accessors(chain = true)
+@Accessors(fluent = true)
 public class LightRecord extends BaseRecord {
 
     /**
@@ -28,10 +28,5 @@ public class LightRecord extends BaseRecord {
      * 是否锁定
      */
     private Boolean isLock;
-
-    /**
-     * 订阅主题
-     */
-    private String acceptTopic;
 
 }

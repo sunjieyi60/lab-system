@@ -2,6 +2,7 @@ package xyz.jasenon.lab.common.entity.device;
 
 import java.util.UUID;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -9,6 +10,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
+@TableName("device")
 public class AirCondition extends Device {
     public AirCondition() {
         this.deviceType = DeviceType.AirCondition;
