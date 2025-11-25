@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@Accessors(chain = true)
+@Accessors(fluent = true)
 public class AccessRecord extends BaseRecord {
 
     /**
@@ -40,9 +40,5 @@ public class AccessRecord extends BaseRecord {
      */
     private Integer delayTime;
 
-    /**
-     * mqtt主题
-     */
-    private String acceptTopic;
 
 }

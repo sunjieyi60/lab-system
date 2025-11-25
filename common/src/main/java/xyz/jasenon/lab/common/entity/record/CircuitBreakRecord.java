@@ -6,8 +6,9 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@Accessors(chain = true)
-public class CircuitBreak extends BaseRecord{
+@Accessors(fluent = true)
+
+public class CircuitBreakRecord extends BaseRecord{
 
     /**
      * 地址
@@ -58,10 +59,5 @@ public class CircuitBreak extends BaseRecord{
      * 线温
      */
     private Float temperature;
-
-    /**
-     * mqtt主题
-     */
-    private String acceptTopic;
 
 }

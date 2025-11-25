@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@Accessors(chain = true)
+@Accessors(fluent = true)
 public class SensorRecord extends BaseRecord {
 
     /**
@@ -39,8 +39,4 @@ public class SensorRecord extends BaseRecord {
      */
     private Integer smoke;
 
-    /**
-     * 主题
-     */
-    private String acceptTopic;
 }
