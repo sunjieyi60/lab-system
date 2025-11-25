@@ -46,7 +46,7 @@ public class MqttAcceptCallback implements MqttCallbackExtended {
     }
 
     @Override
-    public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
+    public void messageArrived(String arg0, MqttMessage arg1) {
         byte[] payloads = arg1.getPayload();
         String topic = arg0;
         log.info("messageArrived, topic:{},payloads:{}", topic, payloads);

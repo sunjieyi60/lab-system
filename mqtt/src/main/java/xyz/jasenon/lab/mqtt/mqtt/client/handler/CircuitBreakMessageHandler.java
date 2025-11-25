@@ -71,7 +71,8 @@ public class CircuitBreakMessageHandler
                 .leakage(leakage)
                 .power(power)
                 .temperature(temperture)
-                .voltage(voltage);
+                .voltage(voltage)
+                .rs485Id(rs485Id);
 
         return circuitBreakRecord;
     }

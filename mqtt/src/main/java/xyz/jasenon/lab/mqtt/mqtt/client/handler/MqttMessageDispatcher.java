@@ -8,18 +8,22 @@ import cn.hutool.core.lang.Assert;
 import jakarta.annotation.Resource;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 
+import java.util.Map;
+
 
 @Component
 public class MqttMessageDispatcher {
 
-    @Resource(name = "handlers")
-    private Map<DeviceType, MqttMessageHandler<?, ?, ?, ?>> handlers;
+    @Autowired
+    private Map<DeviceType, MqttMessageHandler<?,?,?,?>> handlers;
 
     public void dispatch(byte[] payloads, Long rs485Id) {
-        DeviceType deviceType = parsDeviceType(payloads[0] & 0xFF);
-        MqttMessageHandler<?, ?, ?, ?> handler = handlers.get(deviceType);
-        Assert.notNull(handler,"未知的设备类型,无法获取消息处理器");
-        handler.handle(payloads,rs485Id,deviceType);
+        DeviceType deviceType = parsDeviceType(payloads[0] & 0xff);
+        MqttMessageHandler<?,?,?,?> handler = handlers.get(deviceType);
+        if (handler == null) {
+            throw new IllegalArgumentException("未知的设备类型");
+        }
+        handler.handler(payloads, rs485Id, deviceType);
     }
 
     DeviceType parsDeviceType(Integer address){

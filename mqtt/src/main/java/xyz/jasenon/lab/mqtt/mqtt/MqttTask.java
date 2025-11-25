@@ -11,14 +11,9 @@ import xyz.jasenon.lab.common.dto.task.Task;
 public class MqttTask extends Task {
 
     /**
-     * 发送主题
+     * RS485网关ID
      */
-    private String sendTopic;
-
-    /**
-     * 接收主题
-     */
-    private String acceptTopic;
+    private Long rs485Id;
 
     /**
      * 负载数据

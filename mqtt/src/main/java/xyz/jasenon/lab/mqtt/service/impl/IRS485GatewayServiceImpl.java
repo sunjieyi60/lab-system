@@ -9,6 +9,8 @@ import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.mqtt.mapper.RS485Mapper;
 import xyz.jasenon.lab.mqtt.service.IRS485GatewayService;
 
+import java.util.List;
+
 @Service
 public class IRS485GatewayServiceImpl extends ServiceImpl<RS485Mapper,RS485Gateway> implements IRS485GatewayService {
 
@@ -20,4 +22,8 @@ public class IRS485GatewayServiceImpl extends ServiceImpl<RS485Mapper,RS485Gatew
         return rs485GatewayMapper.selectById(gatewayId);
     }
 
+    @Override
+    public List<RS485Gateway> listAllRS485Gateway() {
+        return list();
+    }
 }
