@@ -29,11 +29,11 @@ public abstract class MqttMessageHandler<DM extends BaseMapper<D>, RM extends Ba
             log.warn("数据校验失败, 设备类型: {}, 数据: {}", deviceType, payloads);
             return;
         }
-        D device = parse(payloads, rs485Id);
-        Assert.notNull(device, "设备数据解析失败, 未知的设备");
         if (!needSave(payloads)) {
             return;
         }
+        D device = parse(payloads, rs485Id);
+        Assert.notNull(device, "设备数据解析失败, 未知的设备");
         R record = decryptPayload(payloads, rs485Id);
         RBucket<R> recordSpace = redissonClient.getBucket(deviceType.getRedisPrefix() + device.getId());
         recordSpace.set(record);
