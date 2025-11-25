@@ -2,6 +2,7 @@ package xyz.jasenon.lab.mqtt.mqtt.client.handler;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.hutool.core.lang.Assert;
@@ -23,7 +24,7 @@ public class MqttMessageDispatcher {
         if (handler == null) {
             throw new IllegalArgumentException("未知的设备类型");
         }
-        handler.handler(payloads, rs485Id, deviceType);
+        handler.handle(payloads, rs485Id, deviceType);
     }
 
     DeviceType parsDeviceType(Integer address){

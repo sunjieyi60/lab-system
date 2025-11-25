@@ -30,14 +30,9 @@ public class Task implements Comparable<Task> {
     private CommandLine commandLine;
     
     /**
-     * 参数列表
+     * 参数列表 按照address selfId 操作参数传递 需观察占位符数量
      */
     private Integer[] args;
-
-    /**
-     * 用户ID
-     */
-    private Long userId;
 
     /**
      * asc order
@@ -53,7 +48,6 @@ public class Task implements Comparable<Task> {
         this.deviceId = task.getDeviceId();
         this.commandLine = task.getCommandLine();
         this.args = task.getArgs();
-        this.userId = task.getUserId();
     }
 
 }

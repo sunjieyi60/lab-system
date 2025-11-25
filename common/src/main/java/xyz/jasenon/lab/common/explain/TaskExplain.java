@@ -18,7 +18,8 @@ import xyz.jasenon.lab.common.service.IDeviceService$;
 import xyz.jasenon.lab.common.utils.CrcChecker;
 import xyz.jasenon.lab.common.utils.SumChecker;
 
-public abstract class TaskExplain<T> {
+public abstract class 
+TaskExplain<T> {
 
     final IDeviceService$ deviceService;
 

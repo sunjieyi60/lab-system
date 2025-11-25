@@ -24,7 +24,7 @@ public class SensorMessageHandler extends MqttMessageHandler<SensorMapper, Senso
     }
 
     @Override
-    SensorRecord decryptPayload(byte[] payload, Long rs485Id)                                                                          {
+    SensorRecord decryptPayload(byte[] payload, Long rs485Id) {
         Integer address = payload[0] & 0xff;
         Integer selfId = payload[2] & 0xff;
         Double temperature = Integer.parseInt(Integer.toHexString(payload[3]) + Integer.toHexString(payload[4]), 16)
@@ -73,7 +73,7 @@ public class SensorMessageHandler extends MqttMessageHandler<SensorMapper, Senso
             log.info("polling成功");
             return true;
         }
-        return false;
+        throw new IllegalArgumentException(MessageFormat.format("未知的指令{0}", payload[1]));
     }
 
     @Override
