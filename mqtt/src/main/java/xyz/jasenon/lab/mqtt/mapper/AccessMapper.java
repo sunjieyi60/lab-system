@@ -9,3 +9,4 @@ import xyz.jasenon.lab.common.entity.device.Access;
 public interface AccessMapper extends BaseMapper<Access> {
 
 }
+

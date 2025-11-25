@@ -9,3 +9,4 @@ import xyz.jasenon.lab.common.entity.device.AirCondition;
 public interface AirConditionMapper extends BaseMapper<AirCondition> {
 
 }
+

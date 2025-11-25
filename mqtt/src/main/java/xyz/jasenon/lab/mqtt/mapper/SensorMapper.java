@@ -9,3 +9,4 @@ import xyz.jasenon.lab.common.entity.device.Sensor;
 public interface SensorMapper extends BaseMapper<Sensor> {
 
 }
+

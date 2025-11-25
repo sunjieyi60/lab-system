@@ -22,29 +22,9 @@ public class IDeviceServiceImpl extends ServiceImpl<DeviceMapper,Device> impleme
     @Autowired
     private DeviceMapper deviceMapper;
 
-    @Autowired
-    private AccessMapper accessMapper;
-
-    @Autowired
-    private LightMapper lightMapper;
-
-    @Autowired
-    private AirConditionMapper airConditionMapper;
-
-    @Autowired
-    private SensorMapper sensorMapper;
-
-    @Autowired
-    private CircuitBreakMapper circuitBreakMapper;
-
     @Override
     public Device getDeviceByDeviceId(Long id) {
         return deviceMapper.selectById(id);
-    }
-
-    @Override
-    public <T> T getDeviceByPayload(byte[] payload, Class<T> clazz) {
-        return null;
     }
 
 

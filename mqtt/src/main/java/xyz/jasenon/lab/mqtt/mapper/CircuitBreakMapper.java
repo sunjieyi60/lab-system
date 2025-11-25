@@ -9,3 +9,4 @@ import xyz.jasenon.lab.common.entity.device.CircuitBreak;
 public interface CircuitBreakMapper extends BaseMapper<CircuitBreak> {
 
 }
+

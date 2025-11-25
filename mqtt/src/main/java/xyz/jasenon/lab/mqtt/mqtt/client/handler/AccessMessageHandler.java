@@ -39,8 +39,8 @@ public class AccessMessageHandler extends MqttMessageHandler<AccessMapper,Access
 
     @Override
     public AccessRecord decryptPayload(byte[] payload, Long rs485Id){
-        Integer address = (int) (payload[0]);
-        Integer selfId = (int) (payload[2]);
+        Integer address = payload[0] & 0xff;
+        Integer selfId = payload[2] & 0xff;
 
         Boolean isOpen = payload[3] == (byte) 0xFF;
         Boolean isLcok = payload[5] == (byte) 0xFF;

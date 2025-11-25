@@ -24,7 +24,7 @@ public abstract class MqttMessageHandler<DM extends BaseMapper<D>, RM extends Ba
         this.redissonClient = redissonClient;
     }
 
-    public void handler(byte[] payloads, Long rs485Id, DeviceType deviceType) {
+    public void handle(byte[] payloads, Long rs485Id, DeviceType deviceType) {
         if (!verify(payloads)) {
             log.warn("数据校验失败, 设备类型: {}, 数据: {}", deviceType, payloads);
             return;

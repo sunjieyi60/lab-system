@@ -46,7 +46,7 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
         Light light = new LambdaQueryChainWrapper<>(super.deviceMapper)
                 .eq(Light::getAddress, address)
                 .eq(Light::getSelfId, selfId)
-                .eq(Light::getRs485GatewayId, selfId)
+                .eq(Light::getRs485GatewayId, rs485Id)
                 .one();
 
         return light;

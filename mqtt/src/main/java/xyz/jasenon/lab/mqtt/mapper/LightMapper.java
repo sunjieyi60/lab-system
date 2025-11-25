@@ -9,3 +9,4 @@ import xyz.jasenon.lab.common.entity.device.Light;
 public interface LightMapper extends BaseMapper<Light> {
 
 }
+

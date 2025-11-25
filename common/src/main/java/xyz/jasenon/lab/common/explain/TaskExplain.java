@@ -1,10 +1,8 @@
 package xyz.jasenon.lab.common.explain;
 
 
-import java.lang.reflect.Array;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.List;
 
 import cn.hutool.core.lang.Assert;
 import xyz.jasenon.lab.common.dto.command.Command;
@@ -30,7 +28,7 @@ public abstract class TaskExplain<T> {
 
     public T explainTask(Task task){
         Device device = deviceService.getDeviceByDeviceId(task.getDeviceId());
-        Assert.notNull(null, "设备不存在");
+        Assert.notNull(device, "设备不存在");
         switch (device.getDeviceType()) {
             case AirCondition:{
                 return explainTask(task,(AirCondition) device);
