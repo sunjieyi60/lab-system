@@ -5,19 +5,17 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 
+/**
+ * @author Jasenon_ce
+ * @date 2025/11/26
+ */
 @Getter
 @Setter
-@Accessors(chain = true)
-public class LaboratoryContactUser extends BaseEntity {
+@Accessors(fluent = true)
+public class LaboratoryUser extends BaseEntity {
 
-    /**
-     * 实验室编号
-     */
-    private Long laboratoryId;
-
-    /**
-     * 用户ID
-     */
     private Long userId;
+
+    private Long laboratoryId;
 
 }

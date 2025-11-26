@@ -103,7 +103,7 @@ public enum Permissions {
         if (isDict(permission)) {
             throw new IllegalArgumentException("禁止传递权限目录");
         }
-        return pathOf(permission, new ArrayList<>());
+        return pathOf(permission, new ArrayList<>()).stream().sorted().toList();
     }
 
     // dfs
@@ -111,7 +111,7 @@ public enum Permissions {
         if (permission == null) {
             throw new IllegalArgumentException("非法的权限类型");
         }
-        if (permission.id != ROOT.id) {
+        if (!permission.id.equals(ROOT.id)) {
             path.add(permission.id);
             return pathOf(map.get(permission.parentId), path);
         }
