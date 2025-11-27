@@ -1,13 +1,12 @@
 package xyz.jasenon.lab.mqtt.setnx;
 
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
+import lombok.Getter;
+import lombok.SneakyThrows;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
-import lombok.Getter;
-import lombok.SneakyThrows;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class MqttNx {
 

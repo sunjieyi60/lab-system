@@ -96,6 +96,13 @@
                 <version>${mybatis.plus.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-jsqlparser -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+
             <!--https://mvnrepository.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter -->
             <dependency>
                 <groupId>com.github.yulichang</groupId>

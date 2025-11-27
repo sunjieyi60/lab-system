@@ -1,22 +1,13 @@
 package xyz.jasenon.lab.service.constants;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import xyz.jasenon.lab.service.deserializer.PermissionSerializer;
+
+import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 
 @Slf4j
 @JsonSerialize(using = PermissionSerializer.class)

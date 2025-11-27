@@ -1,11 +1,11 @@
 package xyz.jasenon.lab.common.entity.device;
 
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.util.UUID;
 
 @Getter
 @Setter

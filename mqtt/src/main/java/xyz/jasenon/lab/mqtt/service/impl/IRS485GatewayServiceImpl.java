@@ -1,10 +1,8 @@
 package xyz.jasenon.lab.mqtt.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
 import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.mqtt.mapper.RS485Mapper;
 import xyz.jasenon.lab.mqtt.service.IRS485GatewayService;

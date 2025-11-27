@@ -1,18 +1,12 @@
 package xyz.jasenon.lab.mqtt.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import xyz.jasenon.lab.common.entity.device.DeviceType;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.AccessMessageHandler;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.AirConditionMessageHandler;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.CircuitBreakMessageHandler;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.LightMessageHandler;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.MqttMessageHandler;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.SensorMessageHandler;
+import xyz.jasenon.lab.mqtt.mqtt.client.handler.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class MessageDispatcherConfig {

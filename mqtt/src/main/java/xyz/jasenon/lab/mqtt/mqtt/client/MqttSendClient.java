@@ -1,10 +1,9 @@
 package xyz.jasenon.lab.mqtt.mqtt.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-
-import lombok.extern.slf4j.Slf4j;
 import xyz.jasenon.lab.mqtt.mqtt.MqttTask;
 import xyz.jasenon.lab.mqtt.setnx.MqttNx;
 

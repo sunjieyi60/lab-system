@@ -1,19 +1,17 @@
 package xyz.jasenon.lab.mqtt.mqtt.client.handler;
 
-import java.text.MessageFormat;
-import java.util.Stack;
-
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
-
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-
-import lombok.extern.slf4j.Slf4j;
 import xyz.jasenon.lab.common.entity.device.CircuitBreak;
 import xyz.jasenon.lab.common.entity.record.CircuitBreakRecord;
 import xyz.jasenon.lab.common.utils.CrcChecker;
 import xyz.jasenon.lab.mqtt.mapper.CircuitBreakMapper;
 import xyz.jasenon.lab.mqtt.mapper.CircuitBreakRecordMapper;
+
+import java.text.MessageFormat;
+import java.util.Stack;
 
 @Component
 @Slf4j

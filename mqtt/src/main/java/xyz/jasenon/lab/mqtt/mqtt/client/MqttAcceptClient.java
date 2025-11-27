@@ -1,10 +1,9 @@
 package xyz.jasenon.lab.mqtt.mqtt.client;
 
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import xyz.jasenon.lab.mqtt.mqtt.client.handler.MqttMessageDispatcher;
 import xyz.jasenon.lab.mqtt.setnx.MqttNx;

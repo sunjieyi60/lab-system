@@ -1,15 +1,17 @@
 package xyz.jasenon.lab.common.entity.base;
 
-import java.util.List;
-
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 
+import java.util.List;
+
 @Getter
 @Setter
-@Accessors(chain = true)
+@Accessors(fluent = true)
 public class Laboratory extends BaseEntity {
 
     /**
@@ -25,6 +27,7 @@ public class Laboratory extends BaseEntity {
     /**
      * 实验室部门
      */
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> belongToDepts;
 
     /**

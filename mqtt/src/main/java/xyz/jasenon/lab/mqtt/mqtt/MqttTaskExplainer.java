@@ -2,13 +2,8 @@ package xyz.jasenon.lab.mqtt.mqtt;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
 import xyz.jasenon.lab.common.dto.task.Task;
-import xyz.jasenon.lab.common.entity.device.Access;
-import xyz.jasenon.lab.common.entity.device.AirCondition;
-import xyz.jasenon.lab.common.entity.device.CircuitBreak;
-import xyz.jasenon.lab.common.entity.device.Light;
-import xyz.jasenon.lab.common.entity.device.Sensor;
+import xyz.jasenon.lab.common.entity.device.*;
 import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.common.explain.TaskExplain;
 import xyz.jasenon.lab.mqtt.service.IDeviceService;

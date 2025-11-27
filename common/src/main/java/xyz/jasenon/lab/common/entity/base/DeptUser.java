@@ -5,6 +5,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 
+/**
+ * @author Jasenon_ce
+ */
 @Getter
 @Setter
 @Accessors(chain = true)
