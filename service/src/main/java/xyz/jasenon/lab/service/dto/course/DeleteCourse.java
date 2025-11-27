@@ -10,12 +10,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class DeleteSemester {
+public class DeleteCourse {
 
     /**
-     * 学期id
+     * 课程ID
      */
-    @NotNull(message = "学期ID不能为空")
-    private Long semesterId;
+    @NotNull(message = "课程ID不能为空")
+    private Long courseId;
 
 }
