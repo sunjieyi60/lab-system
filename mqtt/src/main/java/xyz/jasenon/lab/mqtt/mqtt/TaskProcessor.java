@@ -1,14 +1,12 @@
 package xyz.jasenon.lab.mqtt.mqtt;
 
+import lombok.SneakyThrows;
+import xyz.jasenon.lab.mqtt.mqtt.client.MqttAcceptClient;
+import xyz.jasenon.lab.mqtt.mqtt.client.MqttSendClient;
+
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-import lombok.SneakyThrows;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.redisson.api.RedissonClient;
-import xyz.jasenon.lab.mqtt.mqtt.client.MqttAcceptClient;
-import xyz.jasenon.lab.mqtt.mqtt.client.MqttSendClient;
 
 public class TaskProcessor {
 

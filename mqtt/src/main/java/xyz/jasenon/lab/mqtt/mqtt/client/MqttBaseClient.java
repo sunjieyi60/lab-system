@@ -1,13 +1,12 @@
 package xyz.jasenon.lab.mqtt.mqtt.client;
 
-import java.util.UUID;
-
+import cn.hutool.crypto.digest.MD5;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
-import cn.hutool.crypto.digest.MD5;
 import xyz.jasenon.lab.mqtt.setnx.MqttNx;
+
+import java.util.UUID;
 
 public class MqttBaseClient extends MqttClient {
 

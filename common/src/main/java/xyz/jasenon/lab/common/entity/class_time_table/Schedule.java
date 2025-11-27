@@ -1,14 +1,13 @@
 package xyz.jasenon.lab.common.entity.class_time_table;
 
-import java.time.LocalTime;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-
 import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.BaseEntity;
+
+import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter

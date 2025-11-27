@@ -1,22 +1,17 @@
 package xyz.jasenon.lab.common.explain;
 
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-
 import cn.hutool.core.lang.Assert;
 import xyz.jasenon.lab.common.dto.command.Command;
 import xyz.jasenon.lab.common.dto.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
-import xyz.jasenon.lab.common.entity.device.Access;
-import xyz.jasenon.lab.common.entity.device.AirCondition;
-import xyz.jasenon.lab.common.entity.device.CircuitBreak;
-import xyz.jasenon.lab.common.entity.device.Device;
-import xyz.jasenon.lab.common.entity.device.Light;
-import xyz.jasenon.lab.common.entity.device.Sensor;
+import xyz.jasenon.lab.common.entity.device.*;
 import xyz.jasenon.lab.common.service.IDeviceService$;
 import xyz.jasenon.lab.common.utils.CrcChecker;
 import xyz.jasenon.lab.common.utils.SumChecker;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
 
 public abstract class 
 TaskExplain<T> {

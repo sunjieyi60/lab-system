@@ -2,7 +2,6 @@ package xyz.jasenon.lab.mqtt.mqtt.client.handler;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import org.redisson.api.RedissonClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.jasenon.lab.common.entity.device.AirCondition;
@@ -12,7 +11,6 @@ import xyz.jasenon.lab.mqtt.mapper.AirConditionMapper;
 import xyz.jasenon.lab.mqtt.mapper.AirConditionRecordMapper;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class AirConditionMessageHandler
         extends MqttMessageHandler<AirConditionMapper, AirConditionRecordMapper, AirCondition, AirConditionRecord> {

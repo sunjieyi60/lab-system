@@ -1,13 +1,16 @@
 package xyz.jasenon.lab.common.entity.base;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 import xyz.jasenon.lab.common.entity.handler.Md5Encrypt;
 
+/**
+ * @author Jasenon_ce
+ */
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -43,5 +46,9 @@ public class User extends BaseEntity {
      * 创建者ID
      */
     private Long createBy;
+
+    @TableLogic
+    private Boolean deleted;
+
 
 }

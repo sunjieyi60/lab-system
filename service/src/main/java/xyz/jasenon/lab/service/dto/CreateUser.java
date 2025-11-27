@@ -23,40 +23,40 @@ public class CreateUser {
      * 用户名
      */
     @Pattern(regexp = "^[a-zA-Z0-9_-]{4,16}$", message = "用户名必须是4到16位，允许字母数字下划线")
-    @NotBlank
+    @NotBlank(message = "用户名不能为空")
     private String username;
 
     /**
      * 密码
      */
     @Pattern(regexp = "^[a-zA-Z0-9]{6,18}$", message = "密码必须是6到18位，允许字母数字下划线")
-    @NotBlank
+    @NotBlank(message = "密码不能为空")
     private String password;
 
     /**
      * 真实姓名
      */
-    @NotBlank
+    @NotBlank(message = "真实姓名不能为空")
     private String realName;
 
     /**
      * 邮箱地址
      */
     @Pattern(regexp = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$", message = "邮箱格式不正确")
-    @NotBlank
+    @NotBlank(message = "邮箱不能为空")
     private String email;
 
     /**
      * 手机号
      */
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
-    @NotBlank
+    @NotBlank(message = "手机号不能为空")
     private String phone;
 
     /**
      * 创建者id
      */
-    @NotNull
+    @NotNull(message = "创建者id不能为空")
     private Long createBy;
 
     /**

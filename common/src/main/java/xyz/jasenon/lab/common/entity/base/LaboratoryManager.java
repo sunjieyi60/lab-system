@@ -7,7 +7,7 @@ import xyz.jasenon.lab.common.entity.BaseEntity;
 
 @Getter
 @Setter
-@Accessors(chain = true)
+@Accessors(fluent = true)
 public class LaboratoryManager extends BaseEntity {
 
     /**

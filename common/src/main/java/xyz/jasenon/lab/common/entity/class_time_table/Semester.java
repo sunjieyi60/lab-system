@@ -1,10 +1,10 @@
 package xyz.jasenon.lab.common.entity.class_time_table;
 
-import java.time.LocalDate;
-
 import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.BaseEntity;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter

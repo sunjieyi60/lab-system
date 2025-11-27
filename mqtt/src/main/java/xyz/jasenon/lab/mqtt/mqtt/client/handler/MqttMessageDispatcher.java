@@ -1,12 +1,7 @@
 package xyz.jasenon.lab.mqtt.mqtt.client.handler;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import cn.hutool.core.lang.Assert;
-import jakarta.annotation.Resource;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 
 import java.util.Map;

@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 
+/**
+ * @author Jasenon_ce
+ */
 @Getter
 @Setter
 public class Dept extends BaseEntity {

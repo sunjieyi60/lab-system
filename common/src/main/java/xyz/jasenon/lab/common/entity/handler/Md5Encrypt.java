@@ -1,14 +1,13 @@
 package xyz.jasenon.lab.common.entity.handler;
 
+import cn.hutool.crypto.digest.MD5;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.apache.ibatis.type.BaseTypeHandler;
-import org.apache.ibatis.type.JdbcType;
-
-import cn.hutool.crypto.digest.MD5;
 
 public class Md5Encrypt extends BaseTypeHandler<String> {
 

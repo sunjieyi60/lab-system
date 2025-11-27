@@ -2,6 +2,10 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.base.Dept;
+import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.dto.CreateDept;
+import xyz.jasenon.lab.service.dto.DeleteDept;
+import xyz.jasenon.lab.service.dto.EditDept;
 
 /**
  * @author Jasenon_ce
@@ -9,6 +13,10 @@ import xyz.jasenon.lab.common.entity.base.Dept;
  */
 public interface IDeptService extends IService<Dept> {
 
+    R createDept(CreateDept createDept);
 
+    R editDept(EditDept editDept);
+
+    R deleteDept(DeleteDept deleteDept);
 
 }

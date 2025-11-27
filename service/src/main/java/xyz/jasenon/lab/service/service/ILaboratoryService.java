@@ -2,10 +2,21 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
+import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.dto.CreateLaboratory;
+import xyz.jasenon.lab.service.dto.DeleteLaboratory;
+import xyz.jasenon.lab.service.dto.EditLaboratory;
 
 /**
  * @author Jasenon_ce
  * @date 2025/11/26
  */
 public interface ILaboratoryService extends IService<Laboratory> {
+
+    R createLaboratory(CreateLaboratory createLaboratory);
+
+    R editLaboratory(EditLaboratory editLaboratory);
+
+    R deleteLaboratory(DeleteLaboratory deleteLaboratory);
+
 }

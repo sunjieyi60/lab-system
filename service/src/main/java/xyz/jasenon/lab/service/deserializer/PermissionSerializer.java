@@ -1,12 +1,11 @@
 package xyz.jasenon.lab.service.deserializer;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-
 import xyz.jasenon.lab.service.constants.Permissions;
+
+import java.io.IOException;
 
 public class PermissionSerializer extends JsonSerializer<Permissions> {
 
