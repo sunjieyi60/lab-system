@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * @author Jasenon_ce
@@ -12,6 +13,7 @@ import xyz.jasenon.lab.common.entity.BaseEntity;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@TableName("dept_building")
 public class DeptBuilding extends BaseEntity {
 
     /**

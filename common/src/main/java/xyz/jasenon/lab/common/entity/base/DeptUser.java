@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * @author Jasenon_ce
@@ -11,6 +12,7 @@ import xyz.jasenon.lab.common.entity.BaseEntity;
 @Getter
 @Setter
 @Accessors(chain = true)
+@TableName("dept_user")
 public class DeptUser extends BaseEntity {
 
     /**

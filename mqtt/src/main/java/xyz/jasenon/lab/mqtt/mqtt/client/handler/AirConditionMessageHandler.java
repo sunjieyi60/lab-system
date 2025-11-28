@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.AirCondition;
 import xyz.jasenon.lab.common.entity.record.AirConditionRecord;
 import xyz.jasenon.lab.common.utils.SumChecker;
@@ -12,6 +13,7 @@ import xyz.jasenon.lab.mqtt.mapper.AirConditionRecordMapper;
 
 import java.util.List;
 
+@Component
 public class AirConditionMessageHandler
         extends MqttMessageHandler<AirConditionMapper, AirConditionRecordMapper, AirCondition, AirConditionRecord> {
 

@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.common.dto.command;
+package xyz.jasenon.lab.common.command;
 
 public enum SendType {
     MQTT,

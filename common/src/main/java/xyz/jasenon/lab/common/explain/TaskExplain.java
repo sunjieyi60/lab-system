@@ -2,8 +2,8 @@ package xyz.jasenon.lab.common.explain;
 
 
 import cn.hutool.core.lang.Assert;
-import xyz.jasenon.lab.common.dto.command.Command;
-import xyz.jasenon.lab.common.dto.command.CommandLine;
+import xyz.jasenon.lab.common.command.Command;
+import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.entity.device.*;
 import xyz.jasenon.lab.common.service.IDeviceService$;

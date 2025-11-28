@@ -1,6 +1,6 @@
 package xyz.jasenon.lab.service.strategy.task;
 
-import xyz.jasenon.lab.common.dto.command.SendType;
+import xyz.jasenon.lab.common.command.SendType;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

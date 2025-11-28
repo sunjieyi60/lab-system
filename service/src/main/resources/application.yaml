@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    #    url: jdbc:mysql://10.230.80.109:3306/lab_system?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    #    username: root
+    #    password: lab_system
+    url: jdbc:mysql://localhost:3306/lab_sys3?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: sbx159357!?.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+server:
+  port: 8088
+
+task:
+  send:
+    mqtt-task-host:
+    socket-task-host:
+  polling:
+    core-pool-size: 8
+    initial-delay: 0
+    period: 5
+    polling-time-unit: SECONDS
+

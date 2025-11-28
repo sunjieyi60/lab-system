@@ -3,10 +3,12 @@ package xyz.jasenon.lab.common.entity.record;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 @Getter
 @Setter
 @Accessors(fluent = true)
+@TableName("air_condition_record")
 public class AirConditionRecord extends BaseRecord {
 
     /**

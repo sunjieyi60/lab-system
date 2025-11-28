@@ -3,24 +3,27 @@ package xyz.jasenon.lab.service.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.yulichang.query.MPJLambdaQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.jasenon.lab.common.entity.base.Dept;
-import xyz.jasenon.lab.common.entity.base.DeptUser;
-import xyz.jasenon.lab.common.entity.base.LaboratoryUser;
-import xyz.jasenon.lab.common.entity.base.User;
+import xyz.jasenon.lab.common.entity.base.*;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.user.CreateUser;
 import xyz.jasenon.lab.service.dto.user.DeleteUser;
 import xyz.jasenon.lab.service.dto.user.EditUser;
+import xyz.jasenon.lab.service.dto.user.UserLogin;
 import xyz.jasenon.lab.service.entity.UserPermission;
 import xyz.jasenon.lab.service.mapper.*;
 import xyz.jasenon.lab.service.service.IUserService;
+import xyz.jasenon.lab.service.vo.UserBizVo;
+import xyz.jasenon.lab.service.vo.UserPermissionVo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,7 +44,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private LaboratoryUserMapper laboratoryUserMapper;
     @Autowired
     private UserPermissionMapper userPermissionMapper;
-
+    @Autowired
+    private LaboratoryMapper laboratoryMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -92,14 +96,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 分配部门
         List<Long> deptIds = createUser.deptIds();
         if (!deptIds.isEmpty()){
+            List<Long> doDeptIds = new LambdaQueryChainWrapper<>(deptUserMapper)
+                    .eq(DeptUser::getUserId, createBy)
+                    .list().stream().map(DeptUser::getDeptId).toList();
+            boolean deptOver = new HashSet<>(doDeptIds).containsAll(deptIds);
+            if (!deptOver){
+                return R.fail("部门越权");
+            }
             for (Long deptId : deptIds){
-                Dept dept = deptMapper.selectById(deptId);
-                if (dept == null) {
-                    return R.fail("部门不存在");
-                }
                 DeptUser deptUser = new DeptUser()
                         .setUserId(user.getId())
-                        .setDeptId(dept.getId());
+                        .setDeptId(deptId);
                 deptUserMapper.insert(deptUser);
             }
         }
@@ -108,16 +115,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         List<Long> laboratoryIds = createUser.laboratoryIds();
         if (!laboratoryIds.isEmpty()){
             List<Long> doLaboratoryIds = new LambdaQueryChainWrapper<>(laboratoryUserMapper)
-                    .eq(LaboratoryUser::userId, createBy)
-                    .list().stream().map(LaboratoryUser::laboratoryId).toList();
+                    .eq(LaboratoryUser::getUserId, createBy)
+                    .list().stream().map(LaboratoryUser::getLaboratoryId).toList();
             boolean labOver = new HashSet<>(doLaboratoryIds).containsAll(laboratoryIds);
             if (!labOver){
                 return R.fail("实验室越权");
             }
             for (Long laboratoryId : laboratoryIds){
                 LaboratoryUser laboratoryUser = new LaboratoryUser()
-                        .userId(user.getId())
-                        .laboratoryId(laboratoryId);
+                        .setUserId(user.getId())
+                        .setLaboratoryId(laboratoryId);
                 laboratoryUserMapper.insert(laboratoryUser);
             }
         }
@@ -155,7 +162,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         deptUserMapper.delete(new LambdaQueryWrapper<DeptUser>()
                 .eq(DeptUser::getUserId,user.getId()));
         laboratoryUserMapper.delete(new LambdaQueryWrapper<LaboratoryUser>()
-                .eq(LaboratoryUser::userId,user.getId()));
+                .eq(LaboratoryUser::getUserId,user.getId()));
         userPermissionMapper.delete(new LambdaQueryWrapper<UserPermission>()
                 .eq(UserPermission::userId,user.getId()));
 
@@ -183,14 +190,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 分配部门
         List<Long> deptIds = editUser.deptIds();
         if (!deptIds.isEmpty()){
+            List<Long> doDeptIds = new LambdaQueryChainWrapper<>(deptUserMapper)
+                    .eq(DeptUser::getUserId, doUserId)
+                    .list().stream().map(DeptUser::getDeptId).toList();
+            boolean deptOver = new HashSet<>(doDeptIds).containsAll(deptIds);
+            if (!deptOver){
+                return R.fail("部门越权");
+            }
             for (Long deptId : deptIds){
-                Dept dept = deptMapper.selectById(deptId);
-                if (dept == null) {
-                    return R.fail("部门不存在");
-                }
                 DeptUser deptUser = new DeptUser()
                         .setUserId(user.getId())
-                        .setDeptId(dept.getId());
+                        .setDeptId(deptId);
                 deptUserMapper.insert(deptUser);
             }
         }
@@ -199,16 +209,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         List<Long> laboratoryIds = editUser.laboratoryIds();
         if (!laboratoryIds.isEmpty()){
             List<Long> doLaboratoryIds = new LambdaQueryChainWrapper<>(laboratoryUserMapper)
-                    .eq(LaboratoryUser::userId, doUserId)
-                    .list().stream().map(LaboratoryUser::laboratoryId).toList();
+                    .eq(LaboratoryUser::getUserId, doUserId)
+                    .list().stream().map(LaboratoryUser::getLaboratoryId).toList();
             boolean labOver = new HashSet<>(doLaboratoryIds).containsAll(laboratoryIds);
             if (!labOver){
                 return R.fail("实验室越权");
             }
             for (Long laboratoryId : laboratoryIds){
                 LaboratoryUser laboratoryUser = new LaboratoryUser()
-                        .userId(user.getId())
-                        .laboratoryId(laboratoryId);
+                        .setUserId(user.getId())
+                        .setLaboratoryId(laboratoryId);
                 laboratoryUserMapper.insert(laboratoryUser);
             }
         }
@@ -233,10 +243,89 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    public R getCurrentUserDetail() {
+        Long doUserId = StpUtil.getLoginIdAsLong();
+        User user = baseMapper.selectById(doUserId);
+        if (user == null) {
+            return R.fail("用户不存在");
+        }
+        UserBizVo userBizVo = userToUserBizVo(user);
+        return R.success(userBizVo,"获取当前用户详情成功");
+    }
+
+    @Override
+    public R login(UserLogin userLogin) {
+        User user = baseMapper.selectOne(
+                new LambdaQueryWrapper<User>().eq(User::getUsername, userLogin.getUsername())
+        );
+        if (user == null) {
+            return R.fail("用户不存在");
+        }
+        if (!user.getPassword().equals(MD5.create()
+                .digestHex(userLogin.getPassword()))){
+            return R.fail("密码错误");
+        }
+        StpUtil.login(user.getId());
+        return R.success("登录成功");
+    }
+
+    @Override
+    public R logout() {
+        StpUtil.logout();
+        return R.success("登出成功");
+    }
+
+    @Override
+    public R visibleTreeVo() {
+        Long doUserId = StpUtil.getLoginIdAsLong();
+        List<User> visible = visible();
+        List<UserBizVo> userBizVos = visible.stream().map(this::userToUserBizVo).toList();
+        return R.success(userBizVos,"获取可见用户树成功");
+    }
+
+    private UserBizVo userToUserBizVo(User user){
+        UserBizVo userBizVo = BeanUtil.copyProperties(user, UserBizVo.class);
+        List<Dept> depts = deptMapper.selectJoinList(
+                new MPJLambdaWrapper<Dept>()
+                        .select(Dept::getId, Dept::getDeptName)
+                        .leftJoin(DeptUser.class,on -> {
+                            on.eq(DeptUser::getUserId, user.getId());
+                            on.eq(DeptUser::getDeptId,Dept::getId);
+                            return on;
+                        })
+        );
+        List<Laboratory> laboratories = laboratoryMapper.selectJoinList(
+                new MPJLambdaWrapper<Laboratory>()
+                        .selectAll(Laboratory.class)
+                        .leftJoin(LaboratoryUser.class,on -> {
+                            on.eq(LaboratoryUser::getUserId, user.getId());
+                            on.eq(LaboratoryUser::getLaboratoryId,Laboratory::getId);
+                            return on;
+                        })
+        );
+        List<UserPermission> userPermissions = userPermissionMapper.selectList(
+                new LambdaQueryWrapper<UserPermission>().eq(UserPermission::userId,user.getId())
+        );
+        List<UserPermissionVo> vos = userPermissions.stream().map(userPermission -> {
+            UserPermissionVo vo = new UserPermissionVo();
+            vo.setPermission(userPermission.permission());
+            vo.setPath(Permissions.pathOf(userPermission.permission()));
+            return vo;
+        }).toList();
+        userBizVo.depts(depts);
+        userBizVo.laboratories(laboratories);
+        userBizVo.permissions(vos);
+        return userBizVo;
+    }
+
+    @Override
     public List<User> visible() {
         Long doUserId = StpUtil.getLoginIdAsLong();
+        User self = baseMapper.selectById(doUserId);
         List<User> users = this.lambdaQuery().eq(User::getCreateBy, doUserId).list();
-        return dfs(users, new ArrayList<>());
+        List<User> res = dfs(users, new ArrayList<>());
+        res.add(self);
+        return res;
     }
 
     private List<User> dfs(List<User> users, List<User> res){

@@ -2,7 +2,7 @@ package xyz.jasenon.lab.service.strategy.device.ex;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import xyz.jasenon.lab.common.dto.command.CommandLine;
+import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.AirCondition;

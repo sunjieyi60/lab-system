@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import xyz.jasenon.lab.common.dto.command.SendType;
+import xyz.jasenon.lab.common.command.SendType;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.service.strategy.task.TaskSendFactory;
 import xyz.jasenon.lab.service.strategy.task.TaskSendProperties;

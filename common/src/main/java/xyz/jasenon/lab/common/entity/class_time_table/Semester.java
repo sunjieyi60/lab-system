@@ -3,11 +3,13 @@ package xyz.jasenon.lab.common.entity.class_time_table;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.BaseEntity;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@TableName("semester")
 public class Semester extends BaseEntity {
 
     /**

@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 import xyz.jasenon.lab.common.entity.handler.Md5Encrypt;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * @author Jasenon_ce
@@ -14,6 +15,7 @@ import xyz.jasenon.lab.common.entity.handler.Md5Encrypt;
 @Getter
 @Setter
 @Accessors(chain = true)
+@TableName("user")
 public class User extends BaseEntity {
 
     /**

@@ -1,34 +1,42 @@
-package xyz.jasenon.lab.common.entity.device.gateway;
+package xyz.jasenon.lab.service.dto.gateway;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import xyz.jasenon.lab.common.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * @author Jasenon_ce
+ * @date 2025/11/28
+ */
 @Getter
 @Setter
-@TableName("rs485_gateway")
-@Accessors(chain = true)
-public class RS485Gateway extends BaseEntity {
+@Accessors(fluent = true)
+public class CreateRS485Gateway {
 
     /**
      * 网关名称
      */
+    @NotBlank
     private String gatewayName;
 
     /**
-     * 网关订阅消息的主题
+     * 发送主题
      */
+    @NotBlank
     private String sendTopic;
 
     /**
-     * 网关发送消息的主题
+     * 接收主题
      */
+    @NotBlank
     private String acceptTopic;
 
     /**
      * 所属实验室ID
      */
+    @NotNull
     private Long belongToLaboratoryId;
+
 }

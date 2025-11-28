@@ -3,10 +3,12 @@ package xyz.jasenon.lab.common.entity.class_time_table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 @Getter
 @Setter
 @Accessors(fluent = true)
+@TableName("course_schedule")
 public class CourseSchedule extends Schedule {
 
     /**

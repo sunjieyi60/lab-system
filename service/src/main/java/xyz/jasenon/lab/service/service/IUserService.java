@@ -6,6 +6,7 @@ import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.user.CreateUser;
 import xyz.jasenon.lab.service.dto.user.DeleteUser;
 import xyz.jasenon.lab.service.dto.user.EditUser;
+import xyz.jasenon.lab.service.dto.user.UserLogin;
 
 import java.util.List;
 
@@ -20,6 +21,14 @@ public interface IUserService extends IService<User> {
     R editUser(EditUser editUser);
 
     R deleteUser(DeleteUser deleteUser);
+
+    R getCurrentUserDetail();
+
+    R login(UserLogin userLogin);
+
+    R logout();
+
+    R visibleTreeVo();
 
     List<User> visible();
 

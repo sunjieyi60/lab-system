@@ -1,0 +1,23 @@
+package xyz.jasenon.lab.service.dto.gateway;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+/**
+ * @author Jasenon_ce
+ * @date 2025/11/28
+ */
+@Getter
+@Setter
+@Accessors(fluent = true)
+public class DeleteRS485Gateway {
+
+    /**
+     * 网关id
+     */
+    @NotNull
+    private Long rs485GatewayId;
+
+}

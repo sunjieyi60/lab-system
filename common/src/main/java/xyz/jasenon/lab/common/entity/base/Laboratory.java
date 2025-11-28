@@ -6,12 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Accessors(fluent = true)
+@TableName("laboratory")
 public class Laboratory extends BaseEntity {
 
     /**
