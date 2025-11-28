@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 
 import java.time.LocalTime;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Accessors(fluent = true)
 public class Schedule extends BaseEntity {
 
     /**
