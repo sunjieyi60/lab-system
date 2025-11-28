@@ -6,6 +6,8 @@ import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.strategy.task.TaskDispatch;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/28
@@ -34,6 +36,8 @@ public abstract class DeviceCreateStrategy<M extends BaseMapper<T>,T> {
         startPolling(device);
         return R.success("创建设备成功");
     }
+
+    public abstract R<List<T>> list();
 
     protected abstract void startPolling(T t);
 
