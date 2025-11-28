@@ -1,0 +1,13 @@
+package xyz.jasenon.lab.service.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+import xyz.jasenon.lab.common.entity.device.Device;
+
+/**
+ * @author Jasenon_ce
+ * @date 2025/11/28
+ */
+@Mapper
+public interface DeviceMapper extends BaseMapper<Device> {
+}

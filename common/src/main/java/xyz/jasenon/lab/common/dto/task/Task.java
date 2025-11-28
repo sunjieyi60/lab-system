@@ -1,12 +1,15 @@
 package xyz.jasenon.lab.common.dto.task;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.dto.command.CommandLine;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Task implements Comparable<Task> {
 
     /**

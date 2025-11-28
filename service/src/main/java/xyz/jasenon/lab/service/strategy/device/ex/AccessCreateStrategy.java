@@ -1,0 +1,64 @@
+package xyz.jasenon.lab.service.strategy.device.ex;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import xyz.jasenon.lab.common.dto.command.CommandLine;
+import xyz.jasenon.lab.common.dto.task.Task;
+import xyz.jasenon.lab.common.dto.task.TaskPriority;
+import xyz.jasenon.lab.common.entity.device.Access;
+import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.service.dto.device.CreateAccess;
+import xyz.jasenon.lab.service.dto.device.CreateDevice;
+import xyz.jasenon.lab.service.mapper.AccessMapper;
+import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
+import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+/**
+ * @author Jasenon_ce
+ * @date 2025/11/28
+ */
+@Component
+@Slf4j
+public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Access> {
+
+    public AccessCreateStrategy(AccessMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+        super(deviceMapper,pollingScheduleExecutorPool);
+    }
+
+    @Override
+    protected void register() {
+        DeviceCreateFactory.registerDeviceCreateStrategy(DeviceType.Access,this);
+    }
+
+    @Override
+    protected void afterPropertiesSet() {
+        log.info("AccessCreateStrategy registered");
+    }
+
+    @Override
+    protected Access createDevice(CreateDevice createDevice) {
+        CreateAccess createAccess = (CreateAccess) createDevice;
+        Access access = (Access) new Access()
+                .setAddress(createAccess.address())
+                .setSelfId(createAccess.selfId())
+                .setRs485GatewayId(createAccess.rs485GatewayId())
+                .setIsLock(false)
+                .setBelongToLaboratoryId(createAccess.getBelongToLaboratoryId())
+                .setDeviceName(createAccess.getDeviceName())
+                .setDeviceType(createAccess.getDeviceType());
+        return access;
+    }
+
+    @Override
+    protected void startPolling(Access access) {
+        Task task = new Task();
+        task.setDeviceId(access.getId());
+        task.setPriority(TaskPriority.AUTOMATIC);
+        task.setDeviceType(DeviceType.Access);
+        task.setCommandLine(CommandLine.REQUEST_ACCESS_DATA);
+        task.setArgs(new Integer[]{access.getAddress(), access.getSelfId()});
+        Runnable pollingTask = pollingTask(task);
+        pollingScheduleExecutorPool.submit(pollingTask);
+    }
+}

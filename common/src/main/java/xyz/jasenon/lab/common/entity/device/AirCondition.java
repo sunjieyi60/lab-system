@@ -40,4 +40,9 @@ public class AirCondition extends Device {
      * 机组id
      */
     private String groupId = UUID.randomUUID().toString();
+
+    /**
+     * 是否锁定
+     */
+    private Boolean isLock;
 }
