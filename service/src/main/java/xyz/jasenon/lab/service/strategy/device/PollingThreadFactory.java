@@ -20,6 +20,7 @@ public class PollingThreadFactory implements ThreadFactory {
         thread.setName("polling-thread-" + index.incrementAndGet());
         thread.setUncaughtExceptionHandler((t, e) -> {
             log.error("Uncaught exception in polling thread: ", e);
+            t.interrupt();
         });
         return thread;
     }

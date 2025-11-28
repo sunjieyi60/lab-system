@@ -19,4 +19,6 @@ public interface ILaboratoryService extends IService<Laboratory> {
 
     R deleteLaboratory(DeleteLaboratory deleteLaboratory);
 
+    List<Laboratory> listAll();
+
 }

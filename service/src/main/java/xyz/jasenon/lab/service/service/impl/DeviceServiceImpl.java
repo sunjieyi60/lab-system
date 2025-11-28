@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
 import xyz.jasenon.lab.common.entity.base.LaboratoryUser;
 import xyz.jasenon.lab.common.entity.device.Device;
+import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.common.entity.device.gateway.SocketGateway;
 import xyz.jasenon.lab.common.utils.R;
@@ -18,10 +19,12 @@ import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.mapper.RS485GatewayMapper;
 import xyz.jasenon.lab.service.mapper.SocketGatewayMapper;
 import xyz.jasenon.lab.service.service.IDeviceService;
+import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.vo.Rs485GatewayVo;
 import xyz.jasenon.lab.service.vo.SocketGatewayVo;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,6 +106,16 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
                         )
         );
         return laboratoryList;
+    }
+
+    @Override
+    public R<List<Device>> listDevice(List<Long> laboratoryIds, DeviceType deviceType) {
+        List<Long> laboratoryIdsVisible = getVisibleLaboratories().stream().map(l->l.getId()).toList();
+        boolean isOver = !new HashSet<>(laboratoryIdsVisible).containsAll(laboratoryIds);
+        if(isOver){
+            return R.fail("查询越权!");
+        }
+        return R.success(DeviceCreateFactory.getDeviceCreateStrategy(deviceType).list(laboratoryIds));
     }
 
 }

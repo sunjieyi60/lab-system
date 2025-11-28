@@ -51,7 +51,7 @@ public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Acc
     }
 
     @Override
-    protected void startPolling(Access access) {
+    public void startPolling(Access access) {
         Task task = new Task();
         task.setDeviceId(access.getId());
         task.setPriority(TaskPriority.AUTOMATIC);

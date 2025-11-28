@@ -64,16 +64,16 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         laboratoryManagerMapper.insert(laboratoryManager);
 
         LaboratoryUser laboratoryUser = new LaboratoryUser()
-                .laboratoryId(laboratory.getId())
-                .userId(doUserId);
+                .setLaboratoryId(laboratory.getId())
+                .setUserId(doUserId);
         laboratoryUserMapper.insert(laboratoryUser);
 
         User user = userMapper.selectById(doUserId);
         List<User> fathers = fathers(user, new ArrayList<>());
         for(User father : fathers){
             LaboratoryUser fzUser = new LaboratoryUser()
-                    .laboratoryId(laboratory.getId())
-                    .userId(father.getId());
+                    .setLaboratoryId(laboratory.getId())
+                    .setUserId(father.getId());
             laboratoryUserMapper.insert(fzUser);
         }
         return R.success("创建成功");
@@ -130,5 +130,10 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
             fathers(father, result);
         }
         return result;
+    }
+
+    @Override
+    public List<Laboratory> listAll() {
+        return this.list();
     }
 }

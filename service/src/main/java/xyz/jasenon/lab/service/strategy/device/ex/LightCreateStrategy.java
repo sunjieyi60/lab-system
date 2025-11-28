@@ -49,7 +49,7 @@ public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light
     }
 
     @Override
-    protected void startPolling(Light light) {
+    public void startPolling(Light light) {
         Task task = new Task();
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setDeviceId(light.getId());

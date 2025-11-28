@@ -50,7 +50,7 @@ public class SensorCreateStrategy extends DeviceCreateStrategy<SensorMapper, Sen
     }
 
     @Override
-    protected void startPolling(Sensor sensor) {
+    public void startPolling(Sensor sensor) {
         Task task = new Task();
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setDeviceId(sensor.getId());

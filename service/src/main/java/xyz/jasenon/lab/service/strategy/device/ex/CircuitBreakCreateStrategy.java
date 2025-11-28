@@ -48,7 +48,7 @@ public class CircuitBreakCreateStrategy extends DeviceCreateStrategy<CircuitBrea
     }
 
     @Override
-    protected void startPolling(CircuitBreak circuitBreak) {
+    public void startPolling(CircuitBreak circuitBreak) {
         Task task = new Task();
         task.setDeviceType(DeviceType.CircuitBreak);
         task.setDeviceId(circuitBreak.getId());
