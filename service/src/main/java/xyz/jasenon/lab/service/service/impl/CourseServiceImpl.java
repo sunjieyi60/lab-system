@@ -12,6 +12,8 @@ import xyz.jasenon.lab.service.dto.course.EditCourse;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/27
@@ -59,5 +61,10 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         BeanUtil.copyProperties(edit, course, copyOptions);
         this.updateById(course);
         return R.success("课程修改成功");
+    }
+
+    @Override
+    public R<List<Course>> listCourse() {
+        return R.success(list());
     }
 }

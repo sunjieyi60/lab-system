@@ -1,16 +1,24 @@
 package xyz.jasenon.lab.service.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule;
+import xyz.jasenon.lab.common.entity.base.Laboratory;
+import xyz.jasenon.lab.common.entity.class_time_table.*;
 import xyz.jasenon.lab.service.mapper.CourseScheduleMapper;
+import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
-import xyz.jasenon.lab.common.entity.class_time_table.WeekType;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateCourseSchedule;
 import xyz.jasenon.lab.service.dto.course.DeleteCourseSchedule;
+import xyz.jasenon.lab.service.vo.CourseScheduleVo;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Jasenon_ce
@@ -24,6 +32,9 @@ import java.util.List;
  */
 @Service
 public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper, CourseSchedule> implements ICourseScheduleService {
+
+    @Autowired
+    private LaboratoryMapper laboratoryMapper;
 
     @Override
     public R createCourseSchedule(CreateCourseSchedule createCourseSchedule) {
@@ -67,6 +78,39 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         }
         this.removeById(deleteCourseSchedule.getCourseScheduleId());
         return R.success("课程表删除成功");
+    }
+
+    @Override
+    public R<Map<Long, List<CourseScheduleVo>>> listCourseSchedule(List<Long> laboratoryIds) {
+        List<CourseScheduleVo> all = new ArrayList<>();
+        for (Long laboratoryId : laboratoryIds) {
+            List<CourseScheduleVo> list = baseMapper.selectJoinList(CourseScheduleVo.class,
+                    new MPJLambdaWrapper<CourseSchedule>()
+                            .selectAll(CourseSchedule.class)
+                            .selectAs(Course::getId, CourseScheduleVo::getCourseId)
+                            .selectAs(Course::getCourseName, CourseScheduleVo::getCourseName)
+                            .selectAs(Teacher::getId, CourseScheduleVo::getTeacherId)
+                            .selectAs(Teacher::getTeacherName, CourseScheduleVo::getTeacherName)
+                            .selectAs(Semester::getId, CourseScheduleVo::getSemesterId)
+                            .selectAs(Semester::getName, CourseScheduleVo::getSemesterName)
+                            .selectAs(Laboratory::getId, CourseScheduleVo::getLaboratoryId)
+                            .selectAs(Laboratory::getLaboratoryName, CourseScheduleVo::getLaboratoryName)
+                            .leftJoin(Course.class, Course::getId, CourseSchedule::getCourseId)
+                            .leftJoin(Teacher.class, Teacher::getId, CourseSchedule::getTeacherId)
+                            .leftJoin(Semester.class, Semester::getId, CourseSchedule::getSemesterId)
+                            .leftJoin(Laboratory.class, Laboratory::getId, CourseSchedule::getLaboratoryId)
+                            .eq(CourseSchedule::getLaboratoryId, laboratoryId)
+            );
+            all.addAll(list);
+        }
+        Map<Long, List<CourseScheduleVo>> map = all.stream().collect(Collectors.toMap(CourseScheduleVo::getLaboratoryId, List::of));
+        return R.success(map,"获取成功");
+    }
+
+    @Override
+    public R<List<Laboratory>> listLaboratory() {
+        List<Laboratory> lists = laboratoryMapper.selectList(new LambdaQueryWrapper<Laboratory>());
+        return R.success(lists,"获取成功");
     }
 
     /**

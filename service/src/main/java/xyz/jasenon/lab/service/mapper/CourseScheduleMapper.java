@@ -1,6 +1,6 @@
 package xyz.jasenon.lab.service.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.yulichang.base.MPJBaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule;
 
@@ -10,6 +10,6 @@ import xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule;
  * @date 2025/9/18
  */
 @Mapper
-public interface CourseScheduleMapper extends BaseMapper<CourseSchedule> {
+public interface CourseScheduleMapper extends MPJBaseMapper<CourseSchedule> {
 
 }

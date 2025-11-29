@@ -9,6 +9,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -32,10 +33,10 @@ public class MyBatisPlusConfig implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        Date date = new Date();
-        this.strictInsertFill(metaObject, "createTime", Date.class, date);
-        this.strictInsertFill(metaObject, "updateTime", Date.class, date);
-        this.strictInsertFill(metaObject, "delFlag", Boolean.class, false);
+       LocalDateTime now = LocalDateTime.now();
+        this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
+        this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
+        this.strictInsertFill(metaObject, "deleted", Boolean.class, false);
 
     }
 

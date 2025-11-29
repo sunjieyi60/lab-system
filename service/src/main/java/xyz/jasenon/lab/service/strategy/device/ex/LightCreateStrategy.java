@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Light;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateLight;
 import xyz.jasenon.lab.service.mapper.LightMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -46,6 +49,11 @@ public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light
                 .setDeviceType(createLight.getDeviceType())
                 .setBelongToLaboratoryId(createLight.getBelongToLaboratoryId());
         return light;
+    }
+
+    @Override
+    public R<List<Light>> list() {
+        return null;
     }
 
     @Override

@@ -12,6 +12,8 @@ import xyz.jasenon.lab.service.dto.course.EditSemester;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/27
@@ -59,5 +61,10 @@ public class SemesterServiceImpl extends ServiceImpl<SemesterMapper, Semester> i
         BeanUtil.copyProperties(edit, semester, copyOptions);
         this.updateById(semester);
         return R.success("学期修改成功");
+    }
+
+    @Override
+    public R<List<Semester>> listSemester() {
+        return R.success(list());
     }
 }

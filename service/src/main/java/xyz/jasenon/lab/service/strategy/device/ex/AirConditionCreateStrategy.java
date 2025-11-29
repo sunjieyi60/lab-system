@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.AirCondition;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateAirCondition;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.AirConditionMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -53,6 +56,11 @@ public class AirConditionCreateStrategy extends DeviceCreateStrategy<AirConditio
                 .setDeviceType(createAirCondition.getDeviceType())
                 .setBelongToLaboratoryId(createAirCondition.getBelongToLaboratoryId());
         return airCondition;
+    }
+
+    @Override
+    public R<List<AirCondition>> list() {
+        return null;
     }
 
     @Override

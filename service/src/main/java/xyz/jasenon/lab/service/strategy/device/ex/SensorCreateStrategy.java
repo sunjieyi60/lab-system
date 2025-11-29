@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Sensor;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateSensor;
 import xyz.jasenon.lab.service.mapper.SensorMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -47,6 +50,11 @@ public class SensorCreateStrategy extends DeviceCreateStrategy<SensorMapper, Sen
                 .setDeviceType(createSensor.getDeviceType())
                 .setBelongToLaboratoryId(createSensor.getBelongToLaboratoryId());
         return sensor;
+    }
+
+    @Override
+    public R<List<Sensor>> list() {
+        return null;
     }
 
     @Override

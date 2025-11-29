@@ -32,6 +32,9 @@ public enum Permissions {
     ACADEMIC_AFFAIRS_ANALYSIS("教务数据",DATA_ANALYSIS.id,16),
     LABORATORY_POWER_CONSUMPTION("实验室能耗数据",DATA_ANALYSIS.id,17),
     LABORATORY_CENTRAL_AIRCONDITION("实验室中央空调数据",DATA_ANALYSIS.id,18),
+    BASE_SETTINGS("基础设置",ROOT.id,19),
+    BASE_CUD("增加、删除、修改",BASE_SETTINGS.id,20),
+    BASE_VIEW("查看",BASE_SETTINGS.id,21),
     ;
 
     private final String description;
