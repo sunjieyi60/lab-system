@@ -51,12 +51,12 @@ public class CircuitBreakCreateStrategy extends DeviceCreateStrategy<CircuitBrea
     }
 
     @Override
-    public R<List<CircuitBreak>> list() {
+    public List<CircuitBreak> list(List<Long> laboratoryIds) {
         return null;
     }
 
     @Override
-    protected void startPolling(CircuitBreak circuitBreak) {
+    public void startPolling(CircuitBreak circuitBreak) {
         Task task = new Task();
         task.setDeviceType(DeviceType.CircuitBreak);
         task.setDeviceId(circuitBreak.getId());

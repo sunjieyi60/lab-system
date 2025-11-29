@@ -31,7 +31,7 @@ public class DeviceController {
     @RequestPermission(allowed = {Permissions.DEVICE_ADD})
     @PostMapping("/create")
     @Operation(summary = "创建设备", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateAirCondition", value = "{\n  \"deviceType\": \"AirCondition\",\n  \"address\": 35,\n  \"selfId\": 1,\n  \"rs485GatewayId\": 5,\n  \"socketGatewayId\": null,\n  \"belongToLaboratoryId\": 101\n}")))
+            examples = @ExampleObject(name = "CreateAirCondition", value = "{\n  \"deviceType\": \"AirCondition\",\n  \"address\": 35,\n  \"selfId\": 1,\n  \"rs485GatewayId\": 5,\n  \"socketGatewayId\": null,\n  \"belongToLaboratoryId\": 101\n}"))))
     public R createDevice(@RequestBody CreateDevice createDevice){
         return DeviceCreateFactory.getDeviceCreateStrategy(createDevice.getDeviceType())
                 .insertDevice(createDevice);
@@ -46,7 +46,7 @@ public class DeviceController {
     @RequestPermission(allowed = {Permissions.DEVICE_CONTROL})
     @PostMapping("/control")
     @Operation(summary = "下发设备控制任务", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "ControlLight", value = "{\n  \"priority\": \"NORMAL\",\n  \"deviceType\": \"Light\",\n  \"deviceId\": 1001,\n  \"commandLine\": \"OPEN_LIGHT\",\n  \"args\": [41, 1]\n}")))
+            examples = @ExampleObject(name = "ControlLight", value = "{\n  \"priority\": \"NORMAL\",\n  \"deviceType\": \"Light\",\n  \"deviceId\": 1001,\n  \"commandLine\": \"OPEN_LIGHT\",\n  \"args\": [41, 1]\n}"))))
     public R controlDevice(@RequestBody Task task){
         TaskDispatch.dispatch(task);
         return R.success("控制任务下达成功");

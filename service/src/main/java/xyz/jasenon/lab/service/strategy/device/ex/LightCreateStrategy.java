@@ -52,12 +52,12 @@ public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light
     }
 
     @Override
-    public R<List<Light>> list() {
+    public List<Light> list(List<Long> laboratoryIds) {
         return null;
     }
 
     @Override
-    protected void startPolling(Light light) {
+    public void startPolling(Light light) {
         Task task = new Task();
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setDeviceId(light.getId());

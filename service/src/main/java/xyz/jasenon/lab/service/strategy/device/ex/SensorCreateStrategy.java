@@ -53,12 +53,12 @@ public class SensorCreateStrategy extends DeviceCreateStrategy<SensorMapper, Sen
     }
 
     @Override
-    public R<List<Sensor>> list() {
+    public List<Sensor> list(List<Long> laboratoryIds) {
         return null;
     }
 
     @Override
-    protected void startPolling(Sensor sensor) {
+    public void startPolling(Sensor sensor) {
         Task task = new Task();
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setDeviceId(sensor.getId());

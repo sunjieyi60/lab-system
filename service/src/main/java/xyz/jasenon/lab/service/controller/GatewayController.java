@@ -34,7 +34,7 @@ public class GatewayController {
     @RequestPermission(allowed = {Permissions.DEVICE_ADD})
     @PostMapping("/create/rs485")
     @Operation(summary = "创建RS485网关", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateRS485Gateway", value = "{\n  \"gatewayName\": \"RS485-GW-A\",\n  \"sendTopic\": \"lab/rs485/send\",\n  \"acceptTopic\": \"lab/rs485/accept\",\n  \"belongToLaboratoryId\": 101\n}")))
+            examples = @ExampleObject(name = "CreateRS485Gateway", value = "{\n  \"gatewayName\": \"RS485-GW-A\",\n  \"sendTopic\": \"lab/rs485/send\",\n  \"acceptTopic\": \"lab/rs485/accept\",\n  \"belongToLaboratoryId\": 101\n}"))))
     public R createRS485Gateway(@RequestBody CreateRS485Gateway createRS485Gateway) {
         return rs485GatewayService.createRS485Gateway(createRS485Gateway);
     }
@@ -42,7 +42,7 @@ public class GatewayController {
     @RequestPermission(allowed = {Permissions.DEVICE_ADD})
     @PostMapping("/create/socket")
     @Operation(summary = "创建Socket网关", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateSocketGateway", value = "{\n  \"gatewayName\": \"Socket-GW-A\",\n  \"mac\": \"00-11-22-33-44-55\",\n  \"belongToLaboratoryId\": 101\n}")))
+            examples = @ExampleObject(name = "CreateSocketGateway", value = "{\n  \"gatewayName\": \"Socket-GW-A\",\n  \"mac\": \"00-11-22-33-44-55\",\n  \"belongToLaboratoryId\": 101\n}"))))
     public R createSocketGateway(@RequestBody CreateSocketGateway createSocketGateway) {
         return socketGatewayService.createSocketGateway(createSocketGateway);
     }

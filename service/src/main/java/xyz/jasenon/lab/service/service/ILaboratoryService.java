@@ -1,5 +1,7 @@
 package xyz.jasenon.lab.service.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
 import xyz.jasenon.lab.common.utils.R;

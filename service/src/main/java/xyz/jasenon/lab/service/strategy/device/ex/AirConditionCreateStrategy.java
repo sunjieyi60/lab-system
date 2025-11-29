@@ -1,21 +1,21 @@
 package xyz.jasenon.lab.service.strategy.device.ex;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.AirCondition;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateAirCondition;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.AirConditionMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
-
-import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -42,7 +42,7 @@ public class AirConditionCreateStrategy extends DeviceCreateStrategy<AirConditio
     @Override
     protected AirCondition createDevice(CreateDevice createDevice) {
         CreateAirCondition createAirCondition = (CreateAirCondition) createDevice;
-        boolean mustHaveOneGateway = createAirCondition.getRs485GatewayId()!=null || createAirCondition.getSocketGatewayId()!=null;
+        boolean mustHaveOneGateway = createAirCondition.getRs485GatewayId()!=null || createAirCondition.socketGatewayId()!=null;
         if (!mustHaveOneGateway) {
             throw new IllegalArgumentException("rs485GatewayId or socketGatewayId must be set");
         }
@@ -59,12 +59,12 @@ public class AirConditionCreateStrategy extends DeviceCreateStrategy<AirConditio
     }
 
     @Override
-    public R<List<AirCondition>> list() {
+    public List<AirCondition> list(List<Long> laboratoryIds) {
         return null;
     }
 
     @Override
-    protected void startPolling(AirCondition airCondition) {
+    public void startPolling(AirCondition airCondition) {
         Task task = new Task();
         if (airCondition.getRs485GatewayId() != null){
             task.setPriority(TaskPriority.AUTOMATIC);

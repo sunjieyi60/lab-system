@@ -29,7 +29,7 @@ public class DeptController {
     @RequestPermission(allowed = {Permissions.BASE_CUD})
     @PostMapping("/create")
     @Operation(summary = "创建部门", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateDept", value = "{\n  \"deptName\": \"理学院\"\n}")))
+            examples = @ExampleObject(name = "CreateDept", value = "{\n  \"deptName\": \"理学院\"\n}"))))
     public R createDept(@RequestBody CreateDept createDept){
         return deptService.createDept(createDept);
     }

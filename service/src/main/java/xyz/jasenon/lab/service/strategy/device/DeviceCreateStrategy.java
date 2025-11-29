@@ -41,9 +41,9 @@ public abstract class DeviceCreateStrategy<M extends BaseMapper<T>,T extends Dev
         return R.success("创建设备成功");
     }
 
-    public abstract List<T> list(List<Long> laboratoryId);
+    public abstract List<T> list(List<Long> laboratoryIds);
 
-    protected abstract void startPolling(T t);
+    public abstract void startPolling(T t);
 
     protected Runnable pollingTask(Task task){
         return () ->{
