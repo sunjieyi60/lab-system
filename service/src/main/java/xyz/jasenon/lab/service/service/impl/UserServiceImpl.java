@@ -51,11 +51,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Transactional(rollbackFor = Exception.class)
     public R createUser(CreateUser createUser) {
 
-        String username = createUser.username();
-        String password = createUser.password();
-        String realName = createUser.realName();
-        String email = createUser.email();
-        String phone = createUser.phone();
+        String username = createUser.getUsername();
+        String password = createUser.getPassword();
+        String realName = createUser.getRealName();
+        String email = createUser.getEmail();
+        String phone = createUser.getPhone();
         Long createBy = StpUtil.getLoginIdAsLong();
 
         User target = baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
@@ -73,12 +73,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         this.save(user);
 
         // 分配权限
-        List<Permissions> permissions = createUser.permissions();
+        List<Permissions> permissions = createUser.getPermissions();
         if (!permissions.isEmpty()){
             List<Permissions> doUserPermissions = new LambdaQueryChainWrapper<>(userPermissionMapper)
-                    .eq(UserPermission::userId, createBy)
+                    .eq(UserPermission::getUserId, createBy)
                     .list()
-                    .stream().map(UserPermission::permission).toList();
+                    .stream().map(UserPermission::getPermission).toList();
 
             // 是否越权，当前用户只能将自己拥有的权限赋予给其他用户
             boolean pmOver = new HashSet<>(doUserPermissions).containsAll(permissions);
@@ -87,14 +87,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
             for (Permissions permission : permissions){
                 UserPermission userPermission = new UserPermission()
-                        .permission(permission)
-                        .userId(user.getId());
+                        .setPermission(permission)
+                        .setUserId(user.getId());
                 userPermissionMapper.insert(userPermission);
             }
         }
 
         // 分配部门
-        List<Long> deptIds = createUser.deptIds();
+        List<Long> deptIds = createUser.getDeptIds();
         if (!deptIds.isEmpty()){
             List<Long> doDeptIds = new LambdaQueryChainWrapper<>(deptUserMapper)
                     .eq(DeptUser::getUserId, createBy)
@@ -112,7 +112,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         // 分配实验室
-        List<Long> laboratoryIds = createUser.laboratoryIds();
+        List<Long> laboratoryIds = createUser.getLaboratoryIds();
         if (!laboratoryIds.isEmpty()){
             List<Long> doLaboratoryIds = new LambdaQueryChainWrapper<>(laboratoryUserMapper)
                     .eq(LaboratoryUser::getUserId, createBy)
@@ -136,21 +136,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         Long doUserId = StpUtil.getLoginIdAsLong();
         List<User> visible = visible();
-        boolean isVisible = visible.stream().anyMatch(user -> user.getId().equals(editUser.userId()));
+        boolean isVisible = visible.stream().anyMatch(user -> user.getId().equals(editUser.getUserId()));
 
         if (!isVisible){
             return R.fail("无权编辑该用户");
         }
 
-        User user = baseMapper.selectById(editUser.userId());
+        User user = baseMapper.selectById(editUser.getUserId());
         if (user == null) {
             return R.fail("用户不存在");
         }
         User edit = new User()
-                .setPassword(editUser.password())
-                .setPhone(editUser.phone())
-                .setRealName(editUser.realName())
-                .setEmail(editUser.email());
+                .setPassword(editUser.getPassword())
+                .setPhone(editUser.getPhone())
+                .setRealName(editUser.getRealName())
+                .setEmail(editUser.getEmail());
 
         CopyOptions copyOptions = CopyOptions.create()
                 .setIgnoreProperties("id", "createTime")
@@ -164,15 +164,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         laboratoryUserMapper.delete(new LambdaQueryWrapper<LaboratoryUser>()
                 .eq(LaboratoryUser::getUserId,user.getId()));
         userPermissionMapper.delete(new LambdaQueryWrapper<UserPermission>()
-                .eq(UserPermission::userId,user.getId()));
+                .eq(UserPermission::getUserId, user.getId()));
 
         // 分配权限
-        List<Permissions> permissions = editUser.permissions();
+        List<Permissions> permissions = editUser.getPermissions();
         if (!permissions.isEmpty()){
             List<Permissions> doUserPermissions = new LambdaQueryChainWrapper<>(userPermissionMapper)
-                    .eq(UserPermission::userId, doUserId)
+                    .eq(UserPermission::getUserId, doUserId)
                     .list()
-                    .stream().map(UserPermission::permission).toList();
+                    .stream().map(UserPermission::getPermission).toList();
 
             // 是否越权，当前用户只能将自己拥有的权限赋予给其他用户
             boolean pmOver = new HashSet<>(doUserPermissions).containsAll(permissions);
@@ -181,14 +181,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
             for (Permissions permission : permissions){
                 UserPermission userPermission = new UserPermission()
-                        .permission(permission)
-                        .userId(user.getId());
+                        .setPermission(permission)
+                        .setUserId(user.getId());
                 userPermissionMapper.insert(userPermission);
             }
         }
 
         // 分配部门
-        List<Long> deptIds = editUser.deptIds();
+        List<Long> deptIds = editUser.getDeptIds();
         if (!deptIds.isEmpty()){
             List<Long> doDeptIds = new LambdaQueryChainWrapper<>(deptUserMapper)
                     .eq(DeptUser::getUserId, doUserId)
@@ -206,7 +206,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         // 分配实验室
-        List<Long> laboratoryIds = editUser.laboratoryIds();
+        List<Long> laboratoryIds = editUser.getLaboratoryIds();
         if (!laboratoryIds.isEmpty()){
             List<Long> doLaboratoryIds = new LambdaQueryChainWrapper<>(laboratoryUserMapper)
                     .eq(LaboratoryUser::getUserId, doUserId)
@@ -230,11 +230,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public R deleteUser(DeleteUser deleteUser) {
         Long doUserId = StpUtil.getLoginIdAsLong();
         List<User> visible = visible();
-        boolean isVisible = visible.stream().anyMatch(user -> user.getId().equals(deleteUser.userId()));
+        boolean isVisible = visible.stream().anyMatch(user -> user.getId().equals(deleteUser.getUserId()));
         if (!isVisible){
             return R.fail("无权删除该用户");
         }
-        User user = baseMapper.selectById(deleteUser.userId());
+        User user = baseMapper.selectById(deleteUser.getUserId());
         if (user == null) {
             return R.fail("用户不存在");
         }
@@ -304,17 +304,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         })
         );
         List<UserPermission> userPermissions = userPermissionMapper.selectList(
-                new LambdaQueryWrapper<UserPermission>().eq(UserPermission::userId,user.getId())
+                new LambdaQueryWrapper<UserPermission>().eq(UserPermission::getUserId, user.getId())
         );
         List<UserPermissionVo> vos = userPermissions.stream().map(userPermission -> {
             UserPermissionVo vo = new UserPermissionVo();
-            vo.setPermission(userPermission.permission());
-            vo.setPath(Permissions.pathOf(userPermission.permission()));
+            vo.setPermission(userPermission.getPermission());
+            vo.setPath(Permissions.pathOf(userPermission.getPermission()));
             return vo;
         }).toList();
-        userBizVo.depts(depts);
-        userBizVo.laboratories(laboratories);
-        userBizVo.permissions(vos);
+        userBizVo.setDepts(depts);
+        userBizVo.setLaboratories(laboratories);
+        userBizVo.setPermissions(vos);
         return userBizVo;
     }
 

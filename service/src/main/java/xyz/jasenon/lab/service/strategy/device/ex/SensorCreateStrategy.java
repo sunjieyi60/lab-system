@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Sensor;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateSensor;
 import xyz.jasenon.lab.service.mapper.SensorMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -40,9 +43,9 @@ public class SensorCreateStrategy extends DeviceCreateStrategy<SensorMapper, Sen
     protected Sensor createDevice(CreateDevice createDevice) {
         CreateSensor createSensor = (CreateSensor) createDevice;
         Sensor sensor = (Sensor) new Sensor()
-                .setAddress(createSensor.address())
-                .setSelfId(createSensor.selfId())
-                .setRs485GatewayId(createSensor.rs485GatewayId())
+                .setAddress(createSensor.getAddress())
+                .setSelfId(createSensor.getSelfId())
+                .setRs485GatewayId(createSensor.getRs485GatewayId())
                 .setDeviceName(createSensor.getDeviceName())
                 .setDeviceType(createSensor.getDeviceType())
                 .setBelongToLaboratoryId(createSensor.getBelongToLaboratoryId());
@@ -50,7 +53,12 @@ public class SensorCreateStrategy extends DeviceCreateStrategy<SensorMapper, Sen
     }
 
     @Override
-    public void startPolling(Sensor sensor) {
+    public R<List<Sensor>> list() {
+        return null;
+    }
+
+    @Override
+    protected void startPolling(Sensor sensor) {
         Task task = new Task();
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setDeviceId(sensor.getId());

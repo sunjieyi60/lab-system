@@ -38,7 +38,7 @@ public class MqttSendClient extends MqttBaseClient{
     public void submitMqttTask(MqttTask mqttTask){
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setQos(mqttClientProperties.getQos());
-        mqttMessage.setPayload(mqttTask.payload());
+        mqttMessage.setPayload(mqttTask.getPayload());
         try {
             if (mqttNx.tryLock()){
                this.publish(topic, mqttMessage);

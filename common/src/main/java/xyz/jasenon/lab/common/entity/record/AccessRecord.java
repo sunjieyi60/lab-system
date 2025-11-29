@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 @TableName("access_record")
 public class AccessRecord extends BaseRecord {
 

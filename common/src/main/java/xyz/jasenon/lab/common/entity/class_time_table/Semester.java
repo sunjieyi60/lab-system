@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@Accessors(chain = true)
 @TableName("semester")
 public class Semester extends BaseEntity {
 

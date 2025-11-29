@@ -34,13 +34,13 @@ public class SensorMessageHandler extends MqttMessageHandler<SensorMapper, Senso
         Integer smoke = Integer.parseInt(Integer.toHexString(payload[11]) + Integer.toHexString(payload[12]), 16);
 
         SensorRecord sensorRecord = (SensorRecord) new SensorRecord()
-                .temperature(temperature)
-                .humidity(humidity)
-                .light(light)
-                .smoke(smoke)
-                .address(address)
-                .selfId(selfId)
-                .rs485Id(rs485Id);
+                .setTemperature(temperature)
+                .setHumidity(humidity)
+                .setLight(light)
+                .setSmoke(smoke)
+                .setAddress(address)
+                .setSelfId(selfId)
+                .setRs485Id(rs485Id);
 
         return sensorRecord;
     }

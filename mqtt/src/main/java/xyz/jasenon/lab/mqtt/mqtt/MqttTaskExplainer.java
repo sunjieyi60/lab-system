@@ -24,8 +24,8 @@ public class MqttTaskExplainer extends TaskExplain<MqttTask> {
         RS485Gateway gateway = rs485GatewayService.getRS485GatewayByGatewayId(airCondition.getRs485GatewayId());
         Assert.notNull(gateway, "找不到对应的网关");
         MqttTask mqttTask = new MqttTask(task)
-                .rs485Id(gateway.getId())
-                .payload(generatePayload(task, airCondition));
+                .setRs485Id(gateway.getId())
+                .setPayload(generatePayload(task, airCondition));
         return mqttTask;
     }
 
@@ -34,8 +34,8 @@ public class MqttTaskExplainer extends TaskExplain<MqttTask> {
         RS485Gateway gateway = rs485GatewayService.getRS485GatewayByGatewayId(light.getRs485GatewayId());
         Assert.notNull(gateway, "找不到对应的网关");
         MqttTask mqttTask = new MqttTask(task)
-                .rs485Id(gateway.getId())
-                .payload(generatePayload(task, light));
+                .setRs485Id(gateway.getId())
+                .setPayload(generatePayload(task, light));
         return mqttTask;
     }
 
@@ -44,8 +44,8 @@ public class MqttTaskExplainer extends TaskExplain<MqttTask> {
         RS485Gateway gateway = rs485GatewayService.getRS485GatewayByGatewayId(sensor.getRs485GatewayId());
         Assert.notNull(gateway, "找不到对应的网关");
         MqttTask mqttTask = new MqttTask(task)
-                .rs485Id(gateway.getId())
-                .payload(generatePayload(task, sensor));
+                .setRs485Id(gateway.getId())
+                .setPayload(generatePayload(task, sensor));
         return mqttTask;
     }
 
@@ -54,8 +54,8 @@ public class MqttTaskExplainer extends TaskExplain<MqttTask> {
         RS485Gateway gateway = rs485GatewayService.getRS485GatewayByGatewayId(access.getRs485GatewayId());
         Assert.notNull(gateway, "找不到对应的网关");
         MqttTask mqttTask = new MqttTask(task)
-                .rs485Id(gateway.getId())
-                .payload(generatePayload(task, access));
+                .setRs485Id(gateway.getId())
+                .setPayload(generatePayload(task, access));
         return mqttTask;
     }
 
@@ -64,8 +64,8 @@ public class MqttTaskExplainer extends TaskExplain<MqttTask> {
         RS485Gateway gateway = rs485GatewayService.getRS485GatewayByGatewayId(circuitBreak.getRs485GatewayId());
         Assert.notNull(gateway, "找不到对应的网关");
         MqttTask mqttTask = new MqttTask(task)
-                .rs485Id(gateway.getId())
-                .payload(generatePayload(task, circuitBreak));
+                .setRs485Id(gateway.getId())
+                .setPayload(generatePayload(task, circuitBreak));
         return mqttTask;
     }
 

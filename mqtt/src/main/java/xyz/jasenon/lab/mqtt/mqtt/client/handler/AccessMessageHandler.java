@@ -51,13 +51,13 @@ public class AccessMessageHandler extends MqttMessageHandler<AccessMapper,Access
         Integer delayTime = (int) payload[6];
 
         AccessRecord accessRecord = (AccessRecord) new AccessRecord()
-                .address(address)
-                .selfId(selfId)
-                .isOpen(isOpen)
-                .isLock(isLcok)
-                .lockStatus(lockStatus)
-                .delayTime(delayTime)
-                .rs485Id(rs485Id);
+                .setAddress(address)
+                .setSelfId(selfId)
+                .setIsOpen(isOpen)
+                .setIsLock(isLcok)
+                .setLockStatus(lockStatus)
+                .setDelayTime(delayTime)
+                .setRs485Id(rs485Id);
 
         return accessRecord;
     }

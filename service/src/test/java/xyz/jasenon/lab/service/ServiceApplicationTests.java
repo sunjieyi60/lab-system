@@ -15,7 +15,7 @@ class ServiceApplicationTests {
 	void contextLoads() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		log.info("permission tree:{}", objectMapper.writeValueAsString(Permissions.treeAll()));
-		log.info("USER_ADD_PATH:{}",Permissions.pathOf(Permissions.PERMISSION_DELETE));
+		log.info("USER_ADD_PATH:{}",Permissions.pathOf(Permissions.DEVICE_CONTROL));
 	}
 
 }

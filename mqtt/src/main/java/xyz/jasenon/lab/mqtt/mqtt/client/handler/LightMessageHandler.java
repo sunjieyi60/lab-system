@@ -27,11 +27,11 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
         Integer selfId = payload[1] & 0xFF;
 
         LightRecord lightRecord = (LightRecord) new LightRecord()
-                .address(address)
-                .selfId(selfId)
-                .isOpen(payload[3] == (byte) 0xff)
-                .isLock(payload[4] == (byte) 0xff)
-                .rs485Id(rs485Id);
+                .setAddress(address)
+                .setSelfId(selfId)
+                .setIsOpen(payload[3] == (byte) 0xff)
+                .setIsLock(payload[4] == (byte) 0xff)
+                .setRs485Id(rs485Id);
 
         return lightRecord;
     }

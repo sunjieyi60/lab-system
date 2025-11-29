@@ -280,8 +280,6 @@ CREATE TABLE IF NOT EXISTS user_permission (
   INDEX idx_up_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 依赖：所有表已存在（来自 db.sql），引擎 InnoDB，字段类型匹配
-
 ALTER TABLE dept_building
   ADD CONSTRAINT fk_dept_building_dept
     FOREIGN KEY (dept_id) REFERENCES dept(id)
@@ -392,5 +390,5 @@ ALTER TABLE user
   ADD CONSTRAINT fk_user_created_by
     FOREIGN KEY (create_by) REFERENCES user(id)
     ON DELETE RESTRICT ON UPDATE CASCADE;
-    
+
 SET FOREIGN_KEY_CHECKS = 1;

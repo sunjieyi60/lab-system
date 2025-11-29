@@ -7,6 +7,8 @@ import xyz.jasenon.lab.service.dto.course.CreateCourse;
 import xyz.jasenon.lab.service.dto.course.DeleteCourse;
 import xyz.jasenon.lab.service.dto.course.EditCourse;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/27
@@ -18,5 +20,7 @@ public interface ICourseService extends IService<Course> {
     R deleteCourse(DeleteCourse deleteCourse);
 
     R editCourse(EditCourse editCourse);
+
+    R<List<Course>> listCourse();
 
 }

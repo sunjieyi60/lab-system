@@ -7,6 +7,8 @@ import xyz.jasenon.lab.service.dto.course.CreateSemester;
 import xyz.jasenon.lab.service.dto.course.DeleteSemester;
 import xyz.jasenon.lab.service.dto.course.EditSemester;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/27
@@ -19,4 +21,5 @@ public interface ISemesterService extends IService<Semester> {
 
     R editSemester(EditSemester editSemester);
 
+    R<List<Semester>> listSemester();
 }

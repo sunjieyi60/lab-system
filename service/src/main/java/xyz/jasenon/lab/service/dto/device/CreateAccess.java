@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class CreateAccess extends CreateDevice {
 
     @NotNull(message = "门禁地址不能为空")

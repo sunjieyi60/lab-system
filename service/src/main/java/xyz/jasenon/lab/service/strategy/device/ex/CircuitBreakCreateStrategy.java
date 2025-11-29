@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.CircuitBreak;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateCircuitBreak;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.CircuitBreakMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -39,8 +42,8 @@ public class CircuitBreakCreateStrategy extends DeviceCreateStrategy<CircuitBrea
     protected CircuitBreak createDevice(CreateDevice createDevice) {
         CreateCircuitBreak createCircuitBreak = (CreateCircuitBreak) createDevice;
         CircuitBreak circuitBreak = (CircuitBreak) new CircuitBreak()
-                .setAddress(createCircuitBreak.address())
-                .setRs485GatewayId(createCircuitBreak.rs485GatewayId())
+                .setAddress(createCircuitBreak.getAddress())
+                .setRs485GatewayId(createCircuitBreak.getRs485GatewayId())
                 .setDeviceName(createCircuitBreak.getDeviceName())
                 .setDeviceType(createCircuitBreak.getDeviceType())
                 .setBelongToLaboratoryId(createCircuitBreak.getBelongToLaboratoryId());
@@ -48,7 +51,12 @@ public class CircuitBreakCreateStrategy extends DeviceCreateStrategy<CircuitBrea
     }
 
     @Override
-    public void startPolling(CircuitBreak circuitBreak) {
+    public R<List<CircuitBreak>> list() {
+        return null;
+    }
+
+    @Override
+    protected void startPolling(CircuitBreak circuitBreak) {
         Task task = new Task();
         task.setDeviceType(DeviceType.CircuitBreak);
         task.setDeviceId(circuitBreak.getId());

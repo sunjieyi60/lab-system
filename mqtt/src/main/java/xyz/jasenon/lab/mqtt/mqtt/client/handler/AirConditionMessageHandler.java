@@ -52,14 +52,14 @@ public class AirConditionMessageHandler
         Integer errorCode = payload[7] & 0xFF;
 
         AirConditionRecord record = new AirConditionRecord()
-                .address(address)
-                .selfId(selfId)
-                .isOpen(isOpen)
-                .mode(mode)
-                .speed(speed)
-                .temperature(temperature)
-                .roomTemperature(roomTemperature)
-                .errorCode(errorCode);
+                .setAddress(address)
+                .setSelfId(selfId)
+                .setIsOpen(isOpen)
+                .setMode(mode)
+                .setSpeed(speed)
+                .setTemperature(temperature)
+                .setRoomTemperature(roomTemperature)
+                .setErrorCode(errorCode);
 
         return record;
     }

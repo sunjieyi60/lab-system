@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.Access;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateAccess;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.AccessMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -40,9 +43,9 @@ public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Acc
     protected Access createDevice(CreateDevice createDevice) {
         CreateAccess createAccess = (CreateAccess) createDevice;
         Access access = (Access) new Access()
-                .setAddress(createAccess.address())
-                .setSelfId(createAccess.selfId())
-                .setRs485GatewayId(createAccess.rs485GatewayId())
+                .setAddress(createAccess.getAddress())
+                .setSelfId(createAccess.getSelfId())
+                .setRs485GatewayId(createAccess.getRs485GatewayId())
                 .setIsLock(false)
                 .setBelongToLaboratoryId(createAccess.getBelongToLaboratoryId())
                 .setDeviceName(createAccess.getDeviceName())
@@ -51,7 +54,12 @@ public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Acc
     }
 
     @Override
-    public void startPolling(Access access) {
+    public R<List<Access>> list() {
+        return null;
+    }
+
+    @Override
+    protected void startPolling(Access access) {
         Task task = new Task();
         task.setDeviceId(access.getId());
         task.setPriority(TaskPriority.AUTOMATIC);

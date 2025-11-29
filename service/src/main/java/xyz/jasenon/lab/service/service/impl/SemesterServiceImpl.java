@@ -12,6 +12,8 @@ import xyz.jasenon.lab.service.dto.course.EditSemester;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/27
@@ -23,9 +25,9 @@ public class SemesterServiceImpl extends ServiceImpl<SemesterMapper, Semester> i
     public R createSemester(CreateSemester createSemester) {
         // 创建学期：参考项目风格，使用流式DTO取值
         Semester semester = new Semester();
-        semester.setName(createSemester.name());
-        semester.setStartDate(createSemester.startDate());
-        semester.setEndDate(createSemester.endDate());
+        semester.setName(createSemester.getName());
+        semester.setStartDate(createSemester.getStartDate());
+        semester.setEndDate(createSemester.getEndDate());
         this.save(semester);
         return R.success("学期创建成功");
     }
@@ -59,5 +61,10 @@ public class SemesterServiceImpl extends ServiceImpl<SemesterMapper, Semester> i
         BeanUtil.copyProperties(edit, semester, copyOptions);
         this.updateById(semester);
         return R.success("学期修改成功");
+    }
+
+    @Override
+    public R<List<Semester>> listSemester() {
+        return R.success(list());
     }
 }

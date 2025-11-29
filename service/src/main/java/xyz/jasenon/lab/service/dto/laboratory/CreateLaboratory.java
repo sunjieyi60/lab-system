@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class CreateLaboratory {
 
     @NotBlank(message = "实验室ID不能为空")

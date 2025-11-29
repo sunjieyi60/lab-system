@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.AirCondition;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateAirCondition;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.AirConditionMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -39,20 +42,25 @@ public class AirConditionCreateStrategy extends DeviceCreateStrategy<AirConditio
     @Override
     protected AirCondition createDevice(CreateDevice createDevice) {
         CreateAirCondition createAirCondition = (CreateAirCondition) createDevice;
-        boolean mustHaveOneGateway = createAirCondition.rs485GatewayId()!=null || createAirCondition.socketGatewayId()!=null;
+        boolean mustHaveOneGateway = createAirCondition.getRs485GatewayId()!=null || createAirCondition.getSocketGatewayId()!=null;
         if (!mustHaveOneGateway) {
             throw new IllegalArgumentException("rs485GatewayId or socketGatewayId must be set");
         }
         AirCondition airCondition = (AirCondition) new AirCondition()
-                .setAddress(createAirCondition.address())
-                .setSelfId(createAirCondition.selfId())
-                .setRs485GatewayId(createAirCondition.rs485GatewayId())
-                .setSocketGatewayId(createAirCondition.socketGatewayId())
+                .setAddress(createAirCondition.getAddress())
+                .setSelfId(createAirCondition.getSelfId())
+                .setRs485GatewayId(createAirCondition.getRs485GatewayId())
+                .setSocketGatewayId(createAirCondition.getSocketGatewayId())
                 .setIsLock(false)
                 .setDeviceName(createAirCondition.getDeviceName())
                 .setDeviceType(createAirCondition.getDeviceType())
                 .setBelongToLaboratoryId(createAirCondition.getBelongToLaboratoryId());
         return airCondition;
+    }
+
+    @Override
+    public R<List<AirCondition>> list() {
+        return null;
     }
 
     @Override

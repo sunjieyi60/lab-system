@@ -56,7 +56,7 @@ public class TaskProcessorsManage {
     }
 
     public void addTask(MqttTask mqttTask) {
-        Long rs485Id = mqttTask.rs485Id();
+        Long rs485Id = mqttTask.getRs485Id();
         TaskProcessor taskProcessor = taskProcessors.get(rs485Id);
         if (taskProcessor == null) {
             throw new RuntimeException("rs485Id not found");

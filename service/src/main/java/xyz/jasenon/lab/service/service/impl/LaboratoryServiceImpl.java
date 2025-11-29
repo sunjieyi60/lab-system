@@ -42,25 +42,25 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
 
         Long doUserId = StpUtil.getLoginIdAsLong();
         Laboratory laboratory = new Laboratory()
-                .laboratoryId(createLaboratory.laboratoryId())
-                .laboratoryName(createLaboratory.laboratoryName())
-                .belongToBuilding(createLaboratory.belongToBuilding())
-                .area(createLaboratory.area())
-                .classCapacity(createLaboratory.classCapacity())
-                .securityLevel(createLaboratory.securityLevel());
+                .setLaboratoryId(createLaboratory.getLaboratoryId())
+                .setLaboratoryName(createLaboratory.getLaboratoryName())
+                .setBelongToBuilding(createLaboratory.getBelongToBuilding())
+                .setArea(createLaboratory.getArea())
+                .setClassCapacity(createLaboratory.getClassCapacity())
+                .setSecurityLevel(createLaboratory.getSecurityLevel());
 
-        for(Long deptId : createLaboratory.belongToDeptIds()){
+        for(Long deptId : createLaboratory.getBelongToDeptIds()){
             Dept dept = deptMapper.selectById(deptId);
             if(dept == null){
                 return R.fail("部门不存在");
             }
         }
-        laboratory.belongToDepts(createLaboratory.belongToDeptIds());
+        laboratory.setBelongToDepts(createLaboratory.getBelongToDeptIds());
         this.save(laboratory);
 
         LaboratoryManager laboratoryManager = new LaboratoryManager()
-                .laboratoryId(laboratory.getId())
-                .userId(doUserId);
+                .setLaboratoryId(laboratory.getId())
+                .setUserId(doUserId);
         laboratoryManagerMapper.insert(laboratoryManager);
 
         LaboratoryUser laboratoryUser = new LaboratoryUser()
@@ -82,14 +82,14 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
     @Override
     public R editLaboratory(EditLaboratory editLaboratory) {
         Long doUserId = StpUtil.getLoginIdAsLong();
-        Laboratory laboratory = this.getById(editLaboratory.id());
+        Laboratory laboratory = this.getById(editLaboratory.getId());
         if (laboratory == null) {
             return R.fail("实验室不存在");
         }
         List<Long> allowedDepts = deptUserMapper.selectList(new LambdaQueryWrapper<DeptUser>()
                 .eq(DeptUser::getUserId, doUserId)).stream().map(DeptUser::getDeptId).toList();
 
-        boolean allMatch = !new HashSet<>(allowedDepts).containsAll(editLaboratory.belongToDeptIds());
+        boolean allMatch = !new HashSet<>(allowedDepts).containsAll(editLaboratory.getBelongToDeptIds());
         if (allMatch){
             return R.fail("你无权调整实验室的所属部门，因为你不属于该部门");
         }
@@ -99,13 +99,13 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
                 .ignoreNullValue();
 
         Laboratory edit = new Laboratory()
-                .laboratoryId(editLaboratory.laboratoryId())
-                .laboratoryName(editLaboratory.laboratoryName())
-                .belongToBuilding(editLaboratory.belongToBuilding())
-                .belongToDepts(editLaboratory.belongToDeptIds())
-                .area(editLaboratory.area())
-                .classCapacity(editLaboratory.classCapacity())
-                .securityLevel(editLaboratory.securityLevel());
+                .setLaboratoryId(editLaboratory.getLaboratoryId())
+                .setLaboratoryName(editLaboratory.getLaboratoryName())
+                .setBelongToBuilding(editLaboratory.getBelongToBuilding())
+                .setBelongToDepts(editLaboratory.getBelongToDeptIds())
+                .setArea(editLaboratory.getArea())
+                .setClassCapacity(editLaboratory.getClassCapacity())
+                .setSecurityLevel(editLaboratory.getSecurityLevel());
 
         BeanUtil.copyProperties(edit, laboratory, copyOptions);
         this.updateById(laboratory);

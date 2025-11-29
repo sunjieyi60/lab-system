@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 @TableName("user_permission")
 public class UserPermission extends BaseEntity {
 

@@ -7,12 +7,15 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Light;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateLight;
 import xyz.jasenon.lab.service.mapper.LightMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -39,8 +42,8 @@ public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light
     protected Light createDevice(CreateDevice createDevice) {
         CreateLight createLight = (CreateLight) createDevice;
         Light light = (Light) new Light()
-                .setAddress(createLight.address())
-                .setRs485GatewayId(createLight.rs485GatewayId())
+                .setAddress(createLight.getAddress())
+                .setRs485GatewayId(createLight.getRs485GatewayId())
                 .setIsLock(false)
                 .setDeviceName(createLight.getDeviceName())
                 .setDeviceType(createLight.getDeviceType())
@@ -49,7 +52,12 @@ public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light
     }
 
     @Override
-    public void startPolling(Light light) {
+    public R<List<Light>> list() {
+        return null;
+    }
+
+    @Override
+    protected void startPolling(Light light) {
         Task task = new Task();
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setDeviceId(light.getId());
