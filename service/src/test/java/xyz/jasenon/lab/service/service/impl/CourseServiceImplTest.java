@@ -25,9 +25,9 @@ class CourseServiceImplTest {
         Mockito.doReturn(true).when(service).save(any(Course.class));
 
         CreateCourse dto = new CreateCourse()
-                .courseName("高等数学")
-                .volume(120)
-                .grade("2023级");
+                .setCourseName("高等数学")
+                .setVolume(120)
+                .setGrade("2023级");
 
         R r = service.createCourse(dto);
         assertTrue(r.isOk());

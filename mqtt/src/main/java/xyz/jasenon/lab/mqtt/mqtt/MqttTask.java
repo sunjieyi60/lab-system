@@ -7,7 +7,7 @@ import xyz.jasenon.lab.common.dto.task.Task;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class MqttTask extends Task {
 
     /**

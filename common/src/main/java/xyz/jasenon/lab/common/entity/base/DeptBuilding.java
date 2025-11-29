@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  */
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 @TableName("dept_building")
 public class DeptBuilding extends BaseEntity {
 

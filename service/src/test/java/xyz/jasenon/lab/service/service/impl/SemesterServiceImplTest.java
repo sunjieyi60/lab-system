@@ -25,9 +25,9 @@ class SemesterServiceImplTest {
         Mockito.doReturn(true).when(service).save(any(Semester.class));
 
         CreateSemester dto = new CreateSemester()
-                .name("2025-2026 第1学年")
-                .startDate(LocalDate.of(2025, 9, 1))
-                .endDate(LocalDate.of(2026, 1, 15));
+                .setName("2025-2026 第1学年")
+                .setStartDate(LocalDate.of(2025, 9, 1))
+                .setEndDate(LocalDate.of(2026, 1, 15));
 
         R r = service.createSemester(dto);
         assertTrue(r.isOk());

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 @TableName("laboratory")
 public class Laboratory extends BaseEntity {
 

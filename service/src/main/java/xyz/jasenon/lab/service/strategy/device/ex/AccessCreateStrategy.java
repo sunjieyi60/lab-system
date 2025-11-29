@@ -40,9 +40,9 @@ public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Acc
     protected Access createDevice(CreateDevice createDevice) {
         CreateAccess createAccess = (CreateAccess) createDevice;
         Access access = (Access) new Access()
-                .setAddress(createAccess.address())
-                .setSelfId(createAccess.selfId())
-                .setRs485GatewayId(createAccess.rs485GatewayId())
+                .setAddress(createAccess.getAddress())
+                .setSelfId(createAccess.getSelfId())
+                .setRs485GatewayId(createAccess.getRs485GatewayId())
                 .setIsLock(false)
                 .setBelongToLaboratoryId(createAccess.getBelongToLaboratoryId())
                 .setDeviceName(createAccess.getDeviceName())

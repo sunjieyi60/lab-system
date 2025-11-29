@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 
 @Getter
 @Setter
+@Accessors(chain = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "deviceType", include = JsonTypeInfo.As.EXISTING_PROPERTY, visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CreateAirCondition.class, name = "AirCondition"),

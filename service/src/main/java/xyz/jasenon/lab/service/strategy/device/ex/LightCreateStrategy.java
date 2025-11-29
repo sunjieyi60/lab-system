@@ -39,8 +39,8 @@ public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light
     protected Light createDevice(CreateDevice createDevice) {
         CreateLight createLight = (CreateLight) createDevice;
         Light light = (Light) new Light()
-                .setAddress(createLight.address())
-                .setRs485GatewayId(createLight.rs485GatewayId())
+                .setAddress(createLight.getAddress())
+                .setRs485GatewayId(createLight.getRs485GatewayId())
                 .setIsLock(false)
                 .setDeviceName(createLight.getDeviceName())
                 .setDeviceType(createLight.getDeviceType())

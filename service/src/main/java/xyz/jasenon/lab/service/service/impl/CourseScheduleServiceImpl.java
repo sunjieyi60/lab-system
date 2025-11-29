@@ -27,26 +27,25 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
 
     @Override
     public R createCourseSchedule(CreateCourseSchedule createCourseSchedule) {
-        // 创建：按照DTO流式取值注入字段
         CourseSchedule courseSchedule = new CourseSchedule();
-        courseSchedule.semesterId(createCourseSchedule.semesterId());
-        courseSchedule.laboratoryId(createCourseSchedule.laboratoryId());
-        courseSchedule.weekType(createCourseSchedule.weekType());
-        courseSchedule.startWeek(createCourseSchedule.startWeek());
-        courseSchedule.endWeek(createCourseSchedule.endWeek());
-        courseSchedule.startTime(createCourseSchedule.startTime());
-        courseSchedule.endTime(createCourseSchedule.endTime());
-        courseSchedule.weekdays(createCourseSchedule.weekdays());
-        courseSchedule.courseId(createCourseSchedule.courseId());
-        courseSchedule.teacherId(createCourseSchedule.teacherId());
-        courseSchedule.deptId(createCourseSchedule.belongToDeptId());
-        courseSchedule.startSection(createCourseSchedule.startSection());
-        courseSchedule.endSection(createCourseSchedule.endSection());
-        courseSchedule.mark(createCourseSchedule.mark());
+        courseSchedule.setSemesterId(createCourseSchedule.getSemesterId());
+        courseSchedule.setLaboratoryId(createCourseSchedule.getLaboratoryId());
+        courseSchedule.setWeekType(createCourseSchedule.getWeekType());
+        courseSchedule.setStartWeek(createCourseSchedule.getStartWeek());
+        courseSchedule.setEndWeek(createCourseSchedule.getEndWeek());
+        courseSchedule.setStartTime(createCourseSchedule.getStartTime());
+        courseSchedule.setEndTime(createCourseSchedule.getEndTime());
+        courseSchedule.setWeekdays(createCourseSchedule.getWeekdays());
+        courseSchedule.setCourseId(createCourseSchedule.getCourseId());
+        courseSchedule.setTeacherId(createCourseSchedule.getTeacherId());
+        courseSchedule.setDeptId(createCourseSchedule.getBelongToDeptId());
+        courseSchedule.setStartSection(createCourseSchedule.getStartSection());
+        courseSchedule.setEndSection(createCourseSchedule.getEndSection());
+        courseSchedule.setMark(createCourseSchedule.getMark());
 
         // 同一学期范围内扫描潜在冲突对象，降低查询成本并符合业务语义
         List<CourseSchedule> schedules = this.lambdaQuery()
-                .eq(CourseSchedule::semesterId, courseSchedule.semesterId())
+                .eq(CourseSchedule::getSemesterId, courseSchedule.getSemesterId())
                 .list();
 
         // 冲突检测：存在任意一个冲突即阻止创建
@@ -80,29 +79,29 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
      * 5) 时间段或节次重叠
      */
     private boolean hasConflict(CourseSchedule a, CourseSchedule b) {
-        boolean sameLab = a.laboratoryId().equals(b.laboratoryId());
-        boolean sameTeacher = a.teacherId().equals(b.teacherId());
+        boolean sameLab = a.getLaboratoryId().equals(b.getLaboratoryId());
+        boolean sameTeacher = a.getTeacherId().equals(b.getTeacherId());
         if (!(sameLab || sameTeacher)) {
             return false;
         }
-        if (a.weekdays() == null || b.weekdays() == null) {
+        if (a.getWeekdays() == null || b.getWeekdays() == null) {
             return false;
         }
-        boolean weekdaysIntersect = a.weekdays().stream().anyMatch(b.weekdays()::contains);
+        boolean weekdaysIntersect = a.getWeekdays().stream().anyMatch(b.getWeekdays()::contains);
         if (!weekdaysIntersect) {
             return false;
         }
-        int interStart = Math.max(a.startWeek(), b.startWeek());
-        int interEnd = Math.min(a.endWeek(), b.endWeek());
+        int interStart = Math.max(a.getStartWeek(), b.getStartWeek());
+        int interEnd = Math.min(a.getEndWeek(), b.getEndWeek());
         if (interStart > interEnd) {
             return false;
         }
-        boolean weekTypeIntersect = weekTypeOverlap(a.weekType(), b.weekType(), interStart, interEnd);
+        boolean weekTypeIntersect = weekTypeOverlap(a.getWeekType(), b.getWeekType(), interStart, interEnd);
         if (!weekTypeIntersect) {
             return false;
         }
-        boolean timeOverlap = a.startTime().isBefore(b.endTime()) && b.startTime().isBefore(a.endTime());
-        boolean sectionOverlap = a.startSection() <= b.endSection() && b.startSection() <= a.endSection();
+        boolean timeOverlap = a.getStartTime().isBefore(b.getEndTime()) && b.getStartTime().isBefore(a.getEndTime());
+        boolean sectionOverlap = a.getStartSection() <= b.getEndSection() && b.getStartSection() <= a.getEndSection();
         return timeOverlap || sectionOverlap;
     }
 

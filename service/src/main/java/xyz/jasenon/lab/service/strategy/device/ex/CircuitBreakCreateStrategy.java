@@ -39,8 +39,8 @@ public class CircuitBreakCreateStrategy extends DeviceCreateStrategy<CircuitBrea
     protected CircuitBreak createDevice(CreateDevice createDevice) {
         CreateCircuitBreak createCircuitBreak = (CreateCircuitBreak) createDevice;
         CircuitBreak circuitBreak = (CircuitBreak) new CircuitBreak()
-                .setAddress(createCircuitBreak.address())
-                .setRs485GatewayId(createCircuitBreak.rs485GatewayId())
+                .setAddress(createCircuitBreak.getAddress())
+                .setRs485GatewayId(createCircuitBreak.getRs485GatewayId())
                 .setDeviceName(createCircuitBreak.getDeviceName())
                 .setDeviceType(createCircuitBreak.getDeviceType())
                 .setBelongToLaboratoryId(createCircuitBreak.getBelongToLaboratoryId());

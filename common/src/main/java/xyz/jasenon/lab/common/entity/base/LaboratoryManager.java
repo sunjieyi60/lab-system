@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 @TableName("laboratory_manager")
 public class LaboratoryManager extends BaseEntity {
 

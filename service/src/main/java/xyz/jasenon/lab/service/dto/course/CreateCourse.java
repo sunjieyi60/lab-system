@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  */
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class CreateCourse {
 
     @NotBlank(message = "课程名称不能为空")

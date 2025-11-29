@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class BaseRecord {
 
     /**

@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class CreateBuilding {
 
     /**

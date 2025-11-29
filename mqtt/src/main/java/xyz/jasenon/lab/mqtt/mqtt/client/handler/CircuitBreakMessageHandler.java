@@ -60,17 +60,17 @@ public class CircuitBreakMessageHandler
         log.info("分闸:{}", isOpen);
 
         CircuitBreakRecord circuitBreakRecord = (CircuitBreakRecord) new CircuitBreakRecord()
-                .address(address)
-                .current(current)
-                .energy(energy)
-                .isFix(isFix)
-                .isLock(isLock)
-                .isOpen(isOpen)
-                .leakage(leakage)
-                .power(power)
-                .temperature(temperture)
-                .voltage(voltage)
-                .rs485Id(rs485Id);
+                .setAddress(address)
+                .setCurrent(current)
+                .setEnergy(energy)
+                .setIsFix(isFix)
+                .setIsLock(isLock)
+                .setIsOpen(isOpen)
+                .setLeakage(leakage)
+                .setPower(power)
+                .setTemperature(temperture)
+                .setVoltage(voltage)
+                .setRs485Id(rs485Id);
 
         return circuitBreakRecord;
     }

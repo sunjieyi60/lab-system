@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.experimental.Accessors;
 
 
 @Getter
 @Setter
+@Accessors(chain = true)
 @TableName("course")
 public class Course extends BaseEntity {
 

@@ -18,16 +18,16 @@ public class SocketGatewayServiceImpl extends ServiceImpl<SocketGatewayMapper, S
     @Override
     public R createSocketGateway(CreateSocketGateway createSocketGateway) {
         SocketGateway socketGateway = (SocketGateway) new SocketGateway()
-                .setGatewayName(createSocketGateway.gatewayName())
-                .setMac(createSocketGateway.mac())
-                .setBelongToLaboratoryId(createSocketGateway.belongToLaboratoryId());
+                .setGatewayName(createSocketGateway.getGatewayName())
+                .setMac(createSocketGateway.getMac())
+                .setBelongToLaboratoryId(createSocketGateway.getBelongToLaboratoryId());
         this.save(socketGateway);
         return R.success("Socket网关创建成功");
     }
 
     @Override
     public R deleteSocketGateway(DeleteSocketGateway deleteSocketGateway) {
-        this.removeById(deleteSocketGateway.socketGatewayId());
+        this.removeById(deleteSocketGateway.getSocketGatewayId());
         return R.success("Socket网关删除成功");
     }
 }

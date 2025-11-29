@@ -27,13 +27,13 @@ public class BuildingServiceImpl extends ServiceImpl<BuildingMapper, Building> i
     public R createBuilding(CreateBuilding createBuilding) {
 
         Building building = new Building();
-        building.setBuildingName(createBuilding.buildingName());
+        building.setBuildingName(createBuilding.getBuildingName());
         this.save(building);
 
-        for (Long deptId : createBuilding.deptIds()){
+        for (Long deptId : createBuilding.getDeptIds()){
             DeptBuilding deptBuilding = new DeptBuilding();
-            deptBuilding.deptId(deptId);
-            deptBuilding.buildingId(building.getId());
+            deptBuilding.setDeptId(deptId);
+            deptBuilding.setBuildingId(building.getId());
             deptBuildingMapper.insert(deptBuilding);
         }
         return R.success("楼栋创建成功");

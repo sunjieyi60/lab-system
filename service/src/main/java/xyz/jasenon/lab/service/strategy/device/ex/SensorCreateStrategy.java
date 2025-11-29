@@ -40,9 +40,9 @@ public class SensorCreateStrategy extends DeviceCreateStrategy<SensorMapper, Sen
     protected Sensor createDevice(CreateDevice createDevice) {
         CreateSensor createSensor = (CreateSensor) createDevice;
         Sensor sensor = (Sensor) new Sensor()
-                .setAddress(createSensor.address())
-                .setSelfId(createSensor.selfId())
-                .setRs485GatewayId(createSensor.rs485GatewayId())
+                .setAddress(createSensor.getAddress())
+                .setSelfId(createSensor.getSelfId())
+                .setRs485GatewayId(createSensor.getRs485GatewayId())
                 .setDeviceName(createSensor.getDeviceName())
                 .setDeviceType(createSensor.getDeviceType())
                 .setBelongToLaboratoryId(createSensor.getBelongToLaboratoryId());

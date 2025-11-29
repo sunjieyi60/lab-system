@@ -16,7 +16,7 @@ import java.time.LocalDate;
  */
 @Getter
 @Setter
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class CreateSemester {
 
     /**

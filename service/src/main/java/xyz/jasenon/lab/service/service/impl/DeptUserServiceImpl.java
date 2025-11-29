@@ -22,7 +22,7 @@ public class DeptUserServiceImpl extends ServiceImpl<DeptUserMapper, DeptUser> i
 
         boolean doesDoUserInThisDept = this.lambdaQuery()
                 .eq(DeptUser::getUserId, doUserId)
-                .eq(DeptUser::getDeptId, bindUserToDept.deptId())
+                .eq(DeptUser::getDeptId, bindUserToDept.getDeptId())
                 .exists();
 
         if (!doesDoUserInThisDept) {
@@ -31,8 +31,8 @@ public class DeptUserServiceImpl extends ServiceImpl<DeptUserMapper, DeptUser> i
 
         // 创建部门用户关系
         DeptUser deptUser = new DeptUser();
-        deptUser.setDeptId(bindUserToDept.deptId());
-        deptUser.setUserId(bindUserToDept.userId());
+        deptUser.setDeptId(bindUserToDept.getDeptId());
+        deptUser.setUserId(bindUserToDept.getUserId());
         this.save(deptUser);
 
         return R.success("添加成功");

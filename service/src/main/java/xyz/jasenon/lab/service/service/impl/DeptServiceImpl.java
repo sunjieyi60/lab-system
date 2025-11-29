@@ -45,11 +45,11 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements ID
 
     @Override
     public R editDept(EditDept editDept) {
-        Dept dept = this.getById(editDept.deptId());
+        Dept dept = this.getById(editDept.getDeptId());
         if (dept == null) {
             return R.fail("部门不存在");
         }
-        dept.setDeptName(editDept.deptName());
+        dept.setDeptName(editDept.getDeptName());
         this.updateById(dept);
         return R.success("编辑部门成功");
     }

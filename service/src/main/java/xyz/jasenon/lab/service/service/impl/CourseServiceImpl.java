@@ -23,9 +23,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     public R createCourse(CreateCourse createCourse) {
         // 创建课程：参考项目风格，使用流式DTO取值进行字段注入
         Course course = new Course();
-        course.setCourseName(createCourse.courseName());
-        course.setVolumn(createCourse.volume());
-        course.setGrade(createCourse.grade());
+        course.setCourseName(createCourse.getCourseName());
+        course.setVolumn(createCourse.getVolume());
+        course.setGrade(createCourse.getGrade());
         this.save(course);
         return R.success("课程创建成功");
     }

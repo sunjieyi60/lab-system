@@ -18,17 +18,17 @@ public class  RS485GatewayServiceImpl extends ServiceImpl<RS485GatewayMapper, RS
     @Override
     public R createRS485Gateway(CreateRS485Gateway createRS485Gateway) {
         RS485Gateway rs485Gateway = new RS485Gateway()
-                .setSendTopic(createRS485Gateway.sendTopic())
-                .setAcceptTopic(createRS485Gateway.acceptTopic())
-                .setGatewayName(createRS485Gateway.gatewayName())
-                .setBelongToLaboratoryId(createRS485Gateway.belongToLaboratoryId());
+                .setSendTopic(createRS485Gateway.getSendTopic())
+                .setAcceptTopic(createRS485Gateway.getAcceptTopic())
+                .setGatewayName(createRS485Gateway.getGatewayName())
+                .setBelongToLaboratoryId(createRS485Gateway.getBelongToLaboratoryId());
         this.save(rs485Gateway);
         return R.success("rs485网关创建成功");
     }
 
     @Override
     public R deleteRS485Gateway(DeleteRS485Gateway deleteRS485Gateway) {
-        this.removeById(deleteRS485Gateway.rs485GatewayId());
+        this.removeById(deleteRS485Gateway.getRs485GatewayId());
         return R.success("rs485网关删除成功");
     }
 }
