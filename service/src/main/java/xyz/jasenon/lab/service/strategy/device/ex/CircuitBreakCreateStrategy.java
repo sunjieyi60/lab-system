@@ -2,6 +2,9 @@ package xyz.jasenon.lab.service.strategy.device.ex;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
@@ -15,6 +18,7 @@ import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,7 +56,15 @@ public class CircuitBreakCreateStrategy extends DeviceCreateStrategy<CircuitBrea
 
     @Override
     public List<CircuitBreak> list(List<Long> laboratoryIds) {
-        return null;
+        List<CircuitBreak> res = new ArrayList<>();
+        for(Long laboratoryId: laboratoryIds){
+            List<CircuitBreak> part = super.deviceMapper.selectList(
+                new LambdaQueryWrapper<CircuitBreak>()
+                .eq(CircuitBreak::getBelongToLaboratoryId, laboratoryId)
+            );
+            res.addAll(part);
+        }
+        return res;
     }
 
     @Override

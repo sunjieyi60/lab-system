@@ -21,6 +21,7 @@
 			<groupId>xyz.jasenon.lab</groupId>
 			<artifactId>common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -74,18 +75,12 @@
 
 
 	<dependencyManagement>
-
-
 		<dependencies>
-
-
 			<dependency>
 				<groupId>org.objenesis</groupId>
 				<artifactId>objenesis</artifactId>
 				<version>3.4</version>
 			</dependency>
-
 		</dependencies>
-
 	</dependencyManagement>
 </project>

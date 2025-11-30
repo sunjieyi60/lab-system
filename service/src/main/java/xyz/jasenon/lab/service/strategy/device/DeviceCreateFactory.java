@@ -11,9 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DeviceCreateFactory {
 
-    private final static Map<DeviceType,DeviceCreateStrategy<?,?>> STRATEGY = new ConcurrentHashMap<>();
+    private final static Map<DeviceType,DeviceCreateStrategy> STRATEGY = new ConcurrentHashMap<>();
 
-    public static DeviceCreateStrategy<?,?> getDeviceCreateStrategy(DeviceType deviceType) {
+    public static DeviceCreateStrategy getDeviceCreateStrategy(DeviceType deviceType) {
         return STRATEGY.get(deviceType);
     }
 

@@ -28,7 +28,7 @@ public class BuildingController {
     @RequestPermission(allowed = {Permissions.BASE_CUD})
     @PostMapping("/create")
     @Operation(summary = "创建楼栋", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateBuilding", value = "{\n  \"buildingName\": \"A栋\",\n  \"deptIds\": [301,302]\n}")))
+            examples = @ExampleObject(name = "CreateBuilding", value = "{\n  \"buildingName\": \"A栋\",\n  \"deptIds\": [301,302]\n}"))))
     public R create(@RequestBody CreateBuilding createBuilding) {
         return buildingService.createBuilding(createBuilding);
     }

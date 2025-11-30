@@ -2,9 +2,13 @@ package xyz.jasenon.lab.service.strategy.device.ex;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
@@ -42,7 +46,7 @@ public class AirConditionCreateStrategy extends DeviceCreateStrategy<AirConditio
     @Override
     protected AirCondition createDevice(CreateDevice createDevice) {
         CreateAirCondition createAirCondition = (CreateAirCondition) createDevice;
-        boolean mustHaveOneGateway = createAirCondition.getRs485GatewayId()!=null || createAirCondition.socketGatewayId()!=null;
+        boolean mustHaveOneGateway = createAirCondition.getRs485GatewayId()!=null || createAirCondition.getSocketGatewayId()!=null;
         if (!mustHaveOneGateway) {
             throw new IllegalArgumentException("rs485GatewayId or socketGatewayId must be set");
         }
@@ -60,7 +64,15 @@ public class AirConditionCreateStrategy extends DeviceCreateStrategy<AirConditio
 
     @Override
     public List<AirCondition> list(List<Long> laboratoryIds) {
-        return null;
+        List<AirCondition> res = new ArrayList<>();
+        for(Long laboratoryId: laboratoryIds){
+            List<AirCondition> part = super.deviceMapper.selectList(
+                new LambdaQueryWrapper<AirCondition>()
+                .eq(AirCondition::getBelongToLaboratoryId, laboratoryId)
+            );
+            res.addAll(part);
+        }
+        return res;
     }
 
     @Override

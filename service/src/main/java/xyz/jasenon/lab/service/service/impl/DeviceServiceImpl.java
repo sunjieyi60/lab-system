@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -50,7 +51,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
-    public R<Map<Long, Rs485GatewayVo>> getRs485GatewayTree() {
+    public R<Map<Long, List<Rs485GatewayVo>>> getRs485GatewayTree() {
         List<Laboratory> laboratoryList = getVisibleLaboratories();
         List<RS485Gateway> rs485GatewayList = new ArrayList<>();
         for (Laboratory laboratory : laboratoryList) {
@@ -60,7 +61,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             );
             rs485GatewayList.addAll(part);
         }
-        Map<Long, Rs485GatewayVo> map = rs485GatewayList.stream().map(rs485Gateway -> {
+        Map<Long, List<Rs485GatewayVo>> map = rs485GatewayList.stream().map(rs485Gateway -> {
             Rs485GatewayVo vo = new Rs485GatewayVo();
             vo.setGatewayId(rs485Gateway.getId());
             vo.setGatewayName(rs485Gateway.getGatewayName());
@@ -68,12 +69,12 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             vo.setSendTopic(rs485Gateway.getSendTopic());
             vo.setAcceptTopic(rs485Gateway.getAcceptTopic());
             return vo;
-        }).collect(Collectors.toMap(Rs485GatewayVo::getLaboratoryId, vo -> vo));
+        }).collect(Collectors.groupingBy(Rs485GatewayVo::getLaboratoryId, Collectors.toList()));
         return R.success(map,"获取成功");
     }
 
     @Override
-    public R<Map<Long, SocketGatewayVo>> getSocketGatewayTree() {
+    public R<Map<Long, List<SocketGatewayVo>>> getSocketGatewayTree() {
         List<Laboratory> laboratoryList = getVisibleLaboratories();
         List<SocketGateway> socketGatewayList = new ArrayList<>();
         for (Laboratory laboratory : laboratoryList) {
@@ -83,7 +84,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             );
             socketGatewayList.addAll(part);
         }
-        Map<Long, SocketGatewayVo> map = socketGatewayList.stream().map(socketGateway -> {
+        Map<Long, List<SocketGatewayVo>> map = socketGatewayList.stream().map(socketGateway -> {
             SocketGatewayVo vo = new SocketGatewayVo();
             vo.setGatewayId(socketGateway.getId());
             vo.setGatewayName(socketGateway.getGatewayName());
@@ -91,7 +92,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             vo.setMac(socketGateway.getMac());
             vo.setLaboratoryId(socketGateway.getBelongToLaboratoryId());
             return vo;
-        }).collect(Collectors.toMap(SocketGatewayVo::getGatewayId, vo -> vo));
+        }).collect(Collectors.groupingBy(SocketGatewayVo::getGatewayId, Collectors.toList()));
         return R.success(map,"获取成功");
     }
 
@@ -109,13 +110,15 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
-    public R<List<Device>> listDevice(List<Long> laboratoryIds, DeviceType deviceType) {
+    public R<Map<Long,List<Device>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType) {
         List<Long> laboratoryIdsVisible = getVisibleLaboratories().stream().map(l->l.getId()).toList();
         boolean isOver = !new HashSet<>(laboratoryIdsVisible).containsAll(laboratoryIds);
         if(isOver){
             return R.fail("查询越权!");
         }
-        return R.success(DeviceCreateFactory.getDeviceCreateStrategy(deviceType).list(laboratoryIds));
+        List<Device> res = DeviceCreateFactory.getDeviceCreateStrategy(deviceType).list(laboratoryIds);
+        Map<Long,List<Device>> map = res.stream().collect(Collectors.groupingBy(Device::getBelongToLaboratoryId, Collectors.toList()));
+        return R.success(map,"获取成功");
     }
 
 }

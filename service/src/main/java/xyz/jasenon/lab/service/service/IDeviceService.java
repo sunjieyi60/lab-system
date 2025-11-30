@@ -19,9 +19,9 @@ public interface IDeviceService extends IService<Device> {
 
     R deleteDevice(DeleteDevice deleteDevice);
 
-    R<Map<Long, Rs485GatewayVo>> getRs485GatewayTree();
+    R<Map<Long, List<Rs485GatewayVo>>> getRs485GatewayTree();
 
-    R<Map<Long, SocketGatewayVo>> getSocketGatewayTree();
+    R<Map<Long, List<SocketGatewayVo>>> getSocketGatewayTree();
 
-    R<List<Device>> listDevice(List<Long> laboratoryIds, DeviceType deviceType);
+    R<Map<Long,List<Device>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType);
 }

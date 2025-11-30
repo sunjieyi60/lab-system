@@ -2,6 +2,9 @@ package xyz.jasenon.lab.service.strategy.device.ex;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
@@ -15,6 +18,7 @@ import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,7 +57,15 @@ public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light
 
     @Override
     public List<Light> list(List<Long> laboratoryIds) {
-        return null;
+        List<Light> res = new ArrayList<>();
+        for(Long laboratoryId: laboratoryIds){
+            List<Light> part = super.deviceMapper.selectList(
+                new LambdaQueryWrapper<Light>()
+                .eq(Light::getBelongToLaboratoryId, laboratoryId)
+            );
+            res.addAll(part);
+        }
+        return res;
     }
 
     @Override

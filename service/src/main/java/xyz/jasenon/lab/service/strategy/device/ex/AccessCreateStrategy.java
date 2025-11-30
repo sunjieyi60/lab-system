@@ -2,6 +2,10 @@ package xyz.jasenon.lab.service.strategy.device.ex;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
@@ -15,6 +19,7 @@ import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,12 +31,12 @@ import java.util.List;
 public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Access> {
 
     public AccessCreateStrategy(AccessMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
-        super(deviceMapper,pollingScheduleExecutorPool);
+        super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateStrategy(DeviceType.Access,this);
+        DeviceCreateFactory.registerDeviceCreateStrategy(DeviceType.Access, this);
     }
 
     @Override
@@ -55,7 +60,15 @@ public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Acc
 
     @Override
     public List<Access> list(List<Long> laboratoryIds) {
-        return null;
+        List<Access> res = new ArrayList<>();
+        for(Long laboratoryId: laboratoryIds){
+            List<Access> part = super.deviceMapper.selectList(
+                new LambdaQueryWrapper<Access>()
+                .eq(Access::getBelongToLaboratoryId, laboratoryId)
+            );
+            res.addAll(part);
+        }
+        return res;
     }
 
     @Override
@@ -65,7 +78,7 @@ public class AccessCreateStrategy extends DeviceCreateStrategy<AccessMapper, Acc
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setDeviceType(DeviceType.Access);
         task.setCommandLine(CommandLine.REQUEST_ACCESS_DATA);
-        task.setArgs(new Integer[]{access.getAddress(), access.getSelfId()});
+        task.setArgs(new Integer[] { access.getAddress(), access.getSelfId() });
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(pollingTask);
     }
