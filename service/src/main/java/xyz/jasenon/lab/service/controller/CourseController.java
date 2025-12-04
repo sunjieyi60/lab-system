@@ -9,10 +9,6 @@ import xyz.jasenon.lab.service.dto.course.*;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
 import xyz.jasenon.lab.service.service.ICourseService;
 import xyz.jasenon.lab.service.service.ISemesterService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 import java.util.List;
 
@@ -34,24 +30,19 @@ public class CourseController {
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PostMapping("/create/course")
-    @Operation(summary = "创建课程", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateCourse", value = "{\n  \"courseName\": \"高等数学\",\n  \"volume\": 120,\n  \"grade\": \"2023级\"\n}"))))
+
     public R createCourse(@RequestBody CreateCourse createCourse){
         return courseService.createCourse(createCourse);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PostMapping("/create/courseSchedule")
-    @Operation(summary = "创建课程课表", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateCourseSchedule", value = "{\n  \"semesterId\": 1,\n  \"laboratoryId\": 101,\n  \"weekType\": \"Both\",\n  \"startWeek\": 1,\n  \"endWeek\": 16,\n  \"startTime\": \"08:00:00\",\n  \"endTime\": \"09:40:00\",\n  \"weekdays\": [1,3],\n  \"courseId\": 1001,\n  \"teacherId\": 2001,\n  \"belongToDeptId\": 301,\n  \"startSection\": 1,\n  \"endSection\": 2,\n  \"mark\": \"备注\"\n}"))))
     public R createCourseSchedule(@RequestBody CreateCourseSchedule createCourseSchedule){
         return courseScheduleService.createCourseSchedule(createCourseSchedule);
     }
 
     @RequestPermission(allowed = {Permissions.SEMESTER_SETTINGS})
     @PostMapping("/create/semester")
-    @Operation(summary = "创建学期", requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(name = "CreateSemester", value = "{\n  \"name\": \"2025-2026 第1学年\",\n  \"startDate\": \"2025-09-01\",\n  \"endDate\": \"2026-01-15\"\n}"))))
     public R createSemester(@RequestBody CreateSemester createSemester){
         return semesterService.createSemester(createSemester);
     }

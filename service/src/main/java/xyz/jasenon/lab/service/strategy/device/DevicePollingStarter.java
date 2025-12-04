@@ -1,25 +1,15 @@
 package xyz.jasenon.lab.service.strategy.device;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
-import xyz.jasenon.lab.common.entity.device.Access;
-import xyz.jasenon.lab.common.entity.device.AirCondition;
-import xyz.jasenon.lab.common.entity.device.CircuitBreak;
-import xyz.jasenon.lab.common.entity.device.Device;
-import xyz.jasenon.lab.common.entity.device.Light;
-import xyz.jasenon.lab.common.entity.device.Sensor;
+import xyz.jasenon.lab.common.entity.device.*;
 import xyz.jasenon.lab.service.service.ILaboratoryService;
-import xyz.jasenon.lab.service.strategy.device.ex.AccessCreateStrategy;
-import xyz.jasenon.lab.service.strategy.device.ex.AirConditionCreateStrategy;
-import xyz.jasenon.lab.service.strategy.device.ex.CircuitBreakCreateStrategy;
-import xyz.jasenon.lab.service.strategy.device.ex.LightCreateStrategy;
-import xyz.jasenon.lab.service.strategy.device.ex.SensorCreateStrategy;
+import xyz.jasenon.lab.service.strategy.device.ex.*;
+
+import java.util.List;
 
 @Component
 @Slf4j

@@ -17,7 +17,6 @@ import xyz.jasenon.lab.service.exception.PermissionsInsufficientException;
 import xyz.jasenon.lab.service.mapper.UserPermissionMapper;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 /**

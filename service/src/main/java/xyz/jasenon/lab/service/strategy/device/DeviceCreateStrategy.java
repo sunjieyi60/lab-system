@@ -1,7 +1,6 @@
 package xyz.jasenon.lab.service.strategy.device;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
 import lombok.extern.slf4j.Slf4j;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.entity.device.Device;
