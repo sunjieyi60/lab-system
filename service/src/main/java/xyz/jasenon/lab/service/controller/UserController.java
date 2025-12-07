@@ -17,7 +17,7 @@ import xyz.jasenon.lab.service.service.IUserService;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowCredentials = "true")
 public class UserController {
 
     @Autowired

@@ -16,7 +16,7 @@ import xyz.jasenon.lab.service.service.ILaboratoryService;
  */
 @RestController
 @RequestMapping("/laboratory")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowCredentials = "true")
 public class LaboratoryController {
 
     @Autowired

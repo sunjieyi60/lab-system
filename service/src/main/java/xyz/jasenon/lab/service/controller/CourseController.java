@@ -18,7 +18,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/academic")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowCredentials = "true")
 public class CourseController {
 
     @Autowired

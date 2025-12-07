@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/device")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowCredentials = "true")
 public class DeviceController {
 
     @Autowired

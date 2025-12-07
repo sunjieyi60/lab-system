@@ -18,7 +18,7 @@ import xyz.jasenon.lab.service.service.ISocketGatewayService;
  */
 @RestController
 @RequestMapping("/gateway")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowCredentials = "true")
 public class GatewayController {
 
     @Autowired
