@@ -16,7 +16,7 @@ import xyz.jasenon.lab.service.service.IDeptService;
  */
 @RestController
 @RequestMapping("/dept")
-@CrossOrigin(origins = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"localhost:5173"}, allowCredentials = "true")
 public class DeptController {
 
     @Autowired

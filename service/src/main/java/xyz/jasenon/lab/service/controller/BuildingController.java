@@ -16,7 +16,7 @@ import xyz.jasenon.lab.service.service.IBuildingService;
  */
 @RestController
 @RequestMapping("/building")
-@CrossOrigin(origins = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"localhost:5173"}, allowCredentials = "true")
 public class BuildingController {
 
     @Autowired

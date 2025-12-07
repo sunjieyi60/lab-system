@@ -3,6 +3,7 @@ package xyz.jasenon.lab.service.vo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import xyz.jasenon.lab.common.entity.base.Building;
 import xyz.jasenon.lab.common.entity.base.Dept;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
 
@@ -45,11 +46,16 @@ public class UserBizVo {
     /**
      * 所属部门
      */
-    private List<Dept> depts;
+    private List<DeptVo> depts;
 
     /**
      * 用户所拥有的实验室
      */
     private List<Laboratory> laboratories;
+
+    /**
+     * 用户所能看到的楼栋
+     */
+    private List<Building> buildings;
 
 }

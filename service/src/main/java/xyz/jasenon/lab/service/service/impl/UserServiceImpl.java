@@ -21,12 +21,14 @@ import xyz.jasenon.lab.service.dto.user.UserLogin;
 import xyz.jasenon.lab.service.entity.UserPermission;
 import xyz.jasenon.lab.service.mapper.*;
 import xyz.jasenon.lab.service.service.IUserService;
+import xyz.jasenon.lab.service.vo.DeptVo;
 import xyz.jasenon.lab.service.vo.UserBizVo;
 import xyz.jasenon.lab.service.vo.UserPermissionVo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Jasenon_ce
@@ -45,6 +47,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private UserPermissionMapper userPermissionMapper;
     @Autowired
     private LaboratoryMapper laboratoryMapper;
+    @Autowired
+    private BuildingMapper buildingMapper;
+    @Autowired
+    private DeptBuildingMapper deptBuildingMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -284,23 +290,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     private UserBizVo userToUserBizVo(User user){
         UserBizVo userBizVo = BeanUtil.copyProperties(user, UserBizVo.class);
-        List<Dept> depts = deptMapper.selectJoinList(
-                new MPJLambdaWrapper<Dept>()
-                        .select(Dept::getId, Dept::getDeptName)
-                        .leftJoin(DeptUser.class,on -> {
-                            on.eq(DeptUser::getUserId, user.getId());
-                            on.eq(DeptUser::getDeptId,Dept::getId);
-                            return on;
-                        })
+        List<Dept> depts = deptUserMapper.selectJoinList(Dept.class,
+            new MPJLambdaWrapper<DeptUser>()
+                    .selectAll(Dept.class)
+                    .leftJoin(Dept.class, on->on.eq(DeptUser::getUserId, user.getId())
+                            .eq(DeptUser::getDeptId, Dept::getId))
         );
-        List<Laboratory> laboratories = laboratoryMapper.selectJoinList(
-                new MPJLambdaWrapper<Laboratory>()
+        List<DeptVo> deptVos = depts.stream().map(dept -> {
+            DeptVo vo = new DeptVo();
+            List<Building> buildings = deptBuildingMapper.selectJoinList(Building.class,
+                    new MPJLambdaWrapper<DeptBuilding>()
+                            .eq(DeptBuilding::getDeptId, dept.getId())
+                            .leftJoin(Building.class, on->on.eq(DeptBuilding::getBuildingId, Building::getId))
+                            .selectAll(Building.class)
+            );
+            vo.setDept(dept);
+            vo.setBuildings(buildings);
+            return vo;
+        }).toList();
+        List<Laboratory> laboratories = laboratoryUserMapper.selectJoinList(Laboratory.class,
+                new MPJLambdaWrapper<LaboratoryUser>()
                         .selectAll(Laboratory.class)
-                        .leftJoin(LaboratoryUser.class,on -> {
-                            on.eq(LaboratoryUser::getUserId, user.getId());
-                            on.eq(LaboratoryUser::getLaboratoryId,Laboratory::getId);
-                            return on;
-                        })
+                        .leftJoin(Laboratory.class, on->on.eq(LaboratoryUser::getUserId, user.getId())
+                                .eq(LaboratoryUser::getLaboratoryId, Laboratory::getId))
         );
         List<UserPermission> userPermissions = userPermissionMapper.selectList(
                 new LambdaQueryWrapper<UserPermission>().eq(UserPermission::getUserId, user.getId())
@@ -311,9 +323,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             vo.setPath(Permissions.pathOf(userPermission.getPermission()));
             return vo;
         }).toList();
-        userBizVo.setDepts(depts);
+
+        List<Building> buildings = laboratories.stream().map(Laboratory::getBelongToBuilding).collect(Collectors.toSet())
+                        .stream().map(buildingId -> buildingMapper.selectById(buildingId)
+                ).toList();
+
+        userBizVo.setDepts(deptVos);
         userBizVo.setLaboratories(laboratories);
         userBizVo.setPermissions(vos);
+        userBizVo.setBuildings(buildings);
         return userBizVo;
     }
 

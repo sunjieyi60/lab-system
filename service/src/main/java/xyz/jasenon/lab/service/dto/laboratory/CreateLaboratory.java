@@ -1,6 +1,7 @@
 package xyz.jasenon.lab.service.dto.laboratory;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class CreateLaboratory {
     @NotBlank(message = "实验室名称不能为空")
     private String laboratoryName;
 
+    @NotEmpty(message = "所属部门ID不能为空")
     private List<Long> belongToDeptIds;
 
     @NotNull(message = "楼栋ID不能为空")

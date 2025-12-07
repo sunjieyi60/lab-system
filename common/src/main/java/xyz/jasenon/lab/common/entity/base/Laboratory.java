@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("laboratory")
+@TableName(value = "laboratory",autoResultMap = true)
 public class Laboratory extends BaseEntity {
 
     /**
