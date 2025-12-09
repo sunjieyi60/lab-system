@@ -392,3 +392,89 @@ ALTER TABLE user
     ON DELETE RESTRICT ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 0;
+
+INSERT INTO building (id, building_name) VALUES
+  (1, '理工楼A'),
+  (2, '理工楼B');
+
+INSERT INTO dept (id, dept_name) VALUES
+  (10, '计算机学院'),
+  (11, '电气学院'),
+  (12, '机械学院');
+
+INSERT INTO dept_building (id, dept_id, building_id) VALUES
+  (100, 10, 1),
+  (101, 10, 2),
+  (102, 11, 2);
+
+INSERT INTO user (id, username, password, real_name, phone, email, create_by) VALUES
+  (100, 'admin', 'e10adc3949ba59abbe56e057f20f883e', '管理员', '13900000001', 'admin@example.com', NULL),
+  (101, 'teacherA', 'e10adc3949ba59abbe56e057f20f883e', '张老师', '13900000002', 'teacherA@example.com', 100),
+  (102, 'assistantB', 'e10adc3949ba59abbe56e057f20f883e', '李助教', '13900000003', 'assistantB@example.com', 101);
+
+INSERT INTO dept_user (id, dept_id, user_id) VALUES
+  (200, 10, 100),
+  (201, 11, 100),
+  (202, 10, 101),
+  (203, 10, 102);
+
+INSERT INTO laboratory (id, laboratory_id, laboratory_name, belong_to_depts, belong_to_building, security_level, class_capacity, area) VALUES
+  (200, '1-101', '空调控制实验室', JSON_ARRAY(10), 1, 'A', 40, 80),
+  (201, '2-205', '综合控制实验室', JSON_ARRAY(10,11), 2, 'B', 30, 60);
+
+INSERT INTO laboratory_user (id, user_id, laboratory_id) VALUES
+  (300, 100, 200),
+  (301, 100, 201),
+  (302, 101, 200),
+  (303, 101, 201),
+  (304, 102, 200);
+
+INSERT INTO rs485_gateway (id, gateway_name, send_topic, accept_topic, belong_to_laboratory_id) VALUES
+  (300, 'RS485-1', 'lab/rs485/send1', 'lab/rs485/accept1', 200),
+  (301, 'RS485-2', 'lab/rs485/send2', 'lab/rs485/accept2', 201);
+
+INSERT INTO socket_gateway (id, mac, ip, belong_to_laboratory_id, gateway_name) VALUES
+  (400, '00-11-22-33-44-55', '10.0.0.10', 200, 'SocketGW-1');
+
+INSERT INTO device (id, device_name, device_type, belong_to_laboratory_id, address, self_id, rs485_gateway_id, socket_gateway_id, group_id, is_lock) VALUES
+  (500, '中央空调A1', 'AirCondition', 200, 35, 1, 300, NULL, 'group-01', 0),
+  (501, '照明灯L1', 'Light', 200, 41, 1, 300, NULL, NULL, 0),
+  (502, '门禁X1', 'Access', 201, 5, 1, 301, NULL, NULL, 1),
+  (503, '温湿度S1', 'Sensor', 200, 12, 1, 300, NULL, NULL, 0),
+  (504, '断路器CB1', 'CircuitBreak', 200, 7, NULL, 300, NULL, NULL, 1);
+
+INSERT INTO course (id, course_name, volumn, grade) VALUES
+  (600, '热工学', 48, '2025'),
+  (601, '电路', 32, '2025');
+
+INSERT INTO semester (id, name, start_date, end_date) VALUES
+  (700, '2025-秋季', '2025-09-01', '2025-12-31');
+
+INSERT INTO teacher (id, teacher_name) VALUES
+  (800, '张老师');
+
+INSERT INTO course_schedule (id, semester_id, laboratory_id, week_type, start_week, end_week, start_time, end_time, weekdays, course_id, teacher_id, dept_id, start_section, end_section, mark) VALUES
+  (900, 700, 200, 2, 1, 16, '08:00:00', '09:40:00', JSON_ARRAY(1,3,5), 600, 800, 10, 1, 2, '早课'),
+  (901, 700, 201, 1, 2, 14, '10:00:00', '11:40:00', JSON_ARRAY(2,4), 601, 800, 11, 3, 4, '双周课');
+
+INSERT INTO user_permission (id, user_id, permission) VALUES
+  (1000, 101, 'BASE_VIEW'),
+  (1001, 101, 'DEVICE_ADD'),
+  (1100, 100, 'USER_ADD'),
+  (1101, 100, 'USER_EDIT'),
+  (1102, 100, 'USER_DELETE'),
+  (1103, 100, 'SCHEDULE_CLASSES'),
+  (1104, 100, 'SCHEDULE_CLASSES_VIEW'),
+  (1105, 100, 'SEMESTER_SETTINGS'),
+  (1106, 100, 'DEVICE_ADD'),
+  (1107, 100, 'DEVICE_CONTROL'),
+  (1108, 100, 'DEVICE_SMART_CONTROL'),
+  (1109, 100, 'DEVICE_ALARM_SETTINGS'),
+  (1110, 100, 'ACADEMIC_AFFAIRS_ANALYSIS'),
+  (1111, 100, 'LABORATORY_POWER_CONSUMPTION'),
+  (1112, 100, 'LABORATORY_CENTRAL_AIRCONDITION'),
+  (1113, 100, 'BASE_CUD'),
+  (1114, 100, 'BASE_VIEW');
+
+SET FOREIGN_KEY_CHECKS = 1;
