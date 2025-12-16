@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/biz/vo")
-@CrossOrigin(origins = {"localhost:5173"}, allowCredentials = "true")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class BizVoController {
 }

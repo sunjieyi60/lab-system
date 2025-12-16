@@ -42,8 +42,8 @@ public class MyBatisPlusConfig implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        Date date = new Date();
-        this.strictUpdateFill(metaObject, "updateTime", Date.class,date);
+        LocalDateTime now = LocalDateTime.now();
+        this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class,now);
     }
 
     /**
