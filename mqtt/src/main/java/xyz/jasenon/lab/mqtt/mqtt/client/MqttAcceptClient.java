@@ -37,8 +37,8 @@ public class MqttAcceptClient extends MqttBaseClient {
         options.setAutomaticReconnect(true);
 
         try {
-            this.connect(options);
             this.setCallback(new MqttAcceptCallback(mqttNx, this, executor, mqttMessageDispatcher));
+            this.connect(options);
         } catch (Exception e) {
             log.error("connect error", e);
         }

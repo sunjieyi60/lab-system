@@ -26,6 +26,7 @@ public class MqttAcceptCallback implements MqttCallbackExtended {
         try {
             if (mqttNx.tryLock()) {
                 mqttClient.connect();
+                mqttClient.subscribe(this.mqttClient.topic);
             }
         } catch (Exception e) {
             log.error("reconnect error:{},mqttClient:{},mqttNx:{}", e, mqttClient.getClientId(), mqttNx.getKey());

@@ -29,6 +29,7 @@ public class MqttSendClient extends MqttBaseClient{
         options.setAutomaticReconnect(true);
 
         try {
+            this.setCallback(new MqttSendCallback(this,mqttNx));
             this.connect(options);
         } catch (Exception e) {
             log.error("connect error", e);

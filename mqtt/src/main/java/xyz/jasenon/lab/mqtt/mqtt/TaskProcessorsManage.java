@@ -1,6 +1,7 @@
 package xyz.jasenon.lab.mqtt.mqtt;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class TaskProcessorsManage {
     private IRS485GatewayService rs485GatewayService;
     @Autowired
     private MqttClientProperties mqttProperties;
-    @Autowired
+    @Resource(name = "messageHandlingExecutor")
     private ThreadPoolTaskExecutor executor;
     @Autowired
     private MqttMessageDispatcher mqttMessageDispatcher;
