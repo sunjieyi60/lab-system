@@ -94,4 +94,10 @@ public class CourseController {
     public R listCourse(){
         return courseService.listCourse();
     }
+
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
+    @GetMapping("/list/semester")
+    public R listSemester(){
+        return semesterService.listSemester();
+    }
 }
