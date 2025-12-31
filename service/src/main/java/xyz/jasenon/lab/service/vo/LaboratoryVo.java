@@ -1,20 +1,11 @@
-package xyz.jasenon.lab.common.entity.base;
+package xyz.jasenon.lab.service.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import xyz.jasenon.lab.common.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.List;
 
-@Getter
-@Setter
-@Accessors(chain = true)
-@TableName(value = "laboratory",autoResultMap = true)
-public class Laboratory extends BaseEntity {
+public class LaboratoryVo {
 
     /**
      * 实验室编号
@@ -52,9 +43,5 @@ public class Laboratory extends BaseEntity {
      */
     private Integer area;
 
-    /**
-     * 简介
-     */
-    private String intro;
 
 }

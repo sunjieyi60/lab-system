@@ -24,6 +24,7 @@ import xyz.jasenon.lab.service.entity.UserPermission;
 import xyz.jasenon.lab.service.mapper.*;
 import xyz.jasenon.lab.service.service.IUserService;
 import xyz.jasenon.lab.service.vo.DeptVo;
+import xyz.jasenon.lab.service.vo.LaboratoryVo;
 import xyz.jasenon.lab.service.vo.UserBizVo;
 import xyz.jasenon.lab.service.vo.UserPermissionVo;
 
@@ -310,7 +311,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             vo.setBuildings(buildings);
             return vo;
         }).toList();
-        List<Laboratory> laboratories = laboratoryUserMapper.selectJoinList(Laboratory.class,
+        List<LaboratoryVo> laboratories = laboratoryUserMapper.selectJoinList(LaboratoryVo.class,
                 new MPJLambdaWrapper<LaboratoryUser>()
                         .selectAll(Laboratory.class)
                         .leftJoin(Laboratory.class, on->on.eq(LaboratoryUser::getUserId, user.getId())

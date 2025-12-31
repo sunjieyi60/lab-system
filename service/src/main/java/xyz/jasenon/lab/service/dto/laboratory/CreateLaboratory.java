@@ -41,4 +41,6 @@ public class CreateLaboratory {
     @NotNull(message = "面积不能为空")
     private Integer area;
 
+    private String intro;
+
 }

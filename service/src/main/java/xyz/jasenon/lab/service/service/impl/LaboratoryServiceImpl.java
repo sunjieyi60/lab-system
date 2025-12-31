@@ -47,7 +47,8 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
                 .setBelongToBuilding(createLaboratory.getBelongToBuilding())
                 .setArea(createLaboratory.getArea())
                 .setClassCapacity(createLaboratory.getClassCapacity())
-                .setSecurityLevel(createLaboratory.getSecurityLevel());
+                .setSecurityLevel(createLaboratory.getSecurityLevel())
+                .setIntro(createLaboratory.getIntro());
 
         for(Long deptId : createLaboratory.getBelongToDeptIds()){
             Dept dept = deptMapper.selectById(deptId);

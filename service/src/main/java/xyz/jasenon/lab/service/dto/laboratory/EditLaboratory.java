@@ -59,4 +59,9 @@ public class EditLaboratory {
      */
     private Integer area;
 
+    /**
+     * 简介
+     */
+    private String intro;
+
 }
