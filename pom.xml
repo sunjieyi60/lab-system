@@ -19,6 +19,7 @@
         <module>common</module>
         <module>mqtt</module>
         <module>service</module>
+        <module>class_time_table</module>
     </modules>
 
     <properties>
