@@ -23,10 +23,7 @@ import xyz.jasenon.lab.service.dto.user.UserLogin;
 import xyz.jasenon.lab.service.entity.UserPermission;
 import xyz.jasenon.lab.service.mapper.*;
 import xyz.jasenon.lab.service.service.IUserService;
-import xyz.jasenon.lab.service.vo.DeptVo;
-import xyz.jasenon.lab.service.vo.LaboratoryVo;
-import xyz.jasenon.lab.service.vo.UserBizVo;
-import xyz.jasenon.lab.service.vo.UserPermissionVo;
+import xyz.jasenon.lab.service.vo.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,6 +47,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private UserPermissionMapper userPermissionMapper;
     @Autowired
     private LaboratoryMapper laboratoryMapper;
+    @Autowired
+    private LaboratoryManagerMapper laboratoryManagerMapper;
     @Autowired
     private BuildingMapper buildingMapper;
     @Autowired
@@ -317,6 +316,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         .leftJoin(Laboratory.class, on->on.eq(LaboratoryUser::getUserId, user.getId())
                                 .eq(LaboratoryUser::getLaboratoryId, Laboratory::getId))
         );
+        laboratories.forEach(one->{
+            var Q = new MPJLambdaWrapper<LaboratoryManager>()
+                    .selectAll(User.class)
+                    .eq(LaboratoryManager::getLaboratoryId,one.getLaboratoryId())
+                    .leftJoin(User.class,User::getId, LaboratoryManager::getUserId);
+            List<UserVo> managers = laboratoryManagerMapper.selectJoinList(UserVo.class,Q);
+            one.setManagers(managers);
+        });
         List<UserPermission> userPermissions = userPermissionMapper.selectList(
                 new LambdaQueryWrapper<UserPermission>().eq(UserPermission::getUserId, user.getId())
         );
@@ -327,7 +334,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return vo;
         }).toList();
 
-        List<Building> buildings = laboratories.stream().map(Laboratory::getBelongToBuilding).collect(Collectors.toSet())
+        List<Building> buildings = laboratories.stream().map(LaboratoryVo::getBelongToBuilding).collect(Collectors.toSet())
                         .stream().map(buildingId -> buildingMapper.selectById(buildingId)
                 ).toList();
 

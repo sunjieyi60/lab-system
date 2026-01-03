@@ -8,3 +8,4 @@ public interface LogInterpreter<T> {
     String render(T payload);
 }
 
+

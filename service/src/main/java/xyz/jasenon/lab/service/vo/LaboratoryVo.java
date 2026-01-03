@@ -2,9 +2,13 @@ package xyz.jasenon.lab.service.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
 public class LaboratoryVo {
 
     /**
@@ -43,5 +47,14 @@ public class LaboratoryVo {
      */
     private Integer area;
 
+    /**
+     *  简介
+     */
+    private String intro;
+
+    /**
+     * 实验室管理人员
+     */
+    private List<UserVo> managers;
 
 }

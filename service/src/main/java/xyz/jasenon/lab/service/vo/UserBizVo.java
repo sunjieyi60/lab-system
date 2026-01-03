@@ -51,7 +51,7 @@ public class UserBizVo {
     /**
      * 用户所拥有的实验室
      */
-    private List<Laboratory> laboratories;
+    private List<LaboratoryVo> laboratories;
 
     /**
      * 用户所能看到的楼栋
