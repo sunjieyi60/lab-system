@@ -2,3 +2,4 @@
 mvnw
 mvnw.cmd
 .idea
+node_modules/
