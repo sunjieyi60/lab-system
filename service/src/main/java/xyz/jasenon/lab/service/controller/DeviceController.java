@@ -30,7 +30,7 @@ public class DeviceController {
     @RequestPermission(allowed = { Permissions.DEVICE_ADD })
     @PostMapping("/create")
     public R createDevice(@RequestBody CreateDevice createDevice) {
-        return DeviceCreateFactory.getDeviceCreateStrategy(createDevice.getDeviceType())
+        return DeviceCreateFactory.getDeviceCreateMethod(createDevice.getDeviceType())
                 .insertDevice(createDevice);
     }
 

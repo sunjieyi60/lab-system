@@ -34,8 +34,8 @@ public class BaseRecord {
     private Origin origin;
 
     /**
-     * rs485Id: RS485网关ID，非数据库字段
+     * deviceId: 设备ID
      */
-    private Long rs485Id;
+    private Long deviceId;
 
 }

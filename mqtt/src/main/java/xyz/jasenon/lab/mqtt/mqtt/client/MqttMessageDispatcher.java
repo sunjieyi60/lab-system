@@ -1,8 +1,9 @@
-package xyz.jasenon.lab.mqtt.mqtt.client.handler;
+package xyz.jasenon.lab.mqtt.mqtt.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.mqtt.mqtt.client.handler.MqttMessageHandler;
 
 import java.util.Map;
 

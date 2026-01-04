@@ -14,12 +14,14 @@ import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.common.entity.device.gateway.SocketGateway;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.DeleteDevice;
-import xyz.jasenon.lab.service.mapper.DeviceMapper;
+import xyz.jasenon.lab.service.mapper.record.DeviceMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
-import xyz.jasenon.lab.service.mapper.RS485GatewayMapper;
-import xyz.jasenon.lab.service.mapper.SocketGatewayMapper;
+import xyz.jasenon.lab.service.mapper.record.RS485GatewayMapper;
+import xyz.jasenon.lab.service.mapper.record.SocketGatewayMapper;
 import xyz.jasenon.lab.service.service.IDeviceService;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
+import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordFactory;
+import xyz.jasenon.lab.service.vo.DeviceVo;
 import xyz.jasenon.lab.service.vo.Rs485GatewayVo;
 import xyz.jasenon.lab.service.vo.SocketGatewayVo;
 
@@ -109,14 +111,26 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
-    public R<Map<Long,List<Device>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType) {
+    public R<Map<Long,List<DeviceVo>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType) {
         List<Long> laboratoryIdsVisible = getVisibleLaboratories().stream().map(l->l.getId()).toList();
         boolean isOver = !new HashSet<>(laboratoryIdsVisible).containsAll(laboratoryIds);
         if(isOver){
             return R.fail("查询越权!");
         }
-        List<Device> res = DeviceCreateFactory.getDeviceCreateStrategy(deviceType).list(laboratoryIds);
-        Map<Long,List<Device>> map = res.stream().collect(Collectors.groupingBy(Device::getBelongToLaboratoryId, Collectors.toList()));
+        List<Device> res = DeviceCreateFactory.getDeviceCreateMethod(deviceType).list(laboratoryIds);
+        if(res.isEmpty()){
+            return R.fail("查询无结果");
+        }
+        List<DeviceVo> devices = res.stream().filter(r->r.getId()!=null).map(device -> {
+            DeviceVo vo = new DeviceVo();
+            var record = DeviceRecordFactory.getDeviceRecordMethod(deviceType).getRecord(device.getId());
+            vo.setDeviceRecord(record);
+            vo.setDevice(device);
+            return vo;
+        }).toList();
+        Map<Long,List<DeviceVo>> map = devices.stream()
+                .filter(vo->vo.getDevice()!=null)
+                .collect(Collectors.groupingBy(DeviceVo::getDeviceId, Collectors.toList()));
         return R.success(map,"获取成功");
     }
 

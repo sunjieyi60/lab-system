@@ -24,7 +24,7 @@ public class CircuitBreakMessageHandler
     }
 
     @Override
-    CircuitBreakRecord decryptPayload(byte[] payload, Long rs485Id) {
+    CircuitBreakRecord decryptPayload(byte[] payload, Long deviceId) {
         Integer address = payload[0] & 0xFF;
         byte[] payload1 = new byte[] { payload[3], payload[4] };
         String fixStatus = Integer.toBinaryString(payload1[0]).length() > 1 ? Integer.toBinaryString(payload1[0])
@@ -70,7 +70,7 @@ public class CircuitBreakMessageHandler
                 .setPower(power)
                 .setTemperature(temperture)
                 .setVoltage(voltage)
-                .setRs485Id(rs485Id);
+                .setDeviceId(deviceId);
 
         return circuitBreakRecord;
     }

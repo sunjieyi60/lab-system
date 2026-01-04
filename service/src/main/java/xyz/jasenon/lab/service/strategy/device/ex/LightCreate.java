@@ -10,9 +10,9 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Light;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateLight;
-import xyz.jasenon.lab.service.mapper.LightMapper;
+import xyz.jasenon.lab.service.mapper.record.LightMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
+import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,19 +24,19 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class LightCreateStrategy extends DeviceCreateStrategy<LightMapper, Light> {
-    public LightCreateStrategy(LightMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+public class LightCreate extends DeviceCreate<LightMapper, Light> {
+    public LightCreate(LightMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateStrategy(DeviceType.Light, this);
+        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.Light, this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("LightCreateStrategy registered");
+        log.info("LightCreate registered");
     }
 
     @Override

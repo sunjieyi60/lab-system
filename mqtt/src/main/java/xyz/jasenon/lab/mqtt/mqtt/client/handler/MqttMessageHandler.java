@@ -9,6 +9,8 @@ import xyz.jasenon.lab.common.entity.BaseEntity;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.record.BaseRecord;
 
+import java.time.Duration;
+
 @Slf4j
 public abstract class MqttMessageHandler<DM extends BaseMapper<D>, RM extends BaseMapper<R>, D extends BaseEntity, R extends BaseRecord> {
 
@@ -34,11 +36,11 @@ public abstract class MqttMessageHandler<DM extends BaseMapper<D>, RM extends Ba
         Assert.notNull(device, "设备数据解析失败, 未知的设备");
         R record = decryptPayload(payloads, rs485Id);
         RBucket<R> recordSpace = redissonClient.getBucket(deviceType.getRedisPrefix() + device.getId());
-        recordSpace.set(record);
+        recordSpace.set(record, Duration.ofSeconds(30));
         recordMapper.insert(record);
     }
 
-    abstract R decryptPayload(byte[] payload, Long rs485Id);
+    abstract R decryptPayload(byte[] payload, Long deviceId);
 
     abstract D parse(byte[] payload, Long rs485Id);
 

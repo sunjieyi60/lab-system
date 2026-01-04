@@ -6,7 +6,7 @@ import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.gateway.CreateRS485Gateway;
 import xyz.jasenon.lab.service.dto.gateway.DeleteRS485Gateway;
-import xyz.jasenon.lab.service.mapper.RS485GatewayMapper;
+import xyz.jasenon.lab.service.mapper.record.RS485GatewayMapper;
 import xyz.jasenon.lab.service.service.IRS485GatewayService;
 
 /**

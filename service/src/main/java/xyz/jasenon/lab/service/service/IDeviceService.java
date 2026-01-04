@@ -5,6 +5,7 @@ import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.DeleteDevice;
+import xyz.jasenon.lab.service.vo.DeviceVo;
 import xyz.jasenon.lab.service.vo.Rs485GatewayVo;
 import xyz.jasenon.lab.service.vo.SocketGatewayVo;
 
@@ -23,5 +24,5 @@ public interface IDeviceService extends IService<Device> {
 
     R<Map<Long, List<SocketGatewayVo>>> getSocketGatewayTree();
 
-    R<Map<Long,List<Device>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType);
+    R<Map<Long,List<DeviceVo>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType);
 }

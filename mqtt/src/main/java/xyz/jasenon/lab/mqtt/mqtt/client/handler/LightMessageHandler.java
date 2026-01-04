@@ -22,7 +22,7 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
     }
 
     @Override
-    LightRecord decryptPayload(byte[] payload, Long rs485Id) {
+    LightRecord decryptPayload(byte[] payload, Long deviceId) {
         Integer address = payload[0] & 0xFF;
         Integer selfId = payload[1] & 0xFF;
 
@@ -31,7 +31,7 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
                 .setSelfId(selfId)
                 .setIsOpen(payload[3] == (byte) 0xff)
                 .setIsLock(payload[4] == (byte) 0xff)
-                .setRs485Id(rs485Id);
+                .setDeviceId(deviceId);
 
         return lightRecord;
     }

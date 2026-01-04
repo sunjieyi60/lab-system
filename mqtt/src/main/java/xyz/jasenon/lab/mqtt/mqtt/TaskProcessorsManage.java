@@ -11,7 +11,7 @@ import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttAcceptClient;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttClientProperties;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttSendClient;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.MqttMessageDispatcher;
+import xyz.jasenon.lab.mqtt.mqtt.client.MqttMessageDispatcher;
 import xyz.jasenon.lab.mqtt.service.IRS485GatewayService;
 import xyz.jasenon.lab.mqtt.setnx.MqttNx;
 

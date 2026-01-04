@@ -10,9 +10,9 @@ import xyz.jasenon.lab.common.entity.device.AirCondition;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.service.dto.device.CreateAirCondition;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
-import xyz.jasenon.lab.service.mapper.AirConditionMapper;
+import xyz.jasenon.lab.service.mapper.record.AirConditionMapper;
+import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,20 +24,20 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class AirConditionCreateStrategy extends DeviceCreateStrategy<AirConditionMapper, AirCondition> {
+public class AirConditionCreate extends DeviceCreate<AirConditionMapper, AirCondition> {
 
-    public AirConditionCreateStrategy(AirConditionMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public AirConditionCreate(AirConditionMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateStrategy(DeviceType.AirCondition,this);
+        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.AirCondition,this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("AirConditionCreateStrategy registered");
+        log.info("AirConditionCreate registered");
     }
 
     @Override

@@ -8,7 +8,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import xyz.jasenon.lab.mqtt.mqtt.client.handler.MqttMessageDispatcher;
 import xyz.jasenon.lab.mqtt.setnx.MqttNx;
 
 @Slf4j

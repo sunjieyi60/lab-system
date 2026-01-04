@@ -11,13 +11,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DeviceCreateFactory {
 
-    private final static Map<DeviceType,DeviceCreateStrategy> STRATEGY = new ConcurrentHashMap<>();
+    private final static Map<DeviceType, DeviceCreate> STRATEGY = new ConcurrentHashMap<>();
 
-    public static DeviceCreateStrategy getDeviceCreateStrategy(DeviceType deviceType) {
+    public static DeviceCreate getDeviceCreateMethod(DeviceType deviceType) {
         return STRATEGY.get(deviceType);
     }
 
-    public static void registerDeviceCreateStrategy(DeviceType deviceType, DeviceCreateStrategy<?,?> strategy) {
+    public static void registerDeviceCreateMethod(DeviceType deviceType, DeviceCreate<?,?> strategy) {
         STRATEGY.put(deviceType,strategy);
     }
 

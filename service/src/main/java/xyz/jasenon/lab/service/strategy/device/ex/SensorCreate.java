@@ -10,9 +10,9 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Sensor;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateSensor;
-import xyz.jasenon.lab.service.mapper.SensorMapper;
+import xyz.jasenon.lab.service.mapper.record.SensorMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateStrategy;
+import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,20 +24,20 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class SensorCreateStrategy extends DeviceCreateStrategy<SensorMapper, Sensor> {
+public class SensorCreate extends DeviceCreate<SensorMapper, Sensor> {
 
-    public SensorCreateStrategy(SensorMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public SensorCreate(SensorMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateStrategy(DeviceType.Sensor, this);
+        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.Sensor, this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("SensorCreateStrategy registered");
+        log.info("SensorCreate registered");
     }
 
     @Override

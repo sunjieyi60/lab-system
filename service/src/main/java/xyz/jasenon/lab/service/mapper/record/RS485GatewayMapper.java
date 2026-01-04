@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.service.mapper;
+package xyz.jasenon.lab.service.mapper.record;
 
 import com.github.yulichang.base.MPJBaseMapper;
 import org.apache.ibatis.annotations.Mapper;

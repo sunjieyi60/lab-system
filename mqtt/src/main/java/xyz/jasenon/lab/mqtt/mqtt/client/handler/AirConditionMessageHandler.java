@@ -25,7 +25,7 @@ public class AirConditionMessageHandler
     }
 
     @Override
-    AirConditionRecord decryptPayload(byte[] payload, Long rs485Id) {
+    AirConditionRecord decryptPayload(byte[] payload, Long deviceId) {
         Integer address = payload[0] & 0xFF;
         Integer selfId = payload[1] & 0xFF;
 
@@ -51,7 +51,7 @@ public class AirConditionMessageHandler
         }
         Integer errorCode = payload[7] & 0xFF;
 
-        AirConditionRecord record = new AirConditionRecord()
+        AirConditionRecord record = (AirConditionRecord) new AirConditionRecord()
                 .setAddress(address)
                 .setSelfId(selfId)
                 .setIsOpen(isOpen)
@@ -59,7 +59,8 @@ public class AirConditionMessageHandler
                 .setSpeed(speed)
                 .setTemperature(temperature)
                 .setRoomTemperature(roomTemperature)
-                .setErrorCode(errorCode);
+                .setErrorCode(errorCode)
+                .setDeviceId(deviceId);
 
         return record;
     }

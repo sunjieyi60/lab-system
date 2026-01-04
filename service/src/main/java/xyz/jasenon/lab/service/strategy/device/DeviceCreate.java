@@ -15,12 +15,12 @@ import java.util.List;
  * @date 2025/11/28
  */
 @Slf4j
-public abstract class DeviceCreateStrategy<M extends BaseMapper<T>,T extends Device > {
+public abstract class DeviceCreate<M extends BaseMapper<T>,T extends Device > {
 
     protected final M deviceMapper;
     protected final PollingScheduleExecutorPool pollingScheduleExecutorPool;
 
-    public DeviceCreateStrategy(M deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public DeviceCreate(M deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         this.deviceMapper = deviceMapper;
         register();
         afterPropertiesSet();

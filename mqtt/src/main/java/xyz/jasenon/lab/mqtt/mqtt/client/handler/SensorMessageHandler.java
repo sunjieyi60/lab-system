@@ -22,7 +22,7 @@ public class SensorMessageHandler extends MqttMessageHandler<SensorMapper, Senso
     }
 
     @Override
-    SensorRecord decryptPayload(byte[] payload, Long rs485Id) {
+    SensorRecord decryptPayload(byte[] payload, Long deviceId) {
         Integer address = payload[0] & 0xff;
         Integer selfId = payload[2] & 0xff;
         Double temperature = Integer.parseInt(Integer.toHexString(payload[3]) + Integer.toHexString(payload[4]), 16)
@@ -40,7 +40,7 @@ public class SensorMessageHandler extends MqttMessageHandler<SensorMapper, Senso
                 .setSmoke(smoke)
                 .setAddress(address)
                 .setSelfId(selfId)
-                .setRs485Id(rs485Id);
+                .setDeviceId(deviceId);
 
         return sensorRecord;
     }

@@ -6,7 +6,7 @@ import xyz.jasenon.lab.common.entity.device.gateway.SocketGateway;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.gateway.CreateSocketGateway;
 import xyz.jasenon.lab.service.dto.gateway.DeleteSocketGateway;
-import xyz.jasenon.lab.service.mapper.SocketGatewayMapper;
+import xyz.jasenon.lab.service.mapper.record.SocketGatewayMapper;
 import xyz.jasenon.lab.service.service.ISocketGatewayService;
 
 /**

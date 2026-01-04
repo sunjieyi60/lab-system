@@ -36,7 +36,7 @@ public class AccessMessageHandler extends MqttMessageHandler<AccessMapper,Access
     }
 
     @Override
-    public AccessRecord decryptPayload(byte[] payload, Long rs485Id){
+    public AccessRecord decryptPayload(byte[] payload, Long deviceId){
         Integer address = payload[0] & 0xff;
         Integer selfId = payload[2] & 0xff;
 
@@ -57,7 +57,7 @@ public class AccessMessageHandler extends MqttMessageHandler<AccessMapper,Access
                 .setIsLock(isLcok)
                 .setLockStatus(lockStatus)
                 .setDelayTime(delayTime)
-                .setRs485Id(rs485Id);
+                .setDeviceId(deviceId);
 
         return accessRecord;
     }
