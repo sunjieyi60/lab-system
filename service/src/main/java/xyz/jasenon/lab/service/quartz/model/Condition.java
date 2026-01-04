@@ -1,9 +1,14 @@
 package xyz.jasenon.lab.service.quartz.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Jasenon_ce
  * @date 2026/1/4
  */
+@Getter
+@Setter
 public class Condition {
     /**
      * 条件ID

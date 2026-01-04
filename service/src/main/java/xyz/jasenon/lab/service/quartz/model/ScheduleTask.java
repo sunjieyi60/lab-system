@@ -1,9 +1,16 @@
 package xyz.jasenon.lab.service.quartz.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+
 /**
  * @author Jasenon_ce
  * @date 2026/1/4
  */
+@Getter
+@Setter
 public class ScheduleTask {
 
     /**
@@ -25,6 +32,12 @@ public class ScheduleTask {
      * 是否启用
      */
     private String enable;
+
+    /**
+     * 开始日期，结束日期
+     */
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     /**
      * 实验室id

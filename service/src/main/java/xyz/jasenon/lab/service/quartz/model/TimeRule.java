@@ -6,7 +6,6 @@ import lombok.Setter;
 import xyz.jasenon.lab.common.entity.class_time_table.Schedule;
 import xyz.jasenon.lab.common.entity.class_time_table.WeekType;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
