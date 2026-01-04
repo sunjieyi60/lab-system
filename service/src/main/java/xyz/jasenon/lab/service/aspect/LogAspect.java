@@ -41,11 +41,11 @@ public class LogAspect {
         // 按需注册解释器，可后续扩展为 Spring 容器扫描或配置化
         interpreters.put(CreateBuilding.class, payload -> {
             CreateBuilding dto = (CreateBuilding) payload;
-            return "用户" + currentUser() + "创建了楼栋[" + dto.getBuildingName() + "]，部门ID列表" + dto.getDeptIds();
+            return "用户xxx" + "创建了楼栋[" + dto.getBuildingName() + "]，部门ID列表" + dto.getDeptIds();
         });
         interpreters.put(EditBuilding.class, payload -> {
             EditBuilding dto = (EditBuilding) payload;
-            return "用户" + currentUser() + "编辑了楼栋[" + dto.getBuildingId() + ":" + dto.getBuildingName() + "]";
+            return "用户xxx" + "编辑了楼栋[" + dto.getBuildingId() + ":" + dto.getBuildingName() + "]";
         });
     }
 
