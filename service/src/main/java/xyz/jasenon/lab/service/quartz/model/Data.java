@@ -24,9 +24,9 @@ public class Data {
     private String id;
 
     /**
-     * 数据组ID
+     * 任务组id
      */
-    private String dataGroupId;
+    private String scheduleTaskId;
 
     /**
      * 设备ID
