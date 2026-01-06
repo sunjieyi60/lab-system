@@ -11,8 +11,8 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.service.dto.device.CreateCircuitBreak;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.record.CircuitBreakMapper;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,19 +24,19 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class CircuitBreakCreate extends DeviceCreate<CircuitBreakMapper, CircuitBreak> {
-    public CircuitBreakCreate(CircuitBreakMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
+    public CircuitBreakQ(CircuitBreakMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.CircuitBreak, this);
+        DeviceFactory.registerDeviceQMethod(DeviceType.CircuitBreak, this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("CircuitBreakCreate registered");
+        log.info("CircuitBreakQ registered");
     }
 
     @Override

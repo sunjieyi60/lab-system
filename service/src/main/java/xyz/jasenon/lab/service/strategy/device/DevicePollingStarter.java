@@ -18,15 +18,15 @@ public class DevicePollingStarter {
     @Autowired
     private ILaboratoryService laboratoryService;
     @Autowired
-    private AccessCreate accessCreateStrategy;
+    private AccessQ accessCreateStrategy;
     @Autowired
-    private AirConditionCreate airConditionCreateStrategy;
+    private AirConditionQ airConditionCreateStrategy;
     @Autowired
-    private CircuitBreakCreate circuitBreakCreateStrategy;
+    private CircuitBreakQ circuitBreakCreateStrategy;
     @Autowired
-    private SensorCreate sensorCreateStrategy;
+    private SensorQ sensorCreateStrategy;
     @Autowired
-    private LightCreate lightCreateStrategy;
+    private LightQ lightCreateStrategy;
 
     @PostConstruct
     public void init(){

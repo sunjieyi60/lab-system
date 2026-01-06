@@ -19,6 +19,11 @@ public class Alarm {
     private String id;
 
     /**
+     * 任务组id
+     */
+    private String scheduleTaskId;
+
+    /**
      * 用户ID
      */
     private Long userId;
@@ -28,12 +33,7 @@ public class Alarm {
      */
     private AlarmType type;
 
-    /**
-     * 报警分组ID
-     */
-    private String alarmGroupId;
-
-    enum AlarmType {
+    public enum AlarmType {
         SMS,
         SMTP;
     }

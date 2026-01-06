@@ -1,11 +1,13 @@
 package xyz.jasenon.lab.service.quartz.check;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author Jasenon_ce
  * @date 2026/1/4
  */
+@Getter
 @AllArgsConstructor
 public class Result<T> {
     private T data;

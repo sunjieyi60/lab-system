@@ -9,15 +9,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Jasenon_ce
  * @date 2025/11/28
  */
-public class DeviceCreateFactory {
+public class DeviceFactory {
 
-    private final static Map<DeviceType, DeviceCreate> STRATEGY = new ConcurrentHashMap<>();
+    private final static Map<DeviceType, DeviceQ> STRATEGY = new ConcurrentHashMap<>();
 
-    public static DeviceCreate getDeviceCreateMethod(DeviceType deviceType) {
+    public static DeviceQ getDeviceQMethod(DeviceType deviceType) {
         return STRATEGY.get(deviceType);
     }
 
-    public static void registerDeviceCreateMethod(DeviceType deviceType, DeviceCreate<?,?> strategy) {
+    public static void registerDeviceQMethod(DeviceType deviceType, DeviceQ<?,?> strategy) {
         STRATEGY.put(deviceType,strategy);
     }
 

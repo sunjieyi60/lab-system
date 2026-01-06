@@ -11,8 +11,8 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.service.dto.device.CreateAccess;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.record.AccessMapper;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceQ;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,20 +24,20 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class AccessCreate extends DeviceCreate<AccessMapper, Access> {
+public class AccessQ extends DeviceQ<AccessMapper, Access> {
 
-    public AccessCreate(AccessMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public AccessQ(AccessMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.Access, this);
+        DeviceFactory.registerDeviceQMethod(DeviceType.Access, this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("AccessCreate registered");
+        log.info("AccessQ registered");
     }
 
     @Override

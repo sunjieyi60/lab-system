@@ -11,8 +11,8 @@ import xyz.jasenon.lab.common.entity.device.Light;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateLight;
 import xyz.jasenon.lab.service.mapper.record.LightMapper;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,19 +24,19 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class LightCreate extends DeviceCreate<LightMapper, Light> {
-    public LightCreate(LightMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+public class LightQ extends DeviceQ<LightMapper, Light> {
+    public LightQ(LightMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.Light, this);
+        DeviceFactory.registerDeviceQMethod(DeviceType.Light, this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("LightCreate registered");
+        log.info("LightQ registered");
     }
 
     @Override

@@ -21,6 +21,7 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
 @TableName("action")
 public class Action {
 
+    private String id;
     /**
      * 设备类型
      */
@@ -45,6 +46,8 @@ public class Action {
     @NotEmpty(message = "参数列表不能为空")
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Integer[] args;
+
+    private String actionGroupId;
 
     public Task convert2Task(){
         Task task = new Task();

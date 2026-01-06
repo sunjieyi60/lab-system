@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.class_time_table.Schedule;
 import xyz.jasenon.lab.common.entity.class_time_table.WeekType;
+import xyz.jasenon.lab.service.time_order.TimeOrder;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -51,7 +52,9 @@ public class TimeRule {
     /**
      * 开始时间，结束时间
      */
+    @TimeOrder(order = 0)
     private LocalTime startTime;
+    @TimeOrder(order = 1)
     private LocalTime endTime;
 
     public TimeRule courseSchedule2TimeRule(Schedule schedule){

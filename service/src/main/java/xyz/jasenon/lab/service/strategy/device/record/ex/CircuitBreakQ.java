@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.service.strategy.device.record.ex;
 
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.record.CircuitBreakRecord;
@@ -12,8 +13,8 @@ import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordQ;
  */
 @Component
 public class CircuitBreakQ extends DeviceRecordQ<CircuitBreakRecordMapper, CircuitBreakRecord> {
-    public CircuitBreakQ(CircuitBreakRecordMapper recordMapper) {
-        super(recordMapper, DeviceType.CircuitBreak);
+    public CircuitBreakQ(CircuitBreakRecordMapper recordMapper, RedissonClient client) {
+        super(recordMapper, DeviceType.CircuitBreak, client);
         register();
     }
 }

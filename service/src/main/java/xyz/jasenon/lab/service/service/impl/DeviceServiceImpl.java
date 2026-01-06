@@ -19,8 +19,9 @@ import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.mapper.record.RS485GatewayMapper;
 import xyz.jasenon.lab.service.mapper.record.SocketGatewayMapper;
 import xyz.jasenon.lab.service.service.IDeviceService;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordFactory;
+import xyz.jasenon.lab.service.vo.DeviceRecordVo;
 import xyz.jasenon.lab.service.vo.DeviceVo;
 import xyz.jasenon.lab.service.vo.Rs485GatewayVo;
 import xyz.jasenon.lab.service.vo.SocketGatewayVo;
@@ -44,6 +45,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     private RS485GatewayMapper rs485GatewayMapper;
     @Autowired
     private SocketGatewayMapper socketGatewayMapper;
+
 
     @Override
     public R deleteDevice(DeleteDevice deleteDevice) {
@@ -117,13 +119,13 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         if(isOver){
             return R.fail("查询越权!");
         }
-        List<Device> res = DeviceCreateFactory.getDeviceCreateMethod(deviceType).list(laboratoryIds);
+        List<? extends Device> res = DeviceFactory.getDeviceQMethod(deviceType).list(laboratoryIds);
         if(res.isEmpty()){
             return R.fail("查询无结果");
         }
         List<DeviceVo> devices = res.stream().filter(r->r.getId()!=null).map(device -> {
             DeviceVo vo = new DeviceVo();
-            var record = DeviceRecordFactory.getDeviceRecordMethod(deviceType).getRecord(device.getId());
+            DeviceRecordVo<?> record = DeviceRecordFactory.getDeviceRecordMethod(deviceType).getRecord(device.getId());
             vo.setDeviceRecord(record);
             vo.setDevice(device);
             return vo;

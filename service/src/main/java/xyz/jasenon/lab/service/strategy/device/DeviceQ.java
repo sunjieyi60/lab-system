@@ -15,12 +15,12 @@ import java.util.List;
  * @date 2025/11/28
  */
 @Slf4j
-public abstract class DeviceCreate<M extends BaseMapper<T>,T extends Device > {
+public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
 
     protected final M deviceMapper;
     protected final PollingScheduleExecutorPool pollingScheduleExecutorPool;
 
-    public DeviceCreate(M deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public DeviceQ(M deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         this.deviceMapper = deviceMapper;
         register();
         afterPropertiesSet();
@@ -38,6 +38,10 @@ public abstract class DeviceCreate<M extends BaseMapper<T>,T extends Device > {
         deviceMapper.insert(device);
         startPolling(device);
         return R.success("创建设备成功");
+    }
+
+    public T getDeviceById(Long id){
+        return deviceMapper.selectById(id);
     }
 
     public abstract List<T> list(List<Long> laboratoryIds);

@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.service.strategy.device.record.ex;
 
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.record.AccessRecord;
@@ -12,8 +13,8 @@ import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordQ;
  */
 @Component
 public class AccessRecordQ extends DeviceRecordQ<AccessRecordMapper, AccessRecord> {
-    public AccessRecordQ(AccessRecordMapper recordMapper) {
-        super(recordMapper, DeviceType.Access);
+    public AccessRecordQ(AccessRecordMapper recordMapper, RedissonClient client) {
+        super(recordMapper, DeviceType.Access, client);
         register();
     }
 }

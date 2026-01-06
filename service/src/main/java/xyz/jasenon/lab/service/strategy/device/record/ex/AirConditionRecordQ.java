@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.service.strategy.device.record.ex;
 
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.record.AirConditionRecord;
@@ -12,8 +13,8 @@ import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordQ;
  */
 @Component
 public class AirConditionRecordQ extends DeviceRecordQ<AirConditionRecordMapper, AirConditionRecord> {
-    public AirConditionRecordQ(AirConditionRecordMapper recordMapper) {
-        super(recordMapper, DeviceType.AirCondition);
+    public AirConditionRecordQ(AirConditionRecordMapper recordMapper, RedissonClient client) {
+        super(recordMapper, DeviceType.AirCondition, client);
         register();
     }
 }

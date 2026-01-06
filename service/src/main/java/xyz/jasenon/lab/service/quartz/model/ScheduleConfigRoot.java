@@ -26,7 +26,7 @@ public class ScheduleConfigRoot {
     /**
      * 数据组
      */
-    private DataGroup dataGroup;
+    private List<Data> dataGroup;
 
     /**
      * 条件组
@@ -41,6 +41,6 @@ public class ScheduleConfigRoot {
     /**
      * 报警配置
      */
-    private AlarmGroup alarmGroup;
+    private List<Alarm> alarmGroup;
 
 }

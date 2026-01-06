@@ -16,7 +16,7 @@ public class Condition {
     private String id;
 
     /**
-     * 条件表达式
+     * 条件表达式 "#{data.id}.{properties} >=< value"
      */
     private String expr;
 

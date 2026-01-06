@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.service.strategy.device.record.ex;
 
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.record.LightRecord;
@@ -12,8 +13,8 @@ import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordQ;
  */
 @Component
 public class LightRecordQ extends DeviceRecordQ<LightRecordMapper, LightRecord> {
-    public LightRecordQ(LightRecordMapper recordMapper) {
-        super(recordMapper, DeviceType.Light);
+    public LightRecordQ(LightRecordMapper recordMapper, RedissonClient client) {
+        super(recordMapper, DeviceType.Light, client);
         register();
     }
 }

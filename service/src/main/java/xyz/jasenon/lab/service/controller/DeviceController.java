@@ -10,7 +10,7 @@ import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.DeleteDevice;
 import xyz.jasenon.lab.service.service.IDeviceService;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.task.TaskDispatch;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class DeviceController {
     @RequestPermission(allowed = { Permissions.DEVICE_ADD })
     @PostMapping("/create")
     public R createDevice(@RequestBody CreateDevice createDevice) {
-        return DeviceCreateFactory.getDeviceCreateMethod(createDevice.getDeviceType())
+        return DeviceFactory.getDeviceQMethod(createDevice.getDeviceType())
                 .insertDevice(createDevice);
     }
 

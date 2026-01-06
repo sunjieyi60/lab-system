@@ -11,8 +11,8 @@ import xyz.jasenon.lab.common.entity.device.Sensor;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateSensor;
 import xyz.jasenon.lab.service.mapper.record.SensorMapper;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,20 +24,20 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class SensorCreate extends DeviceCreate<SensorMapper, Sensor> {
+public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
 
-    public SensorCreate(SensorMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public SensorQ(SensorMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.Sensor, this);
+        DeviceFactory.registerDeviceQMethod(DeviceType.Sensor, this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("SensorCreate registered");
+        log.info("SensorQ registered");
     }
 
     @Override

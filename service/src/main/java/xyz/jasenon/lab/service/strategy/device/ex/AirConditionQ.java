@@ -11,8 +11,8 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.service.dto.device.CreateAirCondition;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.record.AirConditionMapper;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreate;
-import xyz.jasenon.lab.service.strategy.device.DeviceCreateFactory;
+import xyz.jasenon.lab.service.strategy.device.DeviceQ;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 
 import java.util.ArrayList;
@@ -24,20 +24,20 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class AirConditionCreate extends DeviceCreate<AirConditionMapper, AirCondition> {
+public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
 
-    public AirConditionCreate(AirConditionMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public AirConditionQ(AirConditionMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
         super(deviceMapper, pollingScheduleExecutorPool);
     }
 
     @Override
     protected void register() {
-        DeviceCreateFactory.registerDeviceCreateMethod(DeviceType.AirCondition,this);
+        DeviceFactory.registerDeviceQMethod(DeviceType.AirCondition,this);
     }
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("AirConditionCreate registered");
+        log.info("AirConditionQ registered");
     }
 
     @Override

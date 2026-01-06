@@ -34,4 +34,5 @@ public class Device extends BaseEntity {
      */
     private Long belongToLaboratoryId;
 
+
 }
