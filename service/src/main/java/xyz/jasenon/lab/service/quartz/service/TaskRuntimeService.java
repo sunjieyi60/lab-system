@@ -78,7 +78,7 @@ public class TaskRuntimeService {
 
         List<ActionGroup> actionGroups = cfg.getActionGroups();
         for (ActionGroup actionGroup : actionGroups) {
-            Boolean conditionGroupResult = conditionResultMap.getOrDefault(actionGroup.getConditionGroupId(),false);
+            Boolean conditionGroupResult = conditionResultMap.getOrDefault(actionGroup.getConditionGroupId(),true);
             if (!conditionGroupResult){
                 logError("条件组 " + actionGroup.getConditionGroupId() + " 不满足，不执行动作");
                 continue;
