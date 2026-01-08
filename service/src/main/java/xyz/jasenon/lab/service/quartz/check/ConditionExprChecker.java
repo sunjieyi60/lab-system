@@ -12,14 +12,18 @@ import java.util.Map;
  */
 public class ConditionExprChecker {
 
-    private final ExpressionParser parser = new SpelExpressionParser();
+    private static final ExpressionParser parser = new SpelExpressionParser();
 
-    public Result<Boolean> eval(String expr, Map<String, Object> vars) {
+    public static Result<Boolean> eval(String expr, Map<String, Map<String, Object>> vars) {
         Boolean result = parser.parseExpression(expr).getValue(vars, Boolean.class);
         if (result == null) {
-            return Result.error(false, MessageFormat.format("表达式执行结果为空，请检查表达式是否正确: {0},Context上下文：{1}", expr, vars));
+            throw new IllegalArgumentException(MessageFormat.format("表达式执行结果为空，请检查表达式是否正确: {0},Context上下文：{1}", expr, vars));
         }
-        return Result.success(result);
+        if (result) {
+            return Result.success(true);
+        }else{
+            return Result.error(false, "表达式条件不满足");
+        }
     }
 
 }

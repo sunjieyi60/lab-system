@@ -11,8 +11,6 @@ import xyz.jasenon.lab.common.entity.base.User;
 import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.utils.R;
-import xyz.jasenon.lab.service.mapper.UserMapper;
-import xyz.jasenon.lab.service.quartz.check.DataCollector;
 import xyz.jasenon.lab.service.quartz.check.Result;
 import xyz.jasenon.lab.service.quartz.mapper.*;
 import xyz.jasenon.lab.service.quartz.model.*;
@@ -38,6 +36,9 @@ public class ConfigLoader {
     private final TimeRuleMapper timeRuleMapper;
     private final IUserService userService;
 
+    public List<ScheduleTask> getAllTasks(){
+        return scheduleTaskMapper.selectList(new LambdaQueryWrapper<>());
+    }
 
     public ScheduleConfigRoot load(String id){
         ScheduleConfigRoot scheduleConfig = new ScheduleConfigRoot();
@@ -89,10 +90,10 @@ public class ConfigLoader {
         return scheduleConfig;
     }
 
-    public R configCreate(ScheduleConfigRoot scheduleConfig){
+    public Result<Boolean> configCreate(ScheduleConfigRoot scheduleConfig){
         Result<Boolean> verifyConfig = verifyConfig(scheduleConfig);
         if (!verifyConfig.getData()){
-            return R.fail(verifyConfig.getMessage());
+            return verifyConfig;
         }
         ScheduleTask task = scheduleConfig.getTask();
         scheduleTaskMapper.insert(task);
@@ -118,7 +119,7 @@ public class ConfigLoader {
         for (Alarm alarm : scheduleConfig.getAlarmGroup()){
             alarmMapper.insert(alarm);
         }
-        return R.success("配置创建成功!");
+        return Result.success(true);
     }
 
     public Result<Boolean> verifyConfig(ScheduleConfigRoot scheduleConfig){

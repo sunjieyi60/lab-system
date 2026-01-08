@@ -18,7 +18,7 @@ public class TimeRuleChecker {
     @Autowired
     private SemesterMapper semesterMapper;
 
-    private Result<Boolean> check(TimeRule timeRule){
+    public Result<Boolean> check(TimeRule timeRule){
         LocalDateTime now = LocalDateTime.now();
 
         /*

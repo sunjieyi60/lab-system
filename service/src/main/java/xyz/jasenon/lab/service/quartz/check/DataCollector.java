@@ -12,13 +12,13 @@ import java.text.MessageFormat;
  */
 public class DataCollector {
 
-    public Data collect(Data data){
+    public static Data collect(Data data){
         var record = DeviceRecordFactory.getDeviceRecordMethod(data.getDeviceType()).getRecord(data.getDeviceId());
         data.setValue(record);
         return data;
     }
 
-    public Result<Boolean> check(Data data){
+    public static Result<Boolean> check(Data data){
         if (data.getValue().getData().getOrigin() == Origin.MySql){
             return Result.error(false, MessageFormat.format("离线数据不可靠! 数据源为:{0}", data));
         }
