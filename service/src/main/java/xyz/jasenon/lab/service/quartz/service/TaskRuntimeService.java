@@ -65,13 +65,16 @@ public class TaskRuntimeService {
                         Boolean now = conditionResultMap.getOrDefault(conditionGroup.getId(), conditionCheckResult.getData());
                         now = now && conditionCheckResult.getData();
                         conditionResultMap.put(conditionGroup.getId(), now);
+                        break;
                     }
                     case ANY:
                     {
                         Boolean now = conditionResultMap.getOrDefault(conditionGroup.getId(), !conditionCheckResult.getData());
                         now = now || conditionCheckResult.getData();
                         conditionResultMap.put(conditionGroup.getId(), now);
+                        break;
                     }
+                    default: throw new RuntimeException("未知的条件组类型");
                 }
             }
         }

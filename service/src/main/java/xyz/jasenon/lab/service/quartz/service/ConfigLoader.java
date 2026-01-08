@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.jasenon.lab.common.entity.base.User;
 import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
@@ -90,6 +91,7 @@ public class ConfigLoader {
         return scheduleConfig;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Result<Boolean> configCreate(ScheduleConfigRoot scheduleConfig){
         Result<Boolean> verifyConfig = verifyConfig(scheduleConfig);
         if (!verifyConfig.getData()){
@@ -275,12 +277,12 @@ public class ConfigLoader {
             }
             switch (alarm.getType()){
                 case SMTP:
-                    if (!user.getEmail().isBlank()){
+                    if (user.getEmail().isBlank()){
                         return Result.error(false, MessageFormat.format("Alarm:{}引用的用户邮箱为空",alarm.getId()));
                     }
                     break;
                 case SMS:
-                    if (!user.getPhone().isBlank()){
+                    if (user.getPhone().isBlank()){
                         return Result.error(false, MessageFormat.format("Alarm:{}引用的用户手机号为空",alarm.getId()));
                     }
                     break;
