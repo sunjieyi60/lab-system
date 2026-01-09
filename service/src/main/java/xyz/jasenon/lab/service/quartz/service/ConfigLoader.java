@@ -1,18 +1,18 @@
 package xyz.jasenon.lab.service.quartz.service;
 
-import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.jasenon.lab.common.entity.base.User;
 import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.quartz.check.Result;
+import xyz.jasenon.lab.service.quartz.config.QuartzRegister;
 import xyz.jasenon.lab.service.quartz.mapper.*;
 import xyz.jasenon.lab.service.quartz.model.*;
 import xyz.jasenon.lab.service.service.IUserService;
@@ -36,6 +36,7 @@ public class ConfigLoader {
     private final DataMapper dataMapper;
     private final TimeRuleMapper timeRuleMapper;
     private final IUserService userService;
+    private final QuartzRegister quartzRegister;
 
     public List<ScheduleTask> getAllTasks(){
         return scheduleTaskMapper.selectList(new LambdaQueryWrapper<>());
@@ -92,7 +93,7 @@ public class ConfigLoader {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Result<Boolean> configCreate(ScheduleConfigRoot scheduleConfig){
+    public Result<Boolean> configCreate(ScheduleConfigRoot scheduleConfig) {
         Result<Boolean> verifyConfig = verifyConfig(scheduleConfig);
         if (!verifyConfig.getData()){
             return verifyConfig;
@@ -120,6 +121,11 @@ public class ConfigLoader {
         }
         for (Alarm alarm : scheduleConfig.getAlarmGroup()){
             alarmMapper.insert(alarm);
+        }
+        try {
+            quartzRegister.scheduleTask(scheduleConfig);
+        }catch (SchedulerException e){
+            return Result.error(false, e.getMessage());
         }
         return Result.success(true);
     }
@@ -178,6 +184,7 @@ public class ConfigLoader {
         if (!verifyAlarmGroup.getData()){
             return verifyAlarmGroup;
         }
+
         return Result.success(true);
     }
 

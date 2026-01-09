@@ -1,0 +1,84 @@
+{
+  "task": {
+    "id": "task-001",
+    "taskName": "晚间温控与照明联动",
+    "cron": "0 0/5 * * * ?",
+    "enable": "true",
+    "startDate": "2026-01-01",
+    "endDate": "2026-12-31",
+    "laboratoryId": 101
+  },
+  "timeRule": {
+    "id": "tr-001",
+    "scheduleTaskId": "task-001",
+    "semesterId": 1,
+    "weekdays": [1,2,3,4,5],          // 周一到周五
+    "startWeek": 1,
+    "endWeek": 20,
+    "weekType": "Both",               // 单双周都执行
+    "startTime": "18:00:00",
+    "endTime": "22:00:00"
+  },
+  "dataGroup": [
+    {
+      "id": "d1",
+      "scheduleTaskId": "task-001",
+      "deviceId": 201,                // 传感器设备ID
+      "deviceType": "Sensor"
+    }
+  ],
+  "conditionGroups": [
+    {
+      "id": "cg1",
+      "type": "ALL",
+      "scheduleTaskId": "task-001",
+      "conditions": [
+        {
+          "id": "c1",
+          "conditionGroupId": "cg1",
+          "expr": "#d1.temperature > 28",   // 注意表达式语法，引用 dataGroup 的 id 和属性
+          "desc": "室温高于28度"
+        },
+        {
+          "id": "c2",
+          "conditionGroupId": "cg1",
+          "expr": "#d1.smoke < 50",
+          "desc": "烟雾浓度低于50"
+        }
+      ]
+    }
+  ],
+  "actionGroups": [
+    {
+      "id": "ag1",
+      "scheduleTaskId": "task-001",
+      "conditionGroupId": "cg1",
+      "actions": [
+        {
+          "id": "a1",
+          "actionGroupId": "ag1",
+          "deviceType": "AirCondition",
+          "deviceId": 301,                       // 空调设备ID
+          "commandLine": "OPEN_AIR_CONDITION_RS485",
+          "args": [0x1F, 0x01]                   // 按 commandLine 模板所需的占位符填入
+        },
+        {
+          "id": "a2",
+          "actionGroupId": "ag1",
+          "deviceType": "Light",
+          "deviceId": 401,                       // 灯光设备ID
+          "commandLine": "OPEN_LIGHT",
+          "args": [0x29, 0x01]
+        }
+      ]
+    }
+  ],
+  "alarmGroup": [
+    {
+      "id": "al1",
+      "scheduleTaskId": "task-001",
+      "userId": 501,                // 告警接收用户ID
+      "type": "SMTP"                // 或 SMS
+    }
+  ]
+}
