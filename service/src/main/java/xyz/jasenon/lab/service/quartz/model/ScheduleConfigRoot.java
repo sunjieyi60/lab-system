@@ -43,4 +43,9 @@ public class ScheduleConfigRoot {
      */
     private List<Alarm> alarmGroup;
 
+    /**
+     * 看门狗配置
+     */
+    private WatchDog watchDog;
+
 }
