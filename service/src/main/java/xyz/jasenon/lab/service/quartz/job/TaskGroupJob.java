@@ -6,6 +6,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+import org.springframework.lang.NonNull;
 import xyz.jasenon.lab.service.quartz.service.TaskRuntimeService;
 
 /**
@@ -20,12 +21,12 @@ public class TaskGroupJob extends QuartzJobBean {
     private TaskRuntimeService taskRuntimeService;
 
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException {
         String taskId = context.getMergedJobDataMap().getString("taskId");
         if (taskId == null) {
             log.warn("taskId is missing");
             return;
         }
-        taskRuntimeService.runOnce(taskId);
+        taskRuntimeService.submit(taskId);
     }
 }

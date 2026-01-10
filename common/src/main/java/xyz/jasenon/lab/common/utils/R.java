@@ -29,28 +29,28 @@ public class R<T> implements Serializable {
      */
     private T data;
 
-    public static R success() {
-        R r = new R();
+    public static <T> R<T> success() {
+        R<T> r = new R<>();
         r.setOk(true);
         return r;
     }
 
-    public static <T> R success(T data) {
-        R r = new R();
+    public static <T> R<T> success(T data) {
+        R<T> r = new R<>();
         r.setOk(true);
         r.setData(data);
         return r;
     }
 
-    public static <T> R fail(String msg) {
-        R r = new R();
+    public static <T> R<T> fail(String msg) {
+        R<T> r = new R<>();
         r.setOk(false);
         r.setMsg(msg);
         return r;
     }
 
-    public static <T> R success(T data,String msg) {
-        R r = new R();
+    public static <T> R<T> success(T data,String msg) {
+        R<T> r = new R<>();
         r.setOk(true);
         r.setData(data);
         r.setMsg(msg);

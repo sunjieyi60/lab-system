@@ -19,6 +19,7 @@ import xyz.jasenon.lab.service.service.IUserService;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordFactory;
 import xyz.jasenon.lab.service.vo.DeviceRecordVo;
+import xyz.jasenon.lab.common.entity.record.BaseRecord;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -185,6 +186,16 @@ public class ConfigLoader {
             return verifyAlarmGroup;
         }
 
+        WatchDog watchDog = scheduleConfig.getWatchDog();
+        if (watchDog != null && Boolean.TRUE.equals(watchDog.getWatchEnabled())) {
+            if (watchDog.getWatchIntervalSec() <= 0) {
+                return Result.error(false, MessageFormat.format("WatchDog:{} 间隔必须大于0秒", watchDog));
+            }
+            if (watchDog.getWatchTimeoutSec() <= 0) {
+                return Result.error(false, MessageFormat.format("WatchDog:{} 超时时间必须大于0秒", watchDog));
+            }
+        }
+
         return Result.success(true);
     }
 
@@ -251,7 +262,8 @@ public class ConfigLoader {
             if (!exist){
                 return Result.error(false, MessageFormat.format("Data:{}引用的设备不存在",data.getId()));
             }
-            DeviceRecordVo record = DeviceRecordFactory.getDeviceRecordMethod(data.getDeviceType()).getRecord(data.getDeviceId());
+            @SuppressWarnings("unchecked")
+            DeviceRecordVo<? extends BaseRecord> record = (DeviceRecordVo<? extends BaseRecord>) DeviceRecordFactory.getDeviceRecordMethod(data.getDeviceType()).getRecord(data.getDeviceId());
             if (record == null){
                 return Result.error(false, MessageFormat.format("Data:{}引用的设备记录不存在",data.getId()));
             }
