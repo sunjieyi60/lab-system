@@ -1,5 +1,7 @@
 package xyz.jasenon.lab.service.quartz.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,10 +25,16 @@ public class Condition {
     /**
      * 条件描述
      */
+    @TableField(value = "`desc`")
     private String desc;
 
     /**
      * 条件组ID
      */
     private String conditionGroupId;
+
+    /**
+     * 任务ID（便于批量查询后内存分组，减少N+1）
+     */
+    private String scheduleTaskId;
 }

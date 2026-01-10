@@ -52,13 +52,16 @@ public class ConfigLoader {
         }
         List<ConditionGroup> conditionGroups = conditionGroupMapper.selectList(
                 new LambdaQueryWrapper<ConditionGroup>()
-                        .eq(ConditionGroup::getId, task.getId())
+                        .eq(ConditionGroup::getScheduleTaskId, task.getId())
+        );
+        List<Condition> allConditions = conditionMapper.selectList(
+                new LambdaQueryWrapper<Condition>()
+                        .eq(Condition::getScheduleTaskId, task.getId())
         );
         for(ConditionGroup conditionGroup : conditionGroups){
-            List<Condition> conditions = conditionMapper.selectList(
-                    new LambdaQueryWrapper<Condition>()
-                            .eq(Condition::getConditionGroupId, conditionGroup.getId())
-            );
+            List<Condition> conditions = allConditions.stream()
+                    .filter(c -> conditionGroup.getId().equals(c.getConditionGroupId()))
+                    .toList();
             conditionGroup.setConditions(conditions);
         }
         List<Alarm> alarms = alarmMapper.selectList(
@@ -77,11 +80,14 @@ public class ConfigLoader {
                 new LambdaQueryWrapper<ActionGroup>()
                         .eq(ActionGroup::getScheduleTaskId, task.getId())
         );
+        List<Action> allActions = actionMapper.selectList(
+                new LambdaQueryWrapper<Action>()
+                        .eq(Action::getScheduleTaskId, task.getId())
+        );
         for(ActionGroup actionGroup : actionGroups){
-            List<Action> actions = actionMapper.selectList(
-                    new LambdaQueryWrapper<Action>()
-                            .eq(Action::getActionGroupId, actionGroup.getId())
-            );
+            List<Action> actions = allActions.stream()
+                    .filter(a -> actionGroup.getId().equals(a.getActionGroupId()))
+                    .toList();
             actionGroup.setActions(actions);
         }
         scheduleConfig.setTask(task);
@@ -106,6 +112,7 @@ public class ConfigLoader {
             List<Condition> conditions = conditionGroup.getConditions();
             for (Condition condition : conditions){
                 condition.setConditionGroupId(conditionGroup.getId());
+                condition.setScheduleTaskId(task.getId());
                 conditionMapper.insert(condition);
             }
         }
@@ -117,6 +124,7 @@ public class ConfigLoader {
             List<Action> actions = actionGroup.getActions();
             for (Action action : actions){
                 action.setActionGroupId(actionGroup.getId());
+                action.setScheduleTaskId(task.getId());
                 actionMapper.insert(action);
             }
         }
@@ -209,6 +217,9 @@ public class ConfigLoader {
                 if (!action.getActionGroupId().equals(actionGroup.getId())){
                     return Result.error(false, MessageFormat.format("Action:{}不属于当前ActionGroup",action.getId()));
                 }
+                if (!task.getId().equals(action.getScheduleTaskId())){
+                    return Result.error(false, MessageFormat.format("Action:{}不属于当前任务",action.getId()));
+                }
                 Long deviceId = action.getDeviceId();
                 DeviceType deviceType = action.getDeviceType();
                 boolean exist = devices.stream().anyMatch(device -> device.getId().equals(deviceId) && device.getDeviceType() == deviceType);
@@ -229,6 +240,9 @@ public class ConfigLoader {
             for (Condition condition : conditions){
                 if (!condition.getConditionGroupId().equals(conditionGroup.getId())){
                     return Result.error(false, MessageFormat.format("Condition:{}不属于当前ConditionGroup",condition.getId()));
+                }
+                if (!task.getId().equals(condition.getScheduleTaskId())){
+                    return Result.error(false, MessageFormat.format("Condition:{}不属于当前任务",condition.getId()));
                 }
                 String[] args = new String[2];
                 String expr = condition.getExpr();

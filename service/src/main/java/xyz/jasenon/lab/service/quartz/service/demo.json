@@ -37,13 +37,15 @@
           "id": "c1",
           "conditionGroupId": "cg1",
           "expr": "#d1.temperature > 28",   // 注意表达式语法，引用 dataGroup 的 id 和属性
-          "desc": "室温高于28度"
+          "desc": "室温高于28度",
+          "scheduleTaskId": "task-001"
         },
         {
           "id": "c2",
           "conditionGroupId": "cg1",
           "expr": "#d1.smoke < 50",
-          "desc": "烟雾浓度低于50"
+          "desc": "烟雾浓度低于50",
+          "scheduleTaskId": "task-001"
         }
       ]
     }
@@ -60,7 +62,8 @@
           "deviceType": "AirCondition",
           "deviceId": 301,                       // 空调设备ID
           "commandLine": "OPEN_AIR_CONDITION_RS485",
-          "args": [0x1F, 0x01]                   // 按 commandLine 模板所需的占位符填入
+          "args": [1,1],  //严格遵循address selfId 其他参数填充
+          "scheduleTaskId": "task-001"               // 按 commandLine 模板所需的占位符填入
         },
         {
           "id": "a2",
@@ -68,7 +71,8 @@
           "deviceType": "Light",
           "deviceId": 401,                       // 灯光设备ID
           "commandLine": "OPEN_LIGHT",
-          "args": [0x29, 0x01]
+          "args": [2, 1], //严格遵循address selfId 其他参数填充
+          "scheduleTaskId": "task-001"
         }
       ]
     }

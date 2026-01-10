@@ -49,6 +49,11 @@ public class Action {
 
     private String actionGroupId;
 
+    /**
+     * 任务ID（便于批量查询后内存分组，减少N+1）
+     */
+    private String scheduleTaskId;
+
     public Task convert2Task(){
         Task task = new Task();
         task.setPriority(TaskPriority.AUTOMATIC);
