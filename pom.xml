@@ -139,6 +139,13 @@
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>3.52.0</version>
             </dependency>
+
+            <!--api-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>3.0.0</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>

@@ -1,6 +1,9 @@
 package xyz.jasenon.lab.service.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
@@ -15,6 +18,7 @@ import xyz.jasenon.lab.service.service.IUserService;
  * @author Jasenon_ce
  * @date 2025/11/27
  */
+@Api("用户")
 @RestController
 @RequestMapping("/user")
 @CrossOrigin(originPatterns = "*", allowCredentials = "true")
@@ -25,33 +29,39 @@ public class UserController {
 
     @RequestPermission(allowed = {Permissions.USER_ADD})
     @PostMapping("/create")
-    public R createUser(@RequestBody CreateUser createUser){
+    @ApiOperation("创建用户")
+    public R createUser(@Validated @RequestBody CreateUser createUser){
         return userService.createUser(createUser);
     }
 
     @RequestPermission(allowed = {Permissions.USER_EDIT})
     @PutMapping("/edit")
-    public R editUser(@RequestBody EditUser editUser){
+    @ApiOperation("编辑用户")
+    public R editUser(@Validated @RequestBody EditUser editUser){
         return userService.editUser(editUser);
     }
 
     @RequestPermission(allowed = {Permissions.USER_DELETE})
     @DeleteMapping("/delete")
-    public R deleteUser(@RequestBody DeleteUser deleteUser){
+    @ApiOperation("删除用户")
+    public R deleteUser(@Validated @RequestBody DeleteUser deleteUser){
         return userService.deleteUser(deleteUser);
     }
 
     @PostMapping("/login")
-    public R login(@RequestBody UserLogin userLogin){
+    @ApiOperation("登录")
+    public R login(@Validated @RequestBody UserLogin userLogin){
         return userService.login(userLogin);
     }
 
     @GetMapping("/logout")
+    @ApiOperation("退出登录")
     public R logout(){
         return userService.logout();
     }
 
     @GetMapping("/getCurrentUserDetail")
+    @ApiOperation("获取用户详细信息")
     public R getCurrentUserDetail(){
         return userService.getCurrentUserDetail();
     }

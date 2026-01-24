@@ -1,6 +1,9 @@
 package xyz.jasenon.lab.service.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
@@ -16,6 +19,7 @@ import java.util.List;
  * @author Jasenon_ce
  * @date 2025/11/29
  */
+@Api("学期")
 @RestController
 @RequestMapping("/academic")
 @CrossOrigin(originPatterns = "*", allowCredentials = "true")
@@ -30,73 +34,84 @@ public class CourseController {
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PostMapping("/create/course")
-
-    public R createCourse(@RequestBody CreateCourse createCourse){
+    @ApiOperation("创建课程")
+    public R createCourse(@Validated @RequestBody CreateCourse createCourse){
         return courseService.createCourse(createCourse);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PostMapping("/create/courseSchedule")
-    public R createCourseSchedule(@RequestBody CreateCourseSchedule createCourseSchedule){
+    @ApiOperation("创建课程表")
+    public R createCourseSchedule(@Validated @RequestBody CreateCourseSchedule createCourseSchedule){
         return courseScheduleService.createCourseSchedule(createCourseSchedule);
     }
 
     @RequestPermission(allowed = {Permissions.SEMESTER_SETTINGS})
     @PostMapping("/create/semester")
-    public R createSemester(@RequestBody CreateSemester createSemester){
+    @ApiOperation("创建学期")
+    public R createSemester(@Validated @RequestBody CreateSemester createSemester){
         return semesterService.createSemester(createSemester);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @DeleteMapping("/delete/course")
-    public R deleteCourse(@RequestBody DeleteCourse deleteCourse){
+    @ApiOperation("删除课程")
+    public R deleteCourse(@Validated @RequestBody DeleteCourse deleteCourse){
         return courseService.deleteCourse(deleteCourse);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @DeleteMapping("/delete/courseSchedule")
-    public R deleteCourseSchedule(@RequestBody DeleteCourseSchedule deleteCourseSchedule){
+    @ApiOperation("删除课程表")
+    public R deleteCourseSchedule(@Validated @RequestBody DeleteCourseSchedule deleteCourseSchedule){
         return courseScheduleService.deleteCourseSchedule(deleteCourseSchedule);
     }
 
     @RequestPermission(allowed = {Permissions.SEMESTER_SETTINGS})
     @DeleteMapping("/delete/semester")
-    public R deleteSemester(@RequestBody DeleteSemester deleteSemester){
+    @ApiOperation("删除学期")
+    public R deleteSemester(@Validated @RequestBody DeleteSemester deleteSemester){
         return semesterService.deleteSemester(deleteSemester);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PutMapping("/edit/course")
-    public R editCourse(@RequestBody EditCourse editCourse){
+    @ApiOperation("编辑课程")
+    public R editCourse(@Validated @RequestBody EditCourse editCourse){
         return courseService.editCourse(editCourse);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PutMapping("/edit/semester")
-    public R editSemester(@RequestBody EditSemester editSemester){
+    @ApiOperation("编辑学期")
+    public R editSemester(@Validated @RequestBody EditSemester editSemester){
         return semesterService.editSemester(editSemester);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
     @GetMapping("/list/courseSchedule")
+    @ApiOperation("获取课程表列表")
     public R listCourseSchedule(@RequestParam List<Long> laboratoryIds){
         return courseScheduleService.listCourseSchedule(laboratoryIds);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
     @GetMapping("/list/laboratories")
+    @ApiOperation("获取实验室列表")
     public R listLaboratory(){
         return courseScheduleService.listLaboratory();
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
     @GetMapping("/list/course")
+    @ApiOperation("获取课程列表")
     public R listCourse(){
         return courseService.listCourse();
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
     @GetMapping("/list/semester")
+    @ApiOperation("获取学期列表")
     public R listSemester(){
         return semesterService.listSemester();
     }

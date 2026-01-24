@@ -1,6 +1,9 @@
 package xyz.jasenon.lab.service.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
@@ -19,6 +22,7 @@ import java.util.List;
  * @author Jasenon_ce
  * @date 2025/11/28
  */
+@Api("设备")
 @RestController
 @RequestMapping("/device")
 @CrossOrigin(originPatterns = "*", allowCredentials = "true")
@@ -29,12 +33,14 @@ public class DeviceController {
 
     @RequestPermission(allowed = { Permissions.DEVICE_ADD })
     @PostMapping("/create")
-    public R createDevice(@RequestBody CreateDevice createDevice) {
+    @ApiOperation("创建设备")
+    public R createDevice(@Validated @RequestBody CreateDevice createDevice) {
         return DeviceFactory.getDeviceQMethod(createDevice.getDeviceType())
                 .insertDevice(createDevice);
     }
 
     @PostMapping("/list/device")
+    @ApiOperation("查询设备列表")
     public R listDevice(@RequestParam List<Long> laboratoryIds,
             @RequestParam DeviceType deviceType) {
         return deviceService.listDevice(laboratoryIds, deviceType);
@@ -42,25 +48,29 @@ public class DeviceController {
 
     @RequestPermission(allowed = { Permissions.DEVICE_ADD })
     @DeleteMapping("/delete")
-    public R deleteDevice(@RequestBody DeleteDevice deleteDevice) {
+    @ApiOperation("删除设备")
+    public R deleteDevice(@Validated @RequestBody DeleteDevice deleteDevice) {
         return deviceService.deleteDevice(deleteDevice);
     }
 
     @RequestPermission(allowed = { Permissions.DEVICE_CONTROL })
     @PostMapping("/control")
-    public R controlDevice(@RequestBody Task task) {
+    @ApiOperation("控制设备")
+    public R controlDevice(@Validated @RequestBody Task task) {
         TaskDispatch.dispatch(task);
         return R.success("控制任务下达成功");
     }
 
     @RequestPermission(allowed = { Permissions.DEVICE_ADD })
     @GetMapping("/list/rs485")
+    @ApiOperation("查询 RS485 网关列表")
     public R listRs485Gateway() {
         return deviceService.getRs485GatewayTree();
     }
 
     @RequestPermission(allowed = { Permissions.DEVICE_ADD })
     @GetMapping("/list/socket")
+    @ApiOperation("查询 Socket 网关列表")
     public R listSocketGateway() {
         return deviceService.getSocketGatewayTree();
     }
