@@ -36,7 +36,7 @@ public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
 
     @Override
     protected void afterPropertiesSet() {
-        log.info("CircuitBreakQ registered");
+        log.info("CircuitBreakRecordQ registered");
     }
 
     @Override

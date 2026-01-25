@@ -12,8 +12,8 @@ import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordQ;
  * @date 2026/1/4
  */
 @Component
-public class CircuitBreakQ extends DeviceRecordQ<CircuitBreakRecordMapper, CircuitBreakRecord> {
-    public CircuitBreakQ(CircuitBreakRecordMapper recordMapper, RedissonClient client) {
+public class CircuitBreakRecordQ extends DeviceRecordQ<CircuitBreakRecordMapper, CircuitBreakRecord> {
+    public CircuitBreakRecordQ(CircuitBreakRecordMapper recordMapper, RedissonClient client) {
         super(recordMapper, DeviceType.CircuitBreak, client);
         register();
     }

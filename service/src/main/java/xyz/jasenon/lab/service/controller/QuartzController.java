@@ -28,7 +28,16 @@ public class QuartzController {
     @ApiOperation("创建定时任务")
     public R createConfig(ScheduleConfigRoot scheduleConfigRoot){
         Result<Boolean> res = configLoader.configCreate(scheduleConfigRoot);
-        return res.getData() ? R.success("创建成功") : R.fail(res.getMessage());
+        if (!res.getData()) {
+            return R.fail(res.getMessage());
+        }
+        // 创建成功后注册到Quartz调度器
+        try {
+            quartzRegister.scheduleTask(scheduleConfigRoot);
+        } catch (org.quartz.SchedulerException e) {
+            return R.fail("任务创建成功，但注册到调度器失败: " + e.getMessage());
+        }
+        return R.success("创建成功");
     }
 
 }

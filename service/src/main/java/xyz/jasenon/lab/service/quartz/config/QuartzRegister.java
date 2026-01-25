@@ -4,12 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.service.quartz.job.TaskGroupJob;
 import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
 import xyz.jasenon.lab.service.quartz.model.ScheduleTask;
-import xyz.jasenon.lab.service.quartz.service.TaskRuntimeService;
+import xyz.jasenon.lab.service.quartz.service.ConfigLoader;
 
 import java.util.List;
 
@@ -17,14 +16,17 @@ import java.util.List;
 @Slf4j
 public class QuartzRegister implements InitializingBean {
 
-    @Autowired
-    private TaskRuntimeService taskRuntimeService;
-    @Autowired
-    private Scheduler scheduler;
+    private final ConfigLoader configLoader;
+    private final Scheduler scheduler;
+
+    public QuartzRegister(ConfigLoader configLoader, Scheduler scheduler) {
+        this.configLoader = configLoader;
+        this.scheduler = scheduler;
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        List<TaskGroupRow> taskGroupRows = taskRuntimeService.getAllScheduleTask().stream().map(sc->{
+        List<TaskGroupRow> taskGroupRows = configLoader.getAllTasks().stream().map(sc->{
             var row = new TaskGroupRow(sc.getId(),sc.getCron());
             return row;
         }).toList();

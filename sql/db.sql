@@ -477,4 +477,103 @@ INSERT INTO user_permission (id, user_id, permission) VALUES
   (1113, 100, 'BASE_CUD'),
   (1114, 100, 'BASE_VIEW');
 
+CREATE TABLE schedule_task (
+    id              VARCHAR(64)  PRIMARY KEY,
+    task_name       VARCHAR(128) NOT NULL,
+    cron            VARCHAR(64)  NOT NULL,
+    enable          VARCHAR(8)   NOT NULL,
+    start_date      DATE,
+    end_date        DATE,
+    laboratory_id   BIGINT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE condition_group (
+    id               VARCHAR(64) PRIMARY KEY,
+    type             VARCHAR(16) NOT NULL,          -- ALL / ANY
+    schedule_task_id VARCHAR(64) NOT NULL,
+    CONSTRAINT fk_condition_group_task
+        FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_condition_group_task (schedule_task_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE condition (
+    id                 VARCHAR(64) PRIMARY KEY,
+    expr               VARCHAR(512) NOT NULL,
+    `desc`             VARCHAR(255),
+    condition_group_id VARCHAR(64) NOT NULL,
+    CONSTRAINT fk_condition_group
+        FOREIGN KEY (condition_group_id) REFERENCES condition_group(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_condition_group_id (condition_group_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE action_group (
+    id               VARCHAR(64) PRIMARY KEY,
+    schedule_task_id VARCHAR(64) NOT NULL,
+    condition_group_id VARCHAR(64) NOT NULL,
+    CONSTRAINT fk_action_group_task
+        FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_action_group_condition_group
+        FOREIGN KEY (condition_group_id) REFERENCES condition_group(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_action_group_task (schedule_task_id),
+    INDEX idx_action_group_condition (condition_group_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE action (
+    id              VARCHAR(64) PRIMARY KEY,
+    device_type     VARCHAR(32) NOT NULL,
+    device_id       BIGINT      NOT NULL,
+    command_line    JSON        NOT NULL,
+    args            JSON        NOT NULL,           -- JacksonTypeHandler 持久化数组
+    action_group_id VARCHAR(64) NOT NULL,
+    CONSTRAINT fk_action_group
+        FOREIGN KEY (action_group_id) REFERENCES action_group(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_action_group (action_group_id),
+    INDEX idx_action_device (device_id, device_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE data (
+    id               VARCHAR(64) PRIMARY KEY,
+    schedule_task_id VARCHAR(64) NOT NULL,
+    device_id        BIGINT      NOT NULL,
+    device_type      VARCHAR(32) NOT NULL,
+    CONSTRAINT fk_data_task
+        FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_data_task (schedule_task_id),
+    INDEX idx_data_device (device_id, device_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE time_rule (
+    id               VARCHAR(64) PRIMARY KEY,
+    schedule_task_id VARCHAR(64) NOT NULL UNIQUE,
+    semester_id      BIGINT,
+    weekdays         JSON        NOT NULL,          -- List<Integer>
+    start_week       INT         NOT NULL,
+    end_week         INT         NOT NULL,
+    week_type        VARCHAR(16) NOT NULL,          -- Single / Double / Both
+    start_time       TIME        NOT NULL,
+    end_time         TIME        NOT NULL,
+    CONSTRAINT fk_time_rule_task
+        FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_time_rule_task (schedule_task_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE alarm (
+    id               VARCHAR(64) PRIMARY KEY,
+    schedule_task_id VARCHAR(64) NOT NULL,
+    user_id          BIGINT      NOT NULL,
+    type             VARCHAR(16) NOT NULL,          -- SMTP / SMS
+    CONSTRAINT fk_alarm_task
+        FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_alarm_task (schedule_task_id),
+    INDEX idx_alarm_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -5,14 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.jasenon.lab.common.entity.base.User;
 import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.service.quartz.check.Result;
-import xyz.jasenon.lab.service.quartz.config.QuartzRegister;
 import xyz.jasenon.lab.service.quartz.mapper.*;
 import xyz.jasenon.lab.service.quartz.model.*;
 import xyz.jasenon.lab.service.service.IUserService;
@@ -37,7 +35,6 @@ public class ConfigLoader {
     private final DataMapper dataMapper;
     private final TimeRuleMapper timeRuleMapper;
     private final IUserService userService;
-    private final QuartzRegister quartzRegister;
 
     public List<ScheduleTask> getAllTasks(){
         return scheduleTaskMapper.selectList(new LambdaQueryWrapper<>());
@@ -131,11 +128,7 @@ public class ConfigLoader {
         for (Alarm alarm : scheduleConfig.getAlarmGroup()){
             alarmMapper.insert(alarm);
         }
-        try {
-            quartzRegister.scheduleTask(scheduleConfig);
-        }catch (SchedulerException e){
-            return Result.error(false, e.getMessage());
-        }
+        // 注意：任务注册由调用者（如Controller）负责，避免循环依赖
         return Result.success(true);
     }
 
