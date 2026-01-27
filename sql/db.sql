@@ -119,7 +119,9 @@ CREATE TABLE IF NOT EXISTS device (
   INDEX idx_device_type (device_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- rs485_gateway
+-- ============================================
+-- RS485 Gateway 网关表（RS485协议网关）
+-- ============================================
 CREATE TABLE IF NOT EXISTS rs485_gateway (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   gateway_name VARCHAR(64) NOT NULL,
@@ -131,7 +133,9 @@ CREATE TABLE IF NOT EXISTS rs485_gateway (
   deleted TINYINT(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- socket_gateway
+-- ============================================
+-- Socket Gateway 网关表（Socket协议网关）
+-- ============================================
 CREATE TABLE IF NOT EXISTS socket_gateway (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   mac VARCHAR(32) NULL,
@@ -280,116 +284,122 @@ CREATE TABLE IF NOT EXISTS user_permission (
   INDEX idx_up_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ============================================
+-- 外键约束定义（全部使用 CASCADE）
+-- ============================================
+
 ALTER TABLE dept_building
   ADD CONSTRAINT fk_dept_building_dept
     FOREIGN KEY (dept_id) REFERENCES dept(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_dept_building_building
     FOREIGN KEY (building_id) REFERENCES building(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE dept_user
   ADD CONSTRAINT fk_dept_user_dept
     FOREIGN KEY (dept_id) REFERENCES dept(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_dept_user_user
     FOREIGN KEY (user_id) REFERENCES user(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE laboratory
   ADD CONSTRAINT fk_laboratory_building
     FOREIGN KEY (belong_to_building) REFERENCES building(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE laboratory_manager
   ADD CONSTRAINT fk_lab_manager_lab
     FOREIGN KEY (laboratory_id) REFERENCES laboratory(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_lab_manager_user
     FOREIGN KEY (user_id) REFERENCES user(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE laboratory_user
   ADD CONSTRAINT fk_lab_user_lab
     FOREIGN KEY (laboratory_id) REFERENCES laboratory(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_lab_user_user
     FOREIGN KEY (user_id) REFERENCES user(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE device
   ADD CONSTRAINT fk_device_lab
     FOREIGN KEY (belong_to_laboratory_id) REFERENCES laboratory(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_device_rs485
     FOREIGN KEY (rs485_gateway_id) REFERENCES rs485_gateway(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_device_socket
     FOREIGN KEY (socket_gateway_id) REFERENCES socket_gateway(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- RS485 Gateway 外键
 ALTER TABLE rs485_gateway
   ADD CONSTRAINT fk_rs485_lab
     FOREIGN KEY (belong_to_laboratory_id) REFERENCES laboratory(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- Socket Gateway 外键
 ALTER TABLE socket_gateway
   ADD CONSTRAINT fk_socket_lab
     FOREIGN KEY (belong_to_laboratory_id) REFERENCES laboratory(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE course_schedule
   ADD CONSTRAINT fk_cs_semester
     FOREIGN KEY (semester_id) REFERENCES semester(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_cs_lab
     FOREIGN KEY (laboratory_id) REFERENCES laboratory(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_cs_course
     FOREIGN KEY (course_id) REFERENCES course(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_cs_teacher
     FOREIGN KEY (teacher_id) REFERENCES teacher(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT fk_cs_dept
     FOREIGN KEY (dept_id) REFERENCES dept(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE access_record
   ADD CONSTRAINT fk_access_record_rs485
     FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE air_condition_record
   ADD CONSTRAINT fk_air_record_rs485
     FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE circuit_break_record
   ADD CONSTRAINT fk_cb_record_rs485
     FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE light_record
   ADD CONSTRAINT fk_light_record_rs485
     FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE sensor_record
   ADD CONSTRAINT fk_sensor_record_rs485
     FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE user_permission
   ADD CONSTRAINT fk_user_permission_user
     FOREIGN KEY (user_id) REFERENCES user(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
--- 可选：用户创建者
+-- 用户创建者自引用外键
 ALTER TABLE user
   ADD CONSTRAINT fk_user_created_by
     FOREIGN KEY (create_by) REFERENCES user(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS = 1;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -484,7 +494,8 @@ CREATE TABLE schedule_task (
     enable          VARCHAR(8)   NOT NULL,
     start_date      DATE,
     end_date        DATE,
-    laboratory_id   BIGINT
+    laboratory_id   BIGINT NULL,  -- 可选：所属实验室
+    INDEX idx_schedule_task_lab (laboratory_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE condition_group (
@@ -502,10 +513,15 @@ CREATE TABLE condition (
     expr               VARCHAR(512) NOT NULL,
     `desc`             VARCHAR(255),
     condition_group_id VARCHAR(64) NOT NULL,
+    schedule_task_id   VARCHAR(64) NOT NULL,  -- 任务ID（便于批量查询，减少N+1）
     CONSTRAINT fk_condition_group
         FOREIGN KEY (condition_group_id) REFERENCES condition_group(id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    INDEX idx_condition_group_id (condition_group_id)
+    CONSTRAINT fk_condition_task
+        FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_condition_group_id (condition_group_id),
+    INDEX idx_condition_task_id (schedule_task_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE action_group (
@@ -529,10 +545,15 @@ CREATE TABLE action (
     command_line    JSON        NOT NULL,
     args            JSON        NOT NULL,           -- JacksonTypeHandler 持久化数组
     action_group_id VARCHAR(64) NOT NULL,
+    schedule_task_id VARCHAR(64) NOT NULL,  -- 任务ID（便于批量查询，减少N+1）
     CONSTRAINT fk_action_group
         FOREIGN KEY (action_group_id) REFERENCES action_group(id)
         ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_action_task
+        FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_action_group (action_group_id),
+    INDEX idx_action_task_id (schedule_task_id),
     INDEX idx_action_device (device_id, device_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -551,7 +572,7 @@ CREATE TABLE data (
 CREATE TABLE time_rule (
     id               VARCHAR(64) PRIMARY KEY,
     schedule_task_id VARCHAR(64) NOT NULL UNIQUE,
-    semester_id      BIGINT,
+    semester_id      BIGINT NULL,  -- 可选：学期ID
     weekdays         JSON        NOT NULL,          -- List<Integer>
     start_week       INT         NOT NULL,
     end_week         INT         NOT NULL,
@@ -561,7 +582,11 @@ CREATE TABLE time_rule (
     CONSTRAINT fk_time_rule_task
         FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    INDEX idx_time_rule_task (schedule_task_id)
+    CONSTRAINT fk_time_rule_semester
+        FOREIGN KEY (semester_id) REFERENCES semester(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_time_rule_task (schedule_task_id),
+    INDEX idx_time_rule_semester (semester_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE alarm (
@@ -572,8 +597,21 @@ CREATE TABLE alarm (
     CONSTRAINT fk_alarm_task
         FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
         ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_alarm_user
+        FOREIGN KEY (user_id) REFERENCES user(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_alarm_task (schedule_task_id),
     INDEX idx_alarm_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- Quartz调度任务相关外键约束
+-- ============================================
+
+-- schedule_task 到 laboratory 的外键（可选）
+ALTER TABLE schedule_task
+  ADD CONSTRAINT fk_schedule_task_laboratory
+    FOREIGN KEY (laboratory_id) REFERENCES laboratory(id)
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS = 1;
