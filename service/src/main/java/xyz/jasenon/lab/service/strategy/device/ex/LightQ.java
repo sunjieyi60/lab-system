@@ -59,6 +59,7 @@ public class LightQ extends DeviceQ<LightMapper, Light> {
             List<Light> part = super.deviceMapper.selectList(
                 new LambdaQueryWrapper<Light>()
                 .eq(Light::getBelongToLaboratoryId, laboratoryId)
+                        .eq(Light::getDeviceType, DeviceType.Light)
             );
             res.addAll(part);
         }
@@ -74,6 +75,6 @@ public class LightQ extends DeviceQ<LightMapper, Light> {
         task.setDeviceType(DeviceType.Light);
         task.setArgs(new Integer[]{light.getAddress(), light.getSelfId()});
         Runnable pollingTask = pollingTask(task);
-        pollingScheduleExecutorPool.submit(pollingTask);
+        pollingScheduleExecutorPool.submit(light.getId(), pollingTask);
     }
 }

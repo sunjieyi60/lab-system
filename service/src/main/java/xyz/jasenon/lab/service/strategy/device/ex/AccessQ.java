@@ -61,6 +61,7 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
             List<Access> part = super.deviceMapper.selectList(
                 new LambdaQueryWrapper<Access>()
                 .eq(Access::getBelongToLaboratoryId, laboratoryId)
+                        .eq(Access::getDeviceType, DeviceType.Access)
             );
             res.addAll(part);
         }
@@ -76,6 +77,6 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
         task.setCommandLine(CommandLine.REQUEST_ACCESS_DATA);
         task.setArgs(new Integer[] { access.getAddress(), access.getSelfId() });
         Runnable pollingTask = pollingTask(task);
-        pollingScheduleExecutorPool.submit(pollingTask);
+        pollingScheduleExecutorPool.submit(access.getId(), pollingTask);
     }
 }

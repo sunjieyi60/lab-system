@@ -66,6 +66,7 @@ public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
             List<AirCondition> part = super.deviceMapper.selectList(
                 new LambdaQueryWrapper<AirCondition>()
                 .eq(AirCondition::getBelongToLaboratoryId, laboratoryId)
+                        .eq(AirCondition::getDeviceType, DeviceType.AirCondition)
             );
             res.addAll(part);
         }
@@ -90,6 +91,6 @@ public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
             task.setArgs(new Integer[]{airCondition.getAddress(), airCondition.getSelfId()});
         }
         Runnable pollingTask = pollingTask(task);
-        pollingScheduleExecutorPool.submit(pollingTask);
+        pollingScheduleExecutorPool.submit(airCondition.getId(), pollingTask);
     }
 }

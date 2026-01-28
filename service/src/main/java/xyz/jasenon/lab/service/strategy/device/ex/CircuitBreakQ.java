@@ -58,6 +58,7 @@ public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
             List<CircuitBreak> part = super.deviceMapper.selectList(
                 new LambdaQueryWrapper<CircuitBreak>()
                 .eq(CircuitBreak::getBelongToLaboratoryId, laboratoryId)
+                        .eq(CircuitBreak::getDeviceType, DeviceType.CircuitBreak)
             );
             res.addAll(part);
         }
@@ -73,7 +74,6 @@ public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
         task.setCommandLine(CommandLine.REQUEST_CIRCUITBREAK_DATA);
         task.setArgs(new Integer[]{circuitBreak.getAddress()});
         Runnable pollingTask = pollingTask(task);
-        pollingScheduleExecutorPool.submit(pollingTask);
-
+        pollingScheduleExecutorPool.submit(circuitBreak.getId(), pollingTask);
     }
 }

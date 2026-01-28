@@ -52,9 +52,12 @@ public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
         return () ->{
             T device = deviceMapper.selectById(task.getDeviceId());
             if (device == null){
-                log.info("device:{}不存在!",device);
-                throw new RuntimeException("轮询任务对应的设备已不存在!");
+                log.warn("轮询任务对应的设备已不存在，终止轮询任务! deviceId:{}", task.getDeviceId());
+                // 抛出异常以终止 ScheduledThreadPoolExecutor 的后续调度
+                // 这是设计意图：当设备被删除时，通过异常来停止该设备的轮询任务
+                throw new RuntimeException("轮询任务对应的设备已不存在! deviceId: " + task.getDeviceId());
             }
+            log.info("开始执行轮询任务:{}",task);
             TaskDispatch.dispatch(task);
         };
     }

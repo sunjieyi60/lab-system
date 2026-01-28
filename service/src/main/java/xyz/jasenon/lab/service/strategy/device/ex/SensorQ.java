@@ -60,6 +60,7 @@ public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
             List<Sensor> part = super.deviceMapper.selectList(
                 new LambdaQueryWrapper<Sensor>()
                 .eq(Sensor::getBelongToLaboratoryId, laboratoryId)
+                        .eq(Sensor::getDeviceType, DeviceType.Sensor)
             );
             res.addAll(part);
         }
@@ -75,6 +76,6 @@ public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
         task.setCommandLine(CommandLine.REQUEST_SENSOR_DATA);
         task.setArgs(new Integer[]{sensor.getAddress(), sensor.getSelfId()});
         Runnable pollingTask = pollingTask(task);
-        pollingScheduleExecutorPool.submit(pollingTask);
+        pollingScheduleExecutorPool.submit(sensor.getId(), pollingTask);
     }
 }
