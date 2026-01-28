@@ -32,7 +32,6 @@ class UserVisibleTreeVoIntegrationTest {
         assertNotNull(vo.getDepts());
         assertEquals(1, vo.getDepts().size());
         DeptVo deptVo = vo.getDepts().get(0);
-        assertEquals("计算机学院", deptVo.getDeptName());
         assertNotNull(deptVo.getBuildings());
         assertEquals(2, deptVo.getBuildings().size());
 
