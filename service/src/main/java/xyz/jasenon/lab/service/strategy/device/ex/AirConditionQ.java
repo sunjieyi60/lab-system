@@ -90,6 +90,7 @@ public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
             task.setCommandLine(CommandLine.REQUEST_AIR_CONDITION_DATA_SOCKET);
             task.setArgs(new Integer[]{airCondition.getAddress(), airCondition.getSelfId()});
         }
+        task.setDevice(airCondition);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(airCondition.getId(), pollingTask);
     }

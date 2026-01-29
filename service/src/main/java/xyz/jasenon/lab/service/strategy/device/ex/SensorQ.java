@@ -75,6 +75,7 @@ public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
         task.setDeviceType(DeviceType.Sensor);
         task.setCommandLine(CommandLine.REQUEST_SENSOR_DATA);
         task.setArgs(new Integer[]{sensor.getAddress(), sensor.getSelfId()});
+        task.setDevice(sensor);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(sensor.getId(), pollingTask);
     }

@@ -76,6 +76,7 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
         task.setDeviceType(DeviceType.Access);
         task.setCommandLine(CommandLine.REQUEST_ACCESS_DATA);
         task.setArgs(new Integer[] { access.getAddress(), access.getSelfId() });
+        task.setDevice(access);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(access.getId(), pollingTask);
     }

@@ -74,6 +74,7 @@ public class LightQ extends DeviceQ<LightMapper, Light> {
         task.setCommandLine(CommandLine.REQUEST_LIGHT_DATA);
         task.setDeviceType(DeviceType.Light);
         task.setArgs(new Integer[]{light.getAddress(), light.getSelfId()});
+        task.setDevice(light);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(light.getId(), pollingTask);
     }

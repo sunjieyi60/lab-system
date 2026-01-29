@@ -1,6 +1,8 @@
 package xyz.jasenon.lab.mqtt.mqtt;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.dto.task.Task;
@@ -8,6 +10,8 @@ import xyz.jasenon.lab.common.dto.task.Task;
 @Getter
 @Setter
 @Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class MqttTask extends Task {
 
     /**

@@ -29,6 +29,7 @@ public class SocketTaskSendStrategy implements TaskSendStrategy {
 
     @PostConstruct
     public void init(){
+        log.info("Socket任务发送初始化完成");
         TaskSendFactory.register(SendType.SOCKET,this);
     }
 

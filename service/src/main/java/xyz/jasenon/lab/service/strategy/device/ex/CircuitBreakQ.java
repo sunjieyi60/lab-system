@@ -73,6 +73,7 @@ public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
         task.setPriority(TaskPriority.AUTOMATIC);
         task.setCommandLine(CommandLine.REQUEST_CIRCUITBREAK_DATA);
         task.setArgs(new Integer[]{circuitBreak.getAddress()});
+        task.setDevice(circuitBreak);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(circuitBreak.getId(), pollingTask);
     }

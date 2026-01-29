@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.mqtt.mqtt.MqttTask;
+import xyz.jasenon.lab.mqtt.mqtt.MqttTaskExplainer;
 import xyz.jasenon.lab.mqtt.mqtt.TaskProcessorsManage;
 
 /**
@@ -22,10 +24,13 @@ public class TaskController {
 
     @Autowired
     private TaskProcessorsManage taskProcessorsManage;
+    @Autowired
+    private MqttTaskExplainer mqttTaskExplainer;
 
     @PostMapping("/add")
     @ApiOperation("添加任务")
-    public R addTask(@RequestBody MqttTask mqttTask){
+    public R addTask(@RequestBody Task task){
+        MqttTask mqttTask = mqttTaskExplainer.explainTask(task);
         taskProcessorsManage.addTask(mqttTask);
         return R.success("添加任务成功");
     }

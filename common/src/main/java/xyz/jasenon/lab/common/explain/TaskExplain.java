@@ -23,27 +23,15 @@ TaskExplain<T> {
     }
 
     public T explainTask(Task task){
-        Device device = deviceService.getDeviceByDeviceId(task.getDeviceId());
-        Assert.notNull(device, "设备不存在");
-        switch (device.getDeviceType()) {
-            case AirCondition:{
-                return explainTask(task,(AirCondition) device);
-            }
-            case Light:{
-                return explainTask(task,(Light) device);
-            }
-            case Sensor:{
-                return explainTask(task,(Sensor) device);
-            }
-            case Access:{
-                return explainTask(task,(Access) device);
-            }
-            case CircuitBreak:{
-                return explainTask(task,(CircuitBreak) device);
-            }
-            default:
-                throw new IllegalArgumentException("不支持的设备类型");
-        }
+        Device device = task.getDevice();
+        return switch (device.getDeviceType()) {
+            case AirCondition -> explainTask(task, (AirCondition) device);
+            case Light -> explainTask(task, (Light) device);
+            case Sensor -> explainTask(task, (Sensor) device);
+            case Access -> explainTask(task, (Access) device);
+            case CircuitBreak -> explainTask(task, (CircuitBreak) device);
+            default -> throw new IllegalArgumentException("不支持的设备类型");
+        };
     }
 
     public abstract T explainTask(Task task,AirCondition airCondition);

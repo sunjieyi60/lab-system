@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import xyz.jasenon.lab.common.command.CommandLine;
+import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 
 @Getter
@@ -43,6 +44,9 @@ public class Task implements Comparable<Task> {
     @NotEmpty(message = "参数列表不能为空")
     private Integer[] args;
 
+    @NotNull(message = "设备对象不能为空")
+    private Device device;
+
     /**
      * asc order
      */
@@ -57,6 +61,7 @@ public class Task implements Comparable<Task> {
         this.deviceId = task.getDeviceId();
         this.commandLine = task.getCommandLine();
         this.args = task.getArgs();
+        this.device = task.getDevice();
     }
 
 }

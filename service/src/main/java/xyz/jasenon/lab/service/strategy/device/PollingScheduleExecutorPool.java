@@ -1,6 +1,7 @@
 package xyz.jasenon.lab.service.strategy.device;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Slf4j
 @Component
+@DependsOn({"mqttTaskSendStrategy","socketTaskSendStrategy"})
 public class PollingScheduleExecutorPool {
 
     private final ScheduledThreadPoolExecutor threadPoolExecutor;

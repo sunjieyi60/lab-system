@@ -5,11 +5,13 @@ import cn.hutool.http.HttpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.command.SendType;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.service.strategy.task.TaskSendFactory;
+import xyz.jasenon.lab.service.strategy.task.TaskSendProperties;
 import xyz.jasenon.lab.service.strategy.task.TaskSendStrategy;
 
 /**
@@ -22,12 +24,14 @@ public class MqttTaskSendStrategy implements TaskSendStrategy {
 
     private final String Host;
 
-    public MqttTaskSendStrategy(xyz.jasenon.lab.service.strategy.task.TaskSendProperties taskSendProperties){
+
+    public MqttTaskSendStrategy(TaskSendProperties taskSendProperties){
         this.Host = taskSendProperties.getMqttTaskHost();
     }
 
     @PostConstruct
     public void init(){
+        log.info("MQTT任务发送策略初始化");
         TaskSendFactory.register(SendType.MQTT,this);
     }
 
