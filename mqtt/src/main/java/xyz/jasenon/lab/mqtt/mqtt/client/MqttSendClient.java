@@ -41,9 +41,7 @@ public class MqttSendClient extends MqttBaseClient{
         mqttMessage.setQos(mqttClientProperties.getQos());
         mqttMessage.setPayload(mqttTask.getPayload());
         try {
-            if (mqttNx.tryLock()){
-               this.publish(topic, mqttMessage);
-            }
+           this.publish(topic, mqttMessage);
         }catch (Exception e){
             log.error("submitMqttTask error", e);
         }

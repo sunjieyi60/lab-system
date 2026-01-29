@@ -69,7 +69,7 @@ public class LightQ extends DeviceQ<LightMapper, Light> {
     @Override
     public void startPolling(Light light) {
         Task task = new Task();
-        task.setPriority(TaskPriority.AUTOMATIC);
+        task.setPriority(TaskPriority.POLLING);
         task.setDeviceId(light.getId());
         task.setCommandLine(CommandLine.REQUEST_LIGHT_DATA);
         task.setDeviceType(DeviceType.Light);

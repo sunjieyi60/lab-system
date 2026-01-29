@@ -70,7 +70,7 @@ public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
     @Override
     public void startPolling(Sensor sensor) {
         Task task = new Task();
-        task.setPriority(TaskPriority.AUTOMATIC);
+        task.setPriority(TaskPriority.POLLING);
         task.setDeviceId(sensor.getId());
         task.setDeviceType(DeviceType.Sensor);
         task.setCommandLine(CommandLine.REQUEST_SENSOR_DATA);

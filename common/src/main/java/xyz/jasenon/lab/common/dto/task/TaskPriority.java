@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum TaskPriority {
     NORMAL(0),
-    AUTOMATIC(1);
+    AUTOMATIC(1),
+    POLLING(2);
 
     private final int priority;
     TaskPriority(int priority) {

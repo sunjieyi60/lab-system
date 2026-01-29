@@ -1,6 +1,7 @@
 package xyz.jasenon.lab.mqtt.mqtt;
 
 import lombok.SneakyThrows;
+import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttAcceptClient;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttSendClient;
 
@@ -46,6 +47,8 @@ public class TaskProcessor {
             if (task != null) {
                 if (mqttSendClient.mqttNx.tryLock()) {
                     mqttSendClient.submitMqttTask(task);
+                }else if (!task.getPriority().equals(TaskPriority.POLLING)) {
+                    taskQueue.add(task);
                 }
             }
         }

@@ -3,9 +3,12 @@ package xyz.jasenon.lab.mqtt.setnx;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
+import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 
+import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -16,9 +19,9 @@ public class MqttNx {
     private final String key = UUID.randomUUID().toString();
     private final RedissonClient redissonClient;
     private final String prefix = "mqttnx:";
-    private Long timeout = 50000L;
+    private Long timeout = 500L;
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-    
+
     public MqttNx(RedissonClient redissonClient, Long timeout,
         TimeUnit timeUnit
     ) {
@@ -30,16 +33,22 @@ public class MqttNx {
         this.redissonClient = redissonClient;
     }
 
-    @SneakyThrows
-    public boolean tryLock(){
-        RLock rlock = redissonClient.getSpinLock(prefix + key);
-        if (rlock.isLocked()) return false;
-        return rlock.tryLock(timeout, timeUnit);
+    /**
+     * 尝试加锁：只有key不存在时才能设置成功（上一条已确认或已超时）
+     */
+    public boolean tryLock() {
+        RBucket<String> bucket = redissonClient.getBucket(prefix + key);
+        // trySet = SET NX EX（原子操作）
+        // 只有当key不存在（上条已确认）时才设置成功，同时设置过期时间
+        boolean result = bucket.setIfAbsent("locked", Duration.of(timeout, timeUnit.toChronoUnit()));
+        return result;
     }
 
-    public void unlock(){
-        RLock rlock = redissonClient.getSpinLock(prefix + key);
-        rlock.unlock();
+    /**
+     * 解锁：收到ACK后删除key
+     */
+    public void unlock() {
+        redissonClient.getBucket(prefix + key).delete();
     }
 
 }

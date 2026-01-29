@@ -77,20 +77,16 @@ public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
     public void startPolling(AirCondition airCondition) {
         Task task = new Task();
         if (airCondition.getRs485GatewayId() != null){
-            task.setPriority(TaskPriority.AUTOMATIC);
-            task.setDeviceId(airCondition.getId());
-            task.setDeviceType(DeviceType.AirCondition);
             task.setCommandLine(CommandLine.REQUEST_AIR_CONDITION_DATA_RS485);
-            task.setArgs(new Integer[]{airCondition.getAddress(), airCondition.getSelfId()});
         }
         if (airCondition.getSocketGatewayId() != null){
-            task.setPriority(TaskPriority.AUTOMATIC);
-            task.setDeviceId(airCondition.getId());
-            task.setDeviceType(DeviceType.AirCondition);
             task.setCommandLine(CommandLine.REQUEST_AIR_CONDITION_DATA_SOCKET);
-            task.setArgs(new Integer[]{airCondition.getAddress(), airCondition.getSelfId()});
         }
+        task.setDeviceId(airCondition.getId());
+        task.setDeviceType(DeviceType.AirCondition);
+        task.setPriority(TaskPriority.POLLING);
         task.setDevice(airCondition);
+        task.setArgs(new Integer[]{airCondition.getAddress(), airCondition.getSelfId()});
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(airCondition.getId(), pollingTask);
     }

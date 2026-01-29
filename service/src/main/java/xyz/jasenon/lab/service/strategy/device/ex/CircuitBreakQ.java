@@ -70,7 +70,7 @@ public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
         Task task = new Task();
         task.setDeviceType(DeviceType.CircuitBreak);
         task.setDeviceId(circuitBreak.getId());
-        task.setPriority(TaskPriority.AUTOMATIC);
+        task.setPriority(TaskPriority.POLLING);
         task.setCommandLine(CommandLine.REQUEST_CIRCUITBREAK_DATA);
         task.setArgs(new Integer[]{circuitBreak.getAddress()});
         task.setDevice(circuitBreak);

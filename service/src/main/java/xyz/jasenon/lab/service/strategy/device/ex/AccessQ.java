@@ -72,7 +72,7 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
     public void startPolling(Access access) {
         Task task = new Task();
         task.setDeviceId(access.getId());
-        task.setPriority(TaskPriority.AUTOMATIC);
+        task.setPriority(TaskPriority.POLLING);
         task.setDeviceType(DeviceType.Access);
         task.setCommandLine(CommandLine.REQUEST_ACCESS_DATA);
         task.setArgs(new Integer[] { access.getAddress(), access.getSelfId() });
