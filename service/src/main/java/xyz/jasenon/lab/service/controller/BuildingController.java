@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
+import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.building.CreateBuilding;
 import xyz.jasenon.lab.service.dto.building.EditBuilding;
@@ -29,6 +30,7 @@ public class BuildingController {
     @RequestPermission(allowed = {Permissions.BASE_CUD})
     @PostMapping("/create")
     @ApiOperation("创建楼栋")
+    @LogPoint(title = "楼栋管理", sqEl = "#createBuilding", clazz = CreateBuilding.class)
     public R create(@Validated @RequestBody CreateBuilding createBuilding) {
         return buildingService.createBuilding(createBuilding);
     }
@@ -36,6 +38,7 @@ public class BuildingController {
     @RequestPermission(allowed = {Permissions.BASE_CUD})
     @PutMapping("/edit")
     @ApiOperation("编辑楼栋")
+    @LogPoint(title = "楼栋管理", sqEl = "#editBuilding", clazz = EditBuilding.class)
     public R edit(@Validated @RequestBody EditBuilding editBuilding) {
         return buildingService.editBuilding(editBuilding);
     }

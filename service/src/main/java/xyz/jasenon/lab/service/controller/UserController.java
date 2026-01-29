@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
+import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.user.CreateUser;
 import xyz.jasenon.lab.service.dto.user.DeleteUser;
@@ -30,6 +31,7 @@ public class UserController {
     @RequestPermission(allowed = {Permissions.USER_ADD})
     @PostMapping("/create")
     @ApiOperation("创建用户")
+    @LogPoint(title = "账号管理", sqEl = "#createUser", clazz = CreateUser.class)
     public R createUser(@Validated @RequestBody CreateUser createUser){
         return userService.createUser(createUser);
     }
@@ -37,6 +39,7 @@ public class UserController {
     @RequestPermission(allowed = {Permissions.USER_EDIT})
     @PutMapping("/edit")
     @ApiOperation("编辑用户")
+    @LogPoint(title = "账号管理", sqEl = "#editUser", clazz = EditUser.class)
     public R editUser(@Validated @RequestBody EditUser editUser){
         return userService.editUser(editUser);
     }
@@ -44,6 +47,7 @@ public class UserController {
     @RequestPermission(allowed = {Permissions.USER_DELETE})
     @DeleteMapping("/delete")
     @ApiOperation("删除用户")
+    @LogPoint(title = "账号管理", sqEl = "#deleteUser", clazz = DeleteUser.class)
     public R deleteUser(@Validated @RequestBody DeleteUser deleteUser){
         return userService.deleteUser(deleteUser);
     }

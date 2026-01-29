@@ -264,6 +264,34 @@ CREATE TABLE IF NOT EXISTS user_permission (
                                                INDEX idx_up_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 操作日志表：operation_log
+CREATE TABLE IF NOT EXISTS operation_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    operator_id BIGINT NULL,
+    operator_account VARCHAR(64) NULL,
+    operator_name VARCHAR(64) NULL,
+    operator_role VARCHAR(64) NULL,
+    log_type VARCHAR(32) NULL,
+    operate_way VARCHAR(16) NULL,
+    room VARCHAR(64) NULL,
+    device VARCHAR(128) NULL,
+    content TEXT NULL,
+    operate_time DATETIME NULL,
+    create_time DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 报警日志表：alarm_log
+CREATE TABLE IF NOT EXISTS alarm_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    room VARCHAR(64) NULL,
+    device VARCHAR(128) NULL,
+    alarm_time DATETIME NULL,
+    category VARCHAR(32) NULL,
+    alarm_type VARCHAR(64) NULL,
+    content TEXT NULL,
+    create_time DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ============================================
 -- Quartz调度任务相关表
 -- ============================================

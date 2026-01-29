@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.dto.task.Task;
+import xyz.jasenon.lab.common.entity.log.AlarmLog;
 import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.log.LogTaskManager;
 import xyz.jasenon.lab.service.quartz.check.ConditionExprChecker;
 import xyz.jasenon.lab.service.quartz.check.DataCollector;
 import xyz.jasenon.lab.service.quartz.check.Result;
@@ -14,6 +16,7 @@ import xyz.jasenon.lab.service.strategy.task.TaskDispatch;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,7 @@ public class TaskRuntimeService {
     private final TimeRuleChecker timeRuleChecker;
     private final ExecutorService taskRuntimeExecutor;
     private final ScheduledExecutorService watchDogScheduler;
+    private final LogTaskManager logTaskManager;
 
     /**
      * 任务入口：提交到线程池异步执行，避免阻塞Quartz调度线程。
@@ -181,6 +185,13 @@ public class TaskRuntimeService {
 
     private void logError(String taskId, String errorMessage) {
         log.warn("taskId={} -> {}", taskId, errorMessage);
+
+        // 条件/数据源/时间规则异常，按“条件触发报警”写一条报警日志，后续可按需扩充教室、设备等信息。
+        AlarmLog alarmLog = new AlarmLog()
+                .setCategory("条件触发")
+                .setContent("taskId=" + taskId + " -> " + errorMessage)
+                .setAlarmTime(LocalDateTime.now());
+        logTaskManager.submitAlarmLog(alarmLog);
     }
 
     public List<ScheduleTask> getAllScheduleTask() {

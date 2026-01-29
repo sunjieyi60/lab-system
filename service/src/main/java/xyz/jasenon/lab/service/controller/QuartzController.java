@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.quartz.check.Result;
 import xyz.jasenon.lab.service.quartz.config.QuartzRegister;
 import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
@@ -26,6 +27,7 @@ public class QuartzController {
 
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
+    @LogPoint(title = "报警联动设置", sqEl = "#scheduleConfigRoot", clazz = ScheduleConfigRoot.class)
     public R createConfig(ScheduleConfigRoot scheduleConfigRoot){
         Result<Boolean> res = configLoader.configCreate(scheduleConfigRoot);
         if (!res.getData()) {

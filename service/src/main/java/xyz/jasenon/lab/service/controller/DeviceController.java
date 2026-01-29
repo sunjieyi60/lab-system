@@ -9,6 +9,7 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
+import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.DeleteDevice;
@@ -56,6 +57,7 @@ public class DeviceController {
     @RequestPermission(allowed = { Permissions.DEVICE_CONTROL })
     @PostMapping("/control")
     @ApiOperation("控制设备")
+    @LogPoint(title = "设备控制", sqEl = "#task", clazz = Task.class)
     public R controlDevice(@Validated @RequestBody Task task) {
         TaskDispatch.dispatch(task);
         return R.success("控制任务下达成功");

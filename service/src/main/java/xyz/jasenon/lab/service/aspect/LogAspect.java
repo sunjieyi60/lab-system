@@ -13,15 +13,26 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import xyz.jasenon.lab.common.utils.ExpressionEvaluator;
+import xyz.jasenon.lab.common.entity.log.OperationLog;
 import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.dto.building.CreateBuilding;
 import xyz.jasenon.lab.service.dto.building.EditBuilding;
+import xyz.jasenon.lab.common.dto.task.Task;
+import xyz.jasenon.lab.service.dto.log.OperationLogParts;
+import xyz.jasenon.lab.service.dto.user.CreateUser;
+import xyz.jasenon.lab.service.dto.user.DeleteUser;
+import xyz.jasenon.lab.service.dto.user.EditUser;
+import xyz.jasenon.lab.service.log.LogTaskManager;
+import xyz.jasenon.lab.service.log.TaskLogInterpreter;
+import xyz.jasenon.lab.service.log.ScheduleConfigLogInterpreter;
+import xyz.jasenon.lab.service.log.UserLogInterpreter;
+import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
 
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.time.LocalDateTime;
 
 @Aspect
 @Component
@@ -31,6 +42,20 @@ public class LogAspect {
     // 支持不同返回类型的 SpEL 解析
     private final ExpressionEvaluator evaluator = new ExpressionEvaluator();
     private final Map<Class<?>, LogInterpreter<?>> interpreters = new ConcurrentHashMap<>();
+    private final LogTaskManager logTaskManager;
+    private final TaskLogInterpreter taskLogInterpreter;
+    private final ScheduleConfigLogInterpreter scheduleConfigLogInterpreter;
+    private final UserLogInterpreter userLogInterpreter;
+
+    public LogAspect(LogTaskManager logTaskManager,
+                     TaskLogInterpreter taskLogInterpreter,
+                     ScheduleConfigLogInterpreter scheduleConfigLogInterpreter,
+                     UserLogInterpreter userLogInterpreter) {
+        this.logTaskManager = logTaskManager;
+        this.taskLogInterpreter = taskLogInterpreter;
+        this.scheduleConfigLogInterpreter = scheduleConfigLogInterpreter;
+        this.userLogInterpreter = userLogInterpreter;
+    }
 
     @Pointcut("@annotation(xyz.jasenon.lab.service.annotation.log.LogPoint)")
     public void logPointcut() {
@@ -41,12 +66,17 @@ public class LogAspect {
         // 按需注册解释器，可后续扩展为 Spring 容器扫描或配置化
         interpreters.put(CreateBuilding.class, payload -> {
             CreateBuilding dto = (CreateBuilding) payload;
-            return "用户xxx" + "创建了楼栋[" + dto.getBuildingName() + "]，部门ID列表" + dto.getDeptIds();
+            return "创建了楼栋[" + dto.getBuildingName() + "]，部门ID列表" + dto.getDeptIds();
         });
         interpreters.put(EditBuilding.class, payload -> {
             EditBuilding dto = (EditBuilding) payload;
-            return "用户xxx" + "编辑了楼栋[" + dto.getBuildingId() + ":" + dto.getBuildingName() + "]";
+            return "编辑了楼栋[" + dto.getBuildingId() + ":" + dto.getBuildingName() + "]";
         });
+        interpreters.put(Task.class, taskLogInterpreter);
+        interpreters.put(ScheduleConfigRoot.class, scheduleConfigLogInterpreter);
+        interpreters.put(CreateUser.class, (LogInterpreter<CreateUser>) userLogInterpreter::renderCreate);
+        interpreters.put(EditUser.class, (LogInterpreter<EditUser>) userLogInterpreter::renderEdit);
+        interpreters.put(DeleteUser.class, (LogInterpreter<DeleteUser>) userLogInterpreter::renderDelete);
     }
 
     @After("logPointcut()")
@@ -65,12 +95,29 @@ public class LogAspect {
         AnnotatedElementKey key = new AnnotatedElementKey(method, targetClass);
 
         Object payload = evaluatePayload(logPoint, key, context);
-        String interpreted = interpret(logPoint.clazz(), payload);
+        Object interpreted = interpret(logPoint.clazz(), payload);
 
         String title = safeEval(logPoint.title(), key, context);
-        String content = interpreted != null ? interpreted : safeEval(logPoint.content(), key, context);
 
-        log.info("[{}] {}", title, content);
+        // 组装操作日志实体，交给异步任务管理器落库
+        OperationLog entity = new OperationLog()
+                .setOperatorId(currentUserId())
+                .setOperatorAccount(currentUserAccount())
+                .setLogType(title)
+                .setOperateTime(LocalDateTime.now());
+
+        if (interpreted instanceof OperationLogParts) {
+            OperationLogParts parts = (OperationLogParts) interpreted;
+            entity.setRoom(parts.getRoom());
+            entity.setDevice(parts.getDevice());
+            entity.setOperateWay(parts.getOperateWay());
+            entity.setContent(parts.getContent());
+        } else {
+            String content = interpreted != null ? interpreted.toString() : safeEval(logPoint.content(), key, context);
+            entity.setContent(content);
+        }
+
+        logTaskManager.submitOperationLog(entity);
     }
 
     private Object evaluatePayload(LogPoint logPoint, AnnotatedElementKey key, EvaluationContext context) {
@@ -85,7 +132,7 @@ public class LogAspect {
         }
     }
 
-    private <T> String interpret(Class<T> clazz, Object payload) {
+    private <T> Object interpret(Class<T> clazz, Object payload) {
         if (payload == null || clazz == Void.class) {
             return null;
         }
@@ -116,6 +163,23 @@ public class LogAspect {
         } catch (Exception e) {
             log.warn("LogPoint 表达式解析失败: {}", expr, e);
             return expr;
+        }
+    }
+
+    private Long currentUserId() {
+        try {
+            return StpUtil.getLoginIdAsLong();
+        } catch (NotLoginException e) {
+            return null;
+        }
+    }
+
+    private String currentUserAccount() {
+        try {
+            Object id = StpUtil.getLoginIdDefaultNull();
+            return id != null ? String.valueOf(id) : null;
+        } catch (NotLoginException e) {
+            return null;
         }
     }
 

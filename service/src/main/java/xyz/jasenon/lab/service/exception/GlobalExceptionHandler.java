@@ -1,10 +1,14 @@
 package xyz.jasenon.lab.service.exception;
 
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import xyz.jasenon.lab.common.utils.R;
+
+import java.util.stream.Collectors;
 
 /**
  * @author Jasenon_ce
@@ -16,6 +20,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public R handle(IllegalArgumentException e) {
         return R.fail("参数不合法:"+e.getMessage());
+    }
+
+    /** JSR 380 校验失败：@RequestBody + @Validated */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        String msg = e.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + " " + err.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return R.fail("参数校验失败: " + msg);
+    }
+
+    /** JSR 380 校验失败：@ModelAttribute + @Validated（如日志查询 DTO） */
+    @ExceptionHandler(BindException.class)
+    public R handleBindException(BindException e) {
+        if (e.getBindingResult().getFieldErrorCount() == 0) {
+            return R.fail("参数校验失败");
+        }
+        String msg = e.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + " " + err.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return R.fail("参数校验失败: " + msg);
     }
 
     @ExceptionHandler(PermissionsInsufficientException.class)
