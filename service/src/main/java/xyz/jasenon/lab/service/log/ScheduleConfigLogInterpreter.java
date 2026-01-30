@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
 import xyz.jasenon.lab.service.aspect.LogInterpreter;
+import xyz.jasenon.lab.service.dto.log.OperationLogParts;
 import xyz.jasenon.lab.service.quartz.model.*;
 import xyz.jasenon.lab.service.service.ILaboratoryService;
 
@@ -20,11 +21,13 @@ public class ScheduleConfigLogInterpreter implements LogInterpreter<ScheduleConf
 
     private final ILaboratoryService laboratoryService;
 
+    private static final String OPERATE_WAY_MANUAL = "手动";
+
     @Override
     public Object render(ScheduleConfigRoot payload) {
         ScheduleTask task = payload.getTask();
         if (task == null) {
-            return "创建报警联动配置";
+            return new OperationLogParts("", "", OPERATE_WAY_MANUAL, "创建报警联动配置");
         }
         String taskName = task.getTaskName() != null ? task.getTaskName() : "未命名";
         String room = "";
@@ -69,6 +72,7 @@ public class ScheduleConfigLogInterpreter implements LogInterpreter<ScheduleConf
                     .map(a -> a.getType() != null ? a.getType().name() : "")
                     .collect(Collectors.joining(", ")));
         }
-        return sb.toString();
+        String deviceSummary = actionDesc.isEmpty() ? "" : String.join("; ", actionDesc);
+        return new OperationLogParts(room, deviceSummary, OPERATE_WAY_MANUAL, sb.toString());
     }
 }

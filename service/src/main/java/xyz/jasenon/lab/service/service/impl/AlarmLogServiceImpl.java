@@ -24,11 +24,11 @@ public class AlarmLogServiceImpl extends ServiceImpl<AlarmLogMapper, AlarmLog> i
         if (query.getEndTime() != null) {
             wrapper.le(AlarmLog::getAlarmTime, query.getEndTime());
         }
-        if (query.getCategory() != null && !query.getCategory().isEmpty()) {
-            wrapper.eq(AlarmLog::getCategory, query.getCategory());
+        if (query.getCategories() != null && !query.getCategories().isEmpty()) {
+            wrapper.in(AlarmLog::getCategory, query.getCategories());
         }
-        if (query.getAlarmType() != null && !query.getAlarmType().isEmpty()) {
-            wrapper.eq(AlarmLog::getAlarmType, query.getAlarmType());
+        if (query.getAlarmTypes() != null && !query.getAlarmTypes().isEmpty()) {
+            wrapper.in(AlarmLog::getAlarmType, query.getAlarmTypes());
         }
         if (query.getRoom() != null && !query.getRoom().isEmpty()) {
             wrapper.eq(AlarmLog::getRoom, query.getRoom());

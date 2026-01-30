@@ -36,6 +36,10 @@ public class MqttSendClient extends MqttBaseClient{
         }
     }
 
+    public Long getRs485Id() {
+        return rs485Id;
+    }
+
     public void submitMqttTask(MqttTask mqttTask){
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setQos(mqttClientProperties.getQos());

@@ -13,6 +13,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import xyz.jasenon.lab.common.utils.ExpressionEvaluator;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.common.entity.log.OperationLog;
 import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.dto.building.CreateBuilding;
@@ -27,10 +28,16 @@ import xyz.jasenon.lab.service.log.TaskLogInterpreter;
 import xyz.jasenon.lab.service.log.ScheduleConfigLogInterpreter;
 import xyz.jasenon.lab.service.log.UserLogInterpreter;
 import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
+import xyz.jasenon.lab.service.service.IUserService;
+import xyz.jasenon.lab.service.vo.UserBizVo;
+import xyz.jasenon.lab.service.vo.UserPermissionVo;
+import xyz.jasenon.lab.service.constants.Permissions;
 
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.LocalDateTime;
 
@@ -46,15 +53,18 @@ public class LogAspect {
     private final TaskLogInterpreter taskLogInterpreter;
     private final ScheduleConfigLogInterpreter scheduleConfigLogInterpreter;
     private final UserLogInterpreter userLogInterpreter;
+    private final IUserService userService;
 
     public LogAspect(LogTaskManager logTaskManager,
                      TaskLogInterpreter taskLogInterpreter,
                      ScheduleConfigLogInterpreter scheduleConfigLogInterpreter,
-                     UserLogInterpreter userLogInterpreter) {
+                     UserLogInterpreter userLogInterpreter,
+                     IUserService userService) {
         this.logTaskManager = logTaskManager;
         this.taskLogInterpreter = taskLogInterpreter;
         this.scheduleConfigLogInterpreter = scheduleConfigLogInterpreter;
         this.userLogInterpreter = userLogInterpreter;
+        this.userService = userService;
     }
 
     @Pointcut("@annotation(xyz.jasenon.lab.service.annotation.log.LogPoint)")
@@ -106,6 +116,9 @@ public class LogAspect {
                 .setLogType(title)
                 .setOperateTime(LocalDateTime.now());
 
+        // 补全操作者姓名、角色
+        fillOperatorNameAndRole(entity);
+
         if (interpreted instanceof OperationLogParts) {
             OperationLogParts parts = (OperationLogParts) interpreted;
             entity.setRoom(parts.getRoom());
@@ -113,6 +126,8 @@ public class LogAspect {
             entity.setOperateWay(parts.getOperateWay());
             entity.setContent(parts.getContent());
         } else {
+            // 非设备控制、报警联动等复杂场景，统一视为手动操作
+            entity.setOperateWay("手动");
             String content = interpreted != null ? interpreted.toString() : safeEval(logPoint.content(), key, context);
             entity.setContent(content);
         }
@@ -181,6 +196,47 @@ public class LogAspect {
         } catch (NotLoginException e) {
             return null;
         }
+    }
+
+    /**
+     * 从当前用户详情补全操作人姓名、角色，便于前端按姓名、角色筛选。
+     */
+    private void fillOperatorNameAndRole(OperationLog entity) {
+        try {
+            R<?> r = userService.getCurrentUserDetail();
+            if (r == null || !r.isOk() || r.getData() == null) {
+                return;
+            }
+            UserBizVo vo = (UserBizVo) r.getData();
+            if (vo.getRealName() != null) {
+                entity.setOperatorName(vo.getRealName());
+            }
+            List<UserPermissionVo> perms = vo.getPermissions();
+            if (perms != null && !perms.isEmpty()) {
+                entity.setOperatorRole(deriveOperatorRole(perms));
+            }
+        } catch (Exception e) {
+            log.debug("补全操作人姓名/角色失败，跳过: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 根据权限列表推导展示用角色：有 ROOT 为超级管理员，有其它管理类权限为管理员，否则普通用户。
+     */
+    private String deriveOperatorRole(List<UserPermissionVo> perms) {
+        if (perms == null || perms.isEmpty()) {
+            return "普通用户";
+        }
+        for (UserPermissionVo p : perms) {
+            if (p == null || p.getPermission() == null) continue;
+            Permissions perm = p.getPermission();
+            if (perm == Permissions.ROOT) return "超级管理员";
+            if (perm == Permissions.USER || perm == Permissions.BASE_SETTINGS || perm == Permissions.CONTROL_CENTER
+                    || perm == Permissions.DATA_ANALYSIS || perm == Permissions.ACADEMIC_AFFAIRS_MANAGEMENT) {
+                return "管理员";
+            }
+        }
+        return "普通用户";
     }
 
 }
