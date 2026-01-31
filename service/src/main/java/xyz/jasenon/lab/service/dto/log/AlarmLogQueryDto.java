@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.List;
 import java.time.LocalDateTime;
 
 /**
@@ -25,11 +26,11 @@ public class AlarmLogQueryDto {
     @DateTimeFormat(pattern = "yyyy-M-d-HH:mm")
     private LocalDateTime endTime;
 
-    /** 报警大类：设备异常 / 条件触发 */
-    private String category;
+    /** 报警大类（多选，IN 查询）；不传或空则不按大类过滤 */
+    private List<String> categories;
 
-    /** 报警类型：门禁报警 / 电气报警 / 中央空调报警 / 环境报警 等 */
-    private String alarmType;
+    /** 报警类型（多选，IN 查询）：门禁报警 / 电气报警 / 空调故障 / 环境报警 等；不传或空则不按类型过滤 */
+    private List<String> alarmTypes;
 
     /** 教室 */
     private String room;

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.List;
 import java.time.LocalDateTime;
 
 /**
@@ -25,8 +26,8 @@ public class OperationLogQueryDto {
     @DateTimeFormat(pattern = "yyyy-M-d-HH:mm")
     private LocalDateTime endTime;
 
-    /** 操作类型 */
-    private String logType;
+    /** 操作类型（多选，IN 查询）；不传或空则不按操作类型过滤 */
+    private List<String> logTypes;
 
     /** 账号 */
     private String account;

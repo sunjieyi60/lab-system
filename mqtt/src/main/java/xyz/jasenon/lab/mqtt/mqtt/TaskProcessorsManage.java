@@ -11,6 +11,7 @@ import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttAcceptClient;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttClientProperties;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttSendClient;
+import xyz.jasenon.lab.mqtt.config.AlarmReportClient;
 import xyz.jasenon.lab.mqtt.mqtt.client.MqttMessageDispatcher;
 import xyz.jasenon.lab.mqtt.service.IRS485GatewayService;
 import xyz.jasenon.lab.mqtt.setnx.MqttNx;
@@ -36,6 +37,8 @@ public class TaskProcessorsManage {
     private ThreadPoolTaskExecutor executor;
     @Autowired
     private MqttMessageDispatcher mqttMessageDispatcher;
+    @Autowired
+    private AlarmReportClient alarmReportClient;
 
     private final Map<Long, TaskProcessor> taskProcessors = new ConcurrentHashMap<>();
 
@@ -51,7 +54,7 @@ public class TaskProcessorsManage {
             MqttSendClient mqttSendClient = new MqttSendClient(mqttProperties, mqttNx, rs485Gateway.getSendTopic(), rs485Gateway.getId());
             MqttAcceptClient mqttAcceptClient = new MqttAcceptClient(mqttProperties, mqttNx, rs485Gateway.getAcceptTopic(),
                     rs485Gateway.getId(), executor, mqttMessageDispatcher);
-            TaskProcessor taskProcessor = new TaskProcessor(rs485Gateway.getSendTopic(), rs485Gateway.getAcceptTopic(), mqttSendClient, mqttAcceptClient);
+            TaskProcessor taskProcessor = new TaskProcessor(rs485Gateway.getSendTopic(), rs485Gateway.getAcceptTopic(), mqttSendClient, mqttAcceptClient, alarmReportClient);
             taskProcessors.put(rs485Gateway.getId(), taskProcessor);
         }
     }

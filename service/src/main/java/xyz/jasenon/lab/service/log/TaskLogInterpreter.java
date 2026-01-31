@@ -46,7 +46,17 @@ public class TaskLogInterpreter implements LogInterpreter<Task> {
         if (room == null) {
             room = "";
         }
-        String content = opContent + (deviceName != null ? " [" + deviceName + "]" : "");
+        String paramDetail = null;
+        try {
+            if (payload.getCommandLine() != null && payload.getArgs() != null) {
+                paramDetail = payload.getCommandLine().paramDetail(payload.getArgs());
+            }
+        } catch (Exception ignored) {
+            // 参数解析异常时不追加参数描述，保持原样
+        }
+        String content = opContent
+                + (paramDetail != null && !paramDetail.isEmpty() ? paramDetail : "")
+                + (deviceName != null ? " [" + deviceName + "]" : "");
         return new OperationLogParts(room, deviceName, operateWay, content);
     }
 }

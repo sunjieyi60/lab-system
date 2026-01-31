@@ -33,4 +33,70 @@ public enum CommandLine {
         this.description = description;
     }
 
+    /**
+     * 根据指令与 args 生成参数级描述文案（用于操作日志等）。
+     * 仅对需要参数描述的指令返回非空；其余返回 null，调用方保持原样即可。
+     * args 下标与枚举值与协议约定一致（如空调增强控制：args[2]=开关, args[3]=模式, args[4]=温度, args[5]=风速）。
+     */
+    public String paramDetail(Integer[] args) {
+        if (args == null) {
+            return null;
+        }
+        return switch (this) {
+            case ENHANCE_CONTROL_AIR_CONDITION -> buildAirConditionEnhanceParamDetail(args);
+            default -> null;
+        };
+    }
+
+    /**
+     * 空调增强控制：args[0]=address, args[1]=selfId, args[2]=开关, args[3]=模式, args[4]=温度, args[5]=风速。
+     * 协议枚举：开关 0=关 1=开；模式 1=制热 2=制冷 4=送风 8=除湿；风速 0=自动 1=低 2=中 3=高。
+     */
+    private static String buildAirConditionEnhanceParamDetail(Integer[] args) {
+        if (args.length < 6) {
+            return null;
+        }
+        String switchStr = formatSwitch(args[2]);
+        String modeStr = formatMode(args[3]);
+        String tempStr = formatTemperature(args[4]);
+        String speedStr = formatSpeed(args[5]);
+        return "、" + switchStr + "、" + modeStr + "、" + tempStr + "、" + speedStr;
+    }
+
+    private static String formatSwitch(Integer v) {
+        if (v == null) return "-";
+        return switch (v) {
+            case 0 -> "关";
+            case 1 -> "开机";
+            default -> String.valueOf(v);
+        };
+    }
+
+    private static String formatMode(Integer v) {
+        if (v == null) return "-";
+        return switch (v) {
+            case 1 -> "制热";
+            case 2 -> "制冷";
+            case 4 -> "送风";
+            case 8 -> "除湿";
+            default -> String.valueOf(v);
+        };
+    }
+
+    private static String formatTemperature(Integer v) {
+        if (v == null) return "-";
+        return v + "℃";
+    }
+
+    private static String formatSpeed(Integer v) {
+        if (v == null) return "-";
+        return switch (v) {
+            case 0 -> "自动";
+            case 1 -> "低风";
+            case 2 -> "中风";
+            case 3 -> "高风";
+            default -> String.valueOf(v);
+        };
+    }
+
 }

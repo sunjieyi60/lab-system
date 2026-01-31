@@ -58,5 +58,11 @@ public class AlarmLog {
      */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+    /**
+     * 网关 ID（仅用于接收：room 为空时按此补全教室，不落库）。
+     */
+    @TableField(exist = false)
+    private Long gatewayId;
 }
 

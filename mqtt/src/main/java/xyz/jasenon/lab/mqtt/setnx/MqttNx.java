@@ -22,6 +22,9 @@ public class MqttNx {
     private Long timeout = 500L;
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
+    /** 是否有未确认的发送（用于检测超时释放：tryLock 再次成功且此前未 unlock 则视为超时） */
+    private volatile boolean pendingSend = false;
+
     public MqttNx(RedissonClient redissonClient, Long timeout,
         TimeUnit timeUnit
     ) {
@@ -45,10 +48,26 @@ public class MqttNx {
     }
 
     /**
-     * 解锁：收到ACK后删除key
+     * 解锁：收到ACK后删除key，并清除“待确认”标记
      */
     public void unlock() {
+        pendingSend = false;
         redissonClient.getBucket(prefix + key).delete();
+    }
+
+    /** 标记当前有一次发送在等待 ACK（在 tryLock 成功并发送后调用） */
+    public void markPendingSend() {
+        this.pendingSend = true;
+    }
+
+    /** 清除“待确认”标记 */
+    public void clearPendingSend() {
+        this.pendingSend = false;
+    }
+
+    /** 是否曾有一次发送尚未收到 ACK（用于判断 tryLock 再次成功是否为超时释放） */
+    public boolean wasPendingSend() {
+        return pendingSend;
     }
 
 }

@@ -3,6 +3,12 @@ package xyz.jasenon.lab.service.strategy.device;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import xyz.jasenon.lab.common.entity.base.Laboratory;
+import xyz.jasenon.lab.common.entity.device.Device;
+import xyz.jasenon.lab.common.entity.log.AlarmLog;
+import xyz.jasenon.lab.service.log.LogTaskManager;
+import xyz.jasenon.lab.service.mapper.record.DeviceMapper;
+import xyz.jasenon.lab.service.service.ILaboratoryService;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -20,11 +26,18 @@ public class PollingScheduleExecutorPool {
 
     private final ScheduledThreadPoolExecutor threadPoolExecutor;
     private final PollingProperties pollingProperties;
+    private final LogTaskManager logTaskManager;
+    private final DeviceMapper deviceMapper;
+    private final ILaboratoryService laboratoryService;
     // 存储 deviceId -> Future 的映射，用于管理轮询任务
     private final ConcurrentHashMap<Long, Future<?>> devicePollingFutures = new ConcurrentHashMap<>();
 
-    public PollingScheduleExecutorPool(PollingProperties pollingProperties) {
+    public PollingScheduleExecutorPool(PollingProperties pollingProperties, LogTaskManager logTaskManager,
+                                      DeviceMapper deviceMapper, ILaboratoryService laboratoryService) {
         this.pollingProperties = pollingProperties;
+        this.logTaskManager = logTaskManager;
+        this.deviceMapper = deviceMapper;
+        this.laboratoryService = laboratoryService;
         this.threadPoolExecutor = new ScheduledThreadPoolExecutor(
                 pollingProperties.getCorePoolSize(),
                 new PollingThreadFactory(),
@@ -88,6 +101,25 @@ public class PollingScheduleExecutorPool {
                 if (future != null) {
                     log.info("设备 {} 的轮询任务因异常终止，已清理 Future 映射。异常: {}", deviceId, e.getMessage());
                 }
+                // 上报报警日志：polling 时 Future 异常被 catch 后报警，按 deviceId 补全教室
+                String room = null;
+                try {
+                    Device device = deviceMapper.selectById(deviceId);
+                    if (device != null && device.getBelongToLaboratoryId() != null) {
+                        Laboratory lab = laboratoryService.getById(device.getBelongToLaboratoryId());
+                        room = lab != null
+                                ? (lab.getLaboratoryName() != null ? lab.getLaboratoryName() : lab.getLaboratoryId())
+                                : String.valueOf(device.getBelongToLaboratoryId());
+                    }
+                } catch (Exception ignored) {
+                }
+                AlarmLog alarmLog = new AlarmLog()
+                        .setCategory("设备异常")
+                        .setAlarmType("轮询异常")
+                        .setRoom(room)
+                        .setDevice("设备-" + deviceId)
+                        .setContent("轮询任务因异常终止，deviceId=" + deviceId + ", 异常=" + (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()));
+                logTaskManager.submitAlarmLog(alarmLog);
                 // 重新抛出异常，让 ScheduledThreadPoolExecutor 知道任务失败，停止后续调度
                 throw e;
             }

@@ -24,8 +24,8 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
         if (query.getEndTime() != null) {
             wrapper.le(OperationLog::getOperateTime, query.getEndTime());
         }
-        if (query.getLogType() != null && !query.getLogType().isEmpty()) {
-            wrapper.eq(OperationLog::getLogType, query.getLogType());
+        if (query.getLogTypes() != null && !query.getLogTypes().isEmpty()) {
+            wrapper.in(OperationLog::getLogType, query.getLogTypes());
         }
         if (query.getAccount() != null && !query.getAccount().isEmpty()) {
             wrapper.eq(OperationLog::getOperatorAccount, query.getAccount());
