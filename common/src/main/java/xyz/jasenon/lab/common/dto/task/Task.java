@@ -1,5 +1,7 @@
 package xyz.jasenon.lab.common.dto.task;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -44,6 +46,7 @@ public class Task implements Comparable<Task> {
     @NotEmpty(message = "参数列表不能为空")
     private Integer[] args;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @NotNull(message = "设备对象不能为空")
     private Device device;
 
