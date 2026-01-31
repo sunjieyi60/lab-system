@@ -20,6 +20,7 @@ import xyz.jasenon.lab.service.mapper.record.RS485GatewayMapper;
 import xyz.jasenon.lab.service.mapper.record.SocketGatewayMapper;
 import xyz.jasenon.lab.service.service.IDeviceService;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
+import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordFactory;
 import xyz.jasenon.lab.service.vo.DeviceRecordVo;
 import xyz.jasenon.lab.service.vo.DeviceVo;
@@ -45,11 +46,15 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     private RS485GatewayMapper rs485GatewayMapper;
     @Autowired
     private SocketGatewayMapper socketGatewayMapper;
-
+    @Autowired
+    private PollingScheduleExecutorPool pollingScheduleExecutorPool;
 
     @Override
     public R deleteDevice(DeleteDevice deleteDevice) {
-        baseMapper.deleteById(deleteDevice.getDeviceId());
+        Long deviceId = deleteDevice.getDeviceId();
+        // 设备删除时联动取消该设备的轮询任务，避免孤儿任务和无效报警
+        pollingScheduleExecutorPool.cancelPolling(deviceId);
+        baseMapper.deleteById(deviceId);
         return R.success("删除成功");
     }
 
