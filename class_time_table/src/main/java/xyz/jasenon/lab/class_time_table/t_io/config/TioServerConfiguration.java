@@ -37,7 +37,7 @@ public class TioServerConfiguration {
     /**
      * 心跳超时时间，单位毫秒
      */
-    @Value("${t-io.server.heartbeatTimeout:6000}")
+    @Value("${t-io.server.heartbeat:6000}")
     private Integer heartbeatTimeout;
 
 

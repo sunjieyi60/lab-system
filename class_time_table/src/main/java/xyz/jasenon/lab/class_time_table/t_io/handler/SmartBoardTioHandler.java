@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.class_time_table.t_io.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
@@ -9,12 +10,14 @@ import org.tio.server.intf.TioServerHandler;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.SmartBoardPacket;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Jasenon_ce
  * @date 2026/1/31
  */
 @Component
+@Slf4j
 public class SmartBoardTioHandler implements TioServerHandler {
 
     @Override
@@ -24,37 +27,47 @@ public class SmartBoardTioHandler implements TioServerHandler {
             return null;
         }
 
-        var magicNumber = byteBuffer.getInt(position);
-        if (magicNumber != SmartBoardPacket.MAGIC_NUMBER) {
-            throw new TioDecodeException("magic number 不匹配" + "来自channel:" + channelContext.getClientNode());
-        }
+        // 必须从 position 开始读，否则可能读到错误偏移（框架可能未设置 buffer.position）
+        byteBuffer.position(position);
 
         var header = new byte[SmartBoardPacket.HEADER_LENGTH];
         byteBuffer.get(header);
 
-        // 接收到的消息体长度
-        Integer bodyLength = byteBuffer.getInt();
+        SmartBoardPacket packet = new SmartBoardPacket();
+        var headerBuffer = ByteBuffer.wrap(header).order(byteBuffer.order());
+        int magicNumber = headerBuffer.getInt();
+        if (magicNumber != SmartBoardPacket.MAGIC_NUMBER) {
+            throw new TioDecodeException("magic number 不匹配" + "来自channel:" + channelContext.getClientNode());
+        }
+        packet.setMagic(magicNumber);
+        packet.setVersion(headerBuffer.get());
+        packet.setCmdType(headerBuffer.get());
+        packet.setSeqId(headerBuffer.getShort());
+        packet.setQos(headerBuffer.get());
+        packet.setFlags(headerBuffer.get());
+        packet.setReserved(headerBuffer.get());
+        packet.setCheckSum(headerBuffer.get());
+        // 消息体长度在 16 字节头内最后 4 字节，从 header 解析，不要再用 byteBuffer.getInt()（会读到 body 前 4 字节）
+        Integer bodyLength = headerBuffer.getInt();
 
-        if (bodyLength < 0){
+        if (bodyLength < 0) {
             throw new TioDecodeException("消息体长度小于0" + "来自channel:" + channelContext.getClientNode());
         }
 
-
-
-        // 校验消息体长度
-        Integer neededLength = SmartBoardPacket.HEADER_LENGTH + bodyLength;
-        Integer isEnough = readableLength - neededLength;
-        if (isEnough < 0){
-            // 消息体不完整，直接返回null
+        // 校验消息体是否完整
+        int neededLength = SmartBoardPacket.HEADER_LENGTH + bodyLength;
+        if (readableLength < neededLength) {
             return null;
         }
 
-        SmartBoardPacket packet = new SmartBoardPacket();
-        if (bodyLength > 0){
+        if (bodyLength > 0) {
             byte[] dst = new byte[bodyLength];
             byteBuffer.get(dst);
             packet.setPayload(dst);
+            log.info("收到来自channel:{}的消息，cmdType={}, seqId={}, payload={}", channelContext.getClientNode(), packet.getCmdType(), packet.getSeqId(),
+                    new String(dst, StandardCharsets.UTF_8));
         }
+
         return packet;
     }
 
@@ -80,12 +93,14 @@ public class SmartBoardTioHandler implements TioServerHandler {
         if (bodyLength > 0) {
             buffer.put(body);
         }
-
+        buffer.flip();
         return buffer;
     }
 
     @Override
     public void handler(Packet packet, ChannelContext channelContext) throws Exception {
-
+        var acceptPacket = (SmartBoardPacket) packet;
+        var cmdType = acceptPacket.getCmdType();
+        // TODO: 处理业务逻辑
     }
 }

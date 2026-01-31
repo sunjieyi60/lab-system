@@ -11,7 +11,8 @@ import org.tio.core.intf.Packet;
 public class SmartBoardPacket extends Packet {
 
     public final static Integer MAGIC_NUMBER = 0X5A5A5A5A;
-    public final static Integer HEADER_LENGTH = 20;
+    /** 协议头长度：magic(4)+version(1)+cmdType(1)+seqId(2)+qos(1)+flags(1)+reserved(1)+checkSum(1)+length(4)=16 */
+    public final static Integer HEADER_LENGTH = 16;
 
     private Integer magic = MAGIC_NUMBER;
     private Byte version = 0x01;

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/lab_sys4?useSSL=false&serverTimezone=UTC
+    username: root
+    password: sbx159357!?.
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 2
+
+server:
+  port: 8083
+
+t-io:
+  server:
+    name: tio-server
+    host: "localhost"
+    port: 9000
+    heartbeat: 10000
