@@ -3,9 +3,7 @@ package xyz.jasenon.lab.class_time_table.t_io.config;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.tio.server.TioServer;
 
 /**
  * @author Jasenon_ce

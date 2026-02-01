@@ -19,3 +19,13 @@ t-io:
     host: "localhost"
     port: 9000
     heartbeat: 10000
+
+# 设备认证配置
+device:
+  auth:
+    server:
+      # 服务端RSA私钥（Base64编码，用于解密设备信息）
+      # 方式1：直接配置Base64字符串
+      private-key: ""
+      # 方式2：从文件读取（推荐，更安全）
+      private-key-file: ""
