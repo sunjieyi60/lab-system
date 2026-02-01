@@ -40,6 +40,25 @@ public class ConfigLoader {
         return scheduleTaskMapper.selectList(new LambdaQueryWrapper<>());
     }
 
+    /**
+     * 从数据库删除定时任务（CASCADE 会自动删除关联子表）。
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteTask(String taskId) {
+        return scheduleTaskMapper.deleteById(taskId);
+    }
+
+    /**
+     * 更新任务的启用状态。
+     */
+    public void updateTaskEnable(String taskId, String enable) {
+        ScheduleTask t = scheduleTaskMapper.selectById(taskId);
+        if (t != null) {
+            t.setEnable(enable);
+            scheduleTaskMapper.updateById(t);
+        }
+    }
+
     public ScheduleConfigRoot load(String id){
         ScheduleConfigRoot scheduleConfig = new ScheduleConfigRoot();
 

@@ -10,6 +10,7 @@ import xyz.jasenon.lab.service.annotation.RequestPermission;
 import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.building.CreateBuilding;
+import xyz.jasenon.lab.service.dto.building.DeleteBuilding;
 import xyz.jasenon.lab.service.dto.building.EditBuilding;
 import xyz.jasenon.lab.service.service.IBuildingService;
 
@@ -41,6 +42,14 @@ public class BuildingController {
     @LogPoint(title = "楼栋管理", sqEl = "#editBuilding", clazz = EditBuilding.class)
     public R edit(@Validated @RequestBody EditBuilding editBuilding) {
         return buildingService.editBuilding(editBuilding);
+    }
+
+    @RequestPermission(allowed = {Permissions.BASE_CUD})
+    @DeleteMapping("/delete")
+    @ApiOperation("删除楼栋")
+    @LogPoint(title = "楼栋管理", sqEl = "#deleteBuilding", clazz = DeleteBuilding.class)
+    public R delete(@Validated @RequestBody DeleteBuilding deleteBuilding) {
+        return buildingService.deleteBuilding(deleteBuilding);
     }
 
 }

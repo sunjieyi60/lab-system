@@ -298,7 +298,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     .leftJoin(Dept.class, on->on.eq(DeptUser::getUserId, user.getId())
                             .eq(DeptUser::getDeptId, Dept::getId))
         );
-        List<DeptVo> deptVos = depts.stream().map(dept -> {
+        List<DeptVo> deptVos = depts.stream()
+                .filter(dept -> dept != null)
+                .map(dept -> {
             DeptVo vo = new DeptVo();
             List<Building> buildings = deptBuildingMapper.selectJoinList(Building.class,
                     new MPJLambdaWrapper<DeptBuilding>()
@@ -316,6 +318,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         .leftJoin(Laboratory.class, on->on.eq(LaboratoryUser::getUserId, user.getId())
                                 .eq(LaboratoryUser::getLaboratoryId, Laboratory::getId))
         );
+        laboratories = laboratories.stream().filter(one -> one != null).toList();
         laboratories.forEach(one->{
             var Q = new MPJLambdaWrapper<LaboratoryManager>()
                     .selectAll(User.class)
