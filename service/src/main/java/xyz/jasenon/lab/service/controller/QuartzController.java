@@ -9,11 +9,7 @@ import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.quartz.check.Result;
 import xyz.jasenon.lab.service.quartz.config.QuartzRegister;
 import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
-import xyz.jasenon.lab.service.quartz.model.ScheduleTask;
 import xyz.jasenon.lab.service.quartz.service.ConfigLoader;
-import xyz.jasenon.lab.service.quartz.service.TaskRuntimeService;
-
-import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -28,7 +24,6 @@ public class QuartzController {
 
     private final ConfigLoader configLoader;
     private final QuartzRegister quartzRegister;
-    private final TaskRuntimeService taskRuntimeService;
 
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
@@ -47,40 +42,4 @@ public class QuartzController {
         return R.success("创建成功");
     }
 
-    @DeleteMapping("/delete")
-    @ApiOperation("删除定时任务")
-    public R deleteTask(@RequestParam("taskId") String taskId) {
-        String err = taskRuntimeService.deleteTask(taskId);
-        if (err != null) {
-            return R.fail(err);
-        }
-        return R.success("删除成功");
-    }
-
-    @PostMapping("/cancel")
-    @ApiOperation("取消定时任务")
-    public R cancelTask(@RequestParam("taskId") String taskId) {
-        String err = taskRuntimeService.cancelTask(taskId);
-        if (err != null) {
-            return R.fail(err);
-        }
-        return R.success("取消成功");
-    }
-
-    @PostMapping("/enable")
-    @ApiOperation("启用定时任务")
-    public R enableTask(@RequestParam("taskId") String taskId) {
-        String err = taskRuntimeService.enableTask(taskId);
-        if (err != null) {
-            return R.fail(err);
-        }
-        return R.success("启用成功");
-    }
-
-    @GetMapping("/list")
-    @ApiOperation("获取定时任务列表")
-    public R<List<ScheduleTask>> getAllScheduleTask(@RequestParam(required = false) String enable) {
-        List<ScheduleTask> tasks = taskRuntimeService.getAllScheduleTask(enable);
-        return R.success(tasks);
-    }
 }

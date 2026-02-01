@@ -36,19 +36,7 @@ public class ConfigLoader {
     private final TimeRuleMapper timeRuleMapper;
     private final IUserService userService;
 
-    /**
-     * 获取定时任务列表。enable 为空/null 时查全部；"1" 仅启用；"0" 仅禁用。
-     */
-    public List<ScheduleTask> getAllTasks(String enable) {
-        LambdaQueryWrapper<ScheduleTask> wrapper = new LambdaQueryWrapper<>();
-        if (enable != null && !enable.isBlank()) {
-            wrapper.eq(ScheduleTask::getEnable, enable);
-        }
-        return scheduleTaskMapper.selectList(wrapper);
-    }
-
-    /** 内部使用：获取全部任务（不含 enable 过滤） */
-    public List<ScheduleTask> getAllTasks() {
+    public List<ScheduleTask> getAllTasks(){
         return scheduleTaskMapper.selectList(new LambdaQueryWrapper<>());
     }
 
@@ -106,25 +94,6 @@ public class ConfigLoader {
         scheduleConfig.setTimeRule(timeRule);
         scheduleConfig.setAlarmGroup(alarms);
         return scheduleConfig;
-    }
-
-    /**
-     * 从数据库删除定时任务
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteTask(String taskId) {
-        return scheduleTaskMapper.deleteById(taskId);
-    }
-
-    /**
-     * 更新任务的启用状态（如取消时置为禁用，方便与启用接口一致）。
-     */
-    public void updateTaskEnable(String taskId, String enable) {
-        ScheduleTask t = scheduleTaskMapper.selectById(taskId);
-        if (t != null) {
-            t.setEnable(enable);
-            scheduleTaskMapper.updateById(t);
-        }
     }
 
     @Transactional(rollbackFor = Exception.class)

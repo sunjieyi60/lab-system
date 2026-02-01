@@ -62,19 +62,6 @@ public class QuartzRegister implements InitializingBean {
         scheduleTask($);
     }
 
-    /**
-     * 取消定时任务：从 Quartz 调度器移除 Job
-     */
-    public void cancelTask(String taskId) throws SchedulerException {
-        JobKey key = JobKey.jobKey("taskGroupJob-" + taskId);
-        if (scheduler.checkExists(key)) {
-            scheduler.deleteJob(key);
-            log.info("定时任务已取消: taskId={}", taskId);
-        } else {
-            log.debug("定时任务不存在于调度器: taskId={}", taskId);
-        }
-    }
-
     @AllArgsConstructor
     static class TaskGroupRow {
         private String id;
