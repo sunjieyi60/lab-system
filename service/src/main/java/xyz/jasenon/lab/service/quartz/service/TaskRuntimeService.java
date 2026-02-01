@@ -2,6 +2,7 @@ package xyz.jasenon.lab.service.quartz.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
@@ -14,6 +15,7 @@ import xyz.jasenon.lab.service.quartz.check.ConditionExprChecker;
 import xyz.jasenon.lab.service.quartz.check.DataCollector;
 import xyz.jasenon.lab.service.quartz.check.Result;
 import xyz.jasenon.lab.service.quartz.check.TimeRuleChecker;
+import xyz.jasenon.lab.service.quartz.config.QuartzRegister;
 import xyz.jasenon.lab.service.quartz.model.*;
 import xyz.jasenon.lab.service.service.ILaboratoryService;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
@@ -37,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TaskRuntimeService {
 
     public final ConfigLoader configLoader;
+    private final QuartzRegister quartzRegister;
     private final TimeRuleChecker timeRuleChecker;
     private final ExecutorService taskRuntimeExecutor;
     private final ScheduledExecutorService watchDogScheduler;
@@ -298,8 +301,66 @@ public class TaskRuntimeService {
         logTaskManager.submitAlarmLog(alarmLog);
     }
 
+    /**
+     * 获取所有定时任务列表（不过滤 enable 状态）。
+     */
     public List<ScheduleTask> getAllScheduleTask() {
         return configLoader.getAllTasks();
     }
 
+    /**
+     * 删除定时任务（从数据库物理删除）。成功返回 null，失败返回错误提示文案。
+     */
+    public String deleteTask(String taskId) {
+        if (configLoader.load(taskId) == null) {
+            return "任务不存在";
+        }
+        try {
+            quartzRegister.cancelTask(taskId);
+        } catch (SchedulerException e) {
+            log.warn("删除前移除 Quartz 任务失败, taskId={}", taskId, e);
+        }
+        int deleted = configLoader.deleteTask(taskId);
+        return deleted > 0 ? null : "任务不存在";
+    }
+
+    /**
+     * 取消定时任务。成功返回 null，失败返回错误提示文案。
+     */
+    public String cancelTask(String taskId) {
+        ScheduleConfigRoot cfg = configLoader.load(taskId);
+        if (cfg == null) {
+            return "任务不存在";
+        }
+        if ("0".equals(cfg.getTask().getEnable())) {
+            return "任务已是禁用状态";
+        }
+        configLoader.updateTaskEnable(taskId, "0");
+        try {
+            quartzRegister.cancelTask(taskId);
+        } catch (SchedulerException e) {
+            log.warn("取消 Quartz 任务失败, taskId={}", taskId, e);
+        }
+        return null;
+    }
+
+    /**
+     * 启用定时任务。成功返回 null，失败返回错误提示文案。
+     */
+    public String enableTask(String taskId) {
+        ScheduleConfigRoot cfg = configLoader.load(taskId);
+        if (cfg == null) {
+            return "任务不存在";
+        }
+        if ("1".equals(cfg.getTask().getEnable())) {
+            return "任务已是启用状态";
+        }
+        configLoader.updateTaskEnable(taskId, "1");
+        try {
+            quartzRegister.scheduleTask(cfg);
+        } catch (SchedulerException e) {
+            log.warn("启用 Quartz 任务失败, taskId={}", taskId, e);
+        }
+        return null;
+    }
 }
