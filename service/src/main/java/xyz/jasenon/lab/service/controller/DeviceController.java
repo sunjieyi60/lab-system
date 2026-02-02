@@ -13,6 +13,7 @@ import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.DeleteDevice;
+import xyz.jasenon.lab.service.dto.device.UpdateDevice;
 import xyz.jasenon.lab.service.service.IDeviceService;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.task.TaskDispatch;
@@ -52,6 +53,13 @@ public class DeviceController {
     @ApiOperation("删除设备")
     public R deleteDevice(@Validated @RequestBody DeleteDevice deleteDevice) {
         return deviceService.deleteDevice(deleteDevice);
+    }
+
+    @RequestPermission(allowed = { Permissions.DEVICE_ADD })
+    @PutMapping("/update")
+    @ApiOperation("编辑设备")
+    public R updateDevice(@Validated @RequestBody UpdateDevice updateDevice) {
+        return deviceService.updateDevice(updateDevice);
     }
 
     @RequestPermission(allowed = { Permissions.DEVICE_CONTROL })
