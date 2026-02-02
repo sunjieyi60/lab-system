@@ -86,44 +86,68 @@ public class DeviceService extends ServiceImpl<DeviceMapper, Device> {
         Device device = getDeviceById(deviceId);
         if (device == null) {
             log.warn("设备{}不存在，返回默认配置", deviceId);
-            return getDefaultConfig();
+            return getDefaultConfig(deviceId);
         }
         
         // 如果设备有配置JSON，解析并返回；否则返回默认配置
+        xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO config;
         if (device.getConfigJson() != null && !device.getConfigJson().isEmpty()) {
             try {
-                return com.alibaba.fastjson2.JSON.parseObject(
+                config = com.alibaba.fastjson2.JSON.parseObject(
                     device.getConfigJson(), 
                     xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.class
                 );
             } catch (Exception e) {
                 log.warn("设备{}配置JSON解析失败，使用默认配置", deviceId, e);
-                return getDefaultConfig();
+                config = getDefaultConfig(deviceId);
             }
+        } else {
+            config = getDefaultConfig(deviceId);
         }
-        
-        return getDefaultConfig();
+        config.setDeviceId(deviceId);
+        return config;
     }
     
     /**
-     * 获取默认设备配置
-     * 
+     * 获取默认设备配置（与 Android AppConfig 结构一致）
+     *
+     * @param deviceId 设备ID（用于回填到配置中）
      * @return 默认配置DTO
      */
-    private xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO getDefaultConfig() {
+    private xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO getDefaultConfig(String deviceId) {
         return xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.builder()
-                .heartbeatInterval(5000)
-                .reconnectDelay(5000)
-                .chunkSize(524288)
-                .features(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.FeaturesConfig.builder()
-                        .faceRecognition(true)
-                        .accessControl(true)
-                        .timetableSync(true)
-                        .otaUpdate(true)
-                        .build())
-                .server(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.ServerConfig.builder()
+                .deviceId(deviceId)
+                .backendServer(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.BackendServerConfig.builder()
                         .host("192.168.10.100")
                         .port(9999)
+                        .timeout(5000L)
+                        .heartPeriod(5000L)
+                        .build())
+                .weatherConfig(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.WeatherConfig.builder()
+                        .location(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.Location.builder()
+                                .longitude(114.39297)
+                                .latitude(30.48748)
+                                .build())
+                        .updateInterval(120)
+                        .build())
+                .heziConfig(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.HeziConfig.builder()
+                        .pollIntervalMinutes(120)
+                        .openId("10009395")
+                        .appKey("7ebc0bc70c240ed63d9ddfcaf156db45")
+                        .build())
+                .doorOpenConfig(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.DoorOpenConfig.builder()
+                        .pwdOpenConfig(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.PasswordOpenConfig.builder()
+                                .password("123456")
+                                .keepTime(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.KeepTimeConfig.builder()
+                                        .keepTime(30)
+                                        .build())
+                                .build())
+                        .faceOpenConfig(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.FaceOpenConfig.builder()
+                                .precision(0.85f)
+                                .keepTime(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.KeepTimeConfig.builder()
+                                        .keepTime(30)
+                                        .build())
+                                .build())
                         .build())
                 .build();
     }

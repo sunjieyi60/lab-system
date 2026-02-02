@@ -28,4 +28,8 @@ device:
       # 方式1：直接配置Base64字符串
       private-key: ""
       # 方式2：从文件读取（推荐，更安全）
-      private-key-file: ""
+      private-key-file: "/resources/private_key.pem"
+  # 人脸上传存储路径（按 deviceId/faceId.jpg 落盘）
+  face:
+    enroll:
+      store-path: "data/faces"

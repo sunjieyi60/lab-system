@@ -158,9 +158,10 @@ public class DeviceEncryptionService {
             String deviceInfoJson = new String(decryptedBytes, StandardCharsets.UTF_8);
             DeviceInfoDTO deviceInfo = JSON.parseObject(deviceInfoJson, DeviceInfoDTO.class);
             
-            if (deviceInfo == null || deviceInfo.getDeviceId() == null) {
+            if (deviceInfo == null) {
                 return DecryptResult.failed("设备信息解析失败");
             }
+            // deviceId 可为空，由服务端在注册时分配
             
             // 6. 记录已使用的nonce（5分钟后自动清理）
             usedNonces.put(nonce, currentTime);

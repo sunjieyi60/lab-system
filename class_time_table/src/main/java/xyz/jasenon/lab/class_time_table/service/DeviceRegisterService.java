@@ -14,6 +14,7 @@ import xyz.jasenon.lab.class_time_table.entity.Device;
 import javax.crypto.SecretKey;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 设备注册服务
@@ -32,6 +33,7 @@ public class DeviceRegisterService {
     
     private static final String DEVICE_REGISTER_KEY_PREFIX = "smartboard:device:register:";
     private static final long REGISTER_EXPIRE_SECONDS = 86400; // 24小时过期
+    private final String groupId = "smartboard";
     
     /**
      * 注册设备（解密并写入Redis，绑定ChannelContext，保存AES密钥）
@@ -53,9 +55,12 @@ public class DeviceRegisterService {
             DeviceInfoDTO deviceInfo = decryptResult.getDeviceInfo();
             SecretKey aesKey = decryptResult.getAesKey();
             
+            // 客户端未绑定设备时 deviceId 为空，由服务端分配
             String deviceId = deviceInfo.getDeviceId();
-            if (deviceId == null || deviceId.isEmpty()) {
-                return RegisterResult.failed("INVALID_DEVICE", "设备ID为空");
+            if (deviceId == null || deviceId.isBlank()) {
+                deviceId = UUID.randomUUID().toString();
+                deviceInfo.setDeviceId(deviceId);
+                log.info("设备未携带 deviceId，服务端分配: {}", deviceId);
             }
             
             log.info("设备{}解密成功，开始注册", deviceId);
@@ -65,10 +70,7 @@ public class DeviceRegisterService {
             device.setDeviceId(deviceId);
             device.setDeviceName(deviceInfo.getDeviceName());
             device.setMacAddress(deviceInfo.getMacAddress());
-            device.setVersion(deviceInfo.getVersion());
             device.setIpAddress(channelContext.getClientNode().getIp());
-            device.setDeviceType(deviceInfo.getDeviceType());
-            device.setHardwareInfo(deviceInfo.getHardwareInfo());
             device.setStatus("ONLINE");
             device.setLastOnlineTime(LocalDateTime.now());
             device.setCreateTime(LocalDateTime.now());
@@ -92,6 +94,7 @@ public class DeviceRegisterService {
             
             // 4. 绑定ChannelContext的bindId（关键：后续通过bindId验证设备合法性）
             Tio.bindBsId(channelContext, deviceId);
+            Tio.bindGroup(channelContext, groupId);
             
             // 5. 保存设备的AES密钥（用于后续通信）
             deviceEncryptionService.saveDeviceAesKey(deviceId, aesKey);

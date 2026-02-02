@@ -21,37 +21,26 @@ public class DeviceInfoDTO {
     /**
      * 设备ID（唯一标识）
      */
-    @JSONField(name = "deviceId")
+    @JSONField(name = "device_id")
     private String deviceId;
     
     /**
      * 设备名称
      */
-    @JSONField(name = "deviceName")
+    @JSONField(name = "device_name")
     private String deviceName;
     
     /**
+     * IP地址（客户端上报，服务端可优先使用 Channel 的 IP）
+     */
+    @JSONField(name = "ip_address")
+    private String ipAddress;
+
+    /**
      * MAC地址
      */
-    @JSONField(name = "macAddress")
+    @JSONField(name = "mac_address")
     private String macAddress;
     
-    /**
-     * 设备版本号
-     */
-    @JSONField(name = "version")
-    private String version;
-    
-    /**
-     * 设备类型（如：smartboard, gateway等）
-     */
-    @JSONField(name = "deviceType")
-    private String deviceType;
-    
-    /**
-     * 硬件信息（JSON字符串，可选）
-     */
-    @JSONField(name = "hardwareInfo")
-    private String hardwareInfo;
 }
 

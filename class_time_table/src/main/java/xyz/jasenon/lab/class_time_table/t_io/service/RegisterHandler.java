@@ -17,6 +17,7 @@ import xyz.jasenon.lab.class_time_table.t_io.protocol.PacketBuilder;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.QosLevel;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.SmartBoardPacket;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -88,42 +89,40 @@ public class RegisterHandler {
             }
             
             String deviceId = registerResult.getDeviceInfo().getDeviceId();
+            SecretKey aesKey = registerResult.getAesKey();
             log.info("设备{}注册成功，已绑定ChannelContext并保存AES密钥", deviceId);
             
-            // 获取设备配置（根据设备类型或默认配置）
+            // 获取设备配置（含 deviceId，客户端写入 config.json）
             DeviceConfigDTO config = deviceService.getDeviceConfig(deviceId);
+            String configJson = JSON.toJSONString(config);
+            byte[] configBytes = configJson.getBytes(StandardCharsets.UTF_8);
             
-            // 构建注册成功响应（不需要token，使用ChannelContext的bindId）
-            // 注意：AES密钥已在注册时交换，这里不需要再返回
-            RegisterAckDTO ackDTO = RegisterAckDTO.success(null, config); // token设为null
-            String responseJson = JSON.toJSONString(ackDTO);
-            byte[] responseBytes = responseJson.getBytes(StandardCharsets.UTF_8);
-            
-            // 使用私钥签名payload（保证信息完整性和身份验证）
-            byte[] signature = deviceEncryptionService.signData(responseBytes);
-            if (signature == null) {
-                log.error("签名响应失败，设备: {}", deviceId);
-                sendRegisterAckError(channelContext, "INTERNAL_ERROR", "签名失败");
+            // 使用客户端协商的 AES 密钥加密配置，payload = IV(12) + AES-GCM(ciphertext)
+            DeviceEncryptionService.EncryptResult encryptResult;
+            try {
+                encryptResult = deviceEncryptionService.encryptPayload(configBytes, aesKey);
+            } catch (Exception e) {
+                log.error("加密配置失败，设备: {}", deviceId, e);
+                sendRegisterAckError(channelContext, "INTERNAL_ERROR", "加密配置失败");
                 closeChannel(channelContext);
                 return;
             }
+            byte[] iv = encryptResult.getIv();
+            byte[] encrypted = encryptResult.getEncrypted();
+            byte[] ackPayload = new byte[iv.length + encrypted.length];
+            System.arraycopy(iv, 0, ackPayload, 0, iv.length);
+            System.arraycopy(encrypted, 0, ackPayload, iv.length, encrypted.length);
             
-            // 将签名附加到payload后面（格式：payload + 分隔符 + signature的Base64）
-            String signatureBase64 = java.util.Base64.getEncoder().encodeToString(signature);
-            String signedPayload = responseJson + "|" + signatureBase64;
-            byte[] signedBytes = signedPayload.getBytes(StandardCharsets.UTF_8);
-            
-            // 创建REGISTER_ACK包
+            // 创建 REGISTER_ACK 包，payload 为 AES 加密的配置
             SmartBoardPacket ackPacket = packetBuilder.build(
-                CommandType.REGISTER_ACK, 
-                signedBytes, 
+                CommandType.REGISTER_ACK,
+                ackPayload,
                 QosLevel.AT_LEAST_ONCE
             );
             
-            // 发送响应
             Tio.send(channelContext, ackPacket);
             
-            log.info("设备{}注册成功，已发送REGISTER_ACK，双方已切换为AES加密通信", deviceId);
+            log.info("设备{}注册成功，已发送REGISTER_ACK（AES加密配置），双方已切换为AES加密通信", deviceId);
             
         } catch (Exception e) {
             log.error("处理设备注册请求失败", e);

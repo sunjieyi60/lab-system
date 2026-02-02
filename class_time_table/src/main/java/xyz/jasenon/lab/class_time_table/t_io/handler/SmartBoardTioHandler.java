@@ -11,6 +11,7 @@ import org.tio.server.intf.TioServerHandler;
 import org.tio.core.Tio;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.CommandType;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.SmartBoardPacket;
+import xyz.jasenon.lab.class_time_table.t_io.service.FaceEnrollHandler;
 import xyz.jasenon.lab.class_time_table.t_io.service.RegisterHandler;
 import xyz.jasenon.lab.class_time_table.service.DeviceRegisterService;
 
@@ -26,6 +27,7 @@ import java.nio.ByteBuffer;
 public class SmartBoardTioHandler implements TioServerHandler {
     
     private final RegisterHandler registerHandler;
+    private final FaceEnrollHandler faceEnrollHandler;
     private final DeviceRegisterService deviceRegisterService;
 
     @Override
@@ -155,6 +157,10 @@ public class SmartBoardTioHandler implements TioServerHandler {
         
         // 根据指令类型分发到不同的处理器
         log.debug("收到设备{}的指令，cmdType={}", deviceId, cmdType);
+        if (cmdType == CommandType.FACE_SEND_ACK) {
+            faceEnrollHandler.handleFaceSendAck(acceptPacket, channelContext);
+            return;
+        }
         // 其他指令类型的处理将在后续实现
     }
 }
