@@ -13,6 +13,7 @@ import xyz.jasenon.lab.class_time_table.entity.Device;
 
 import javax.crypto.SecretKey;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -82,15 +83,10 @@ public class DeviceRegisterService {
             deviceMap.put("deviceId", device.getDeviceId());
             deviceMap.put("deviceName", device.getDeviceName());
             deviceMap.put("macAddress", device.getMacAddress());
-            deviceMap.put("version", device.getVersion());
             deviceMap.put("ipAddress", device.getIpAddress());
-            deviceMap.put("deviceType", device.getDeviceType());
-            deviceMap.put("hardwareInfo", device.getHardwareInfo());
-            deviceMap.put("status", device.getStatus());
-            deviceMap.put("lastOnlineTime", device.getLastOnlineTime().toString());
             deviceMap.put("createTime", device.getCreateTime().toString());
             deviceMap.put("updateTime", device.getUpdateTime().toString());
-            deviceMap.expire(java.time.Duration.ofSeconds(REGISTER_EXPIRE_SECONDS));
+            deviceMap.expire(Duration.ofSeconds(REGISTER_EXPIRE_SECONDS));
             
             // 4. 绑定ChannelContext的bindId（关键：后续通过bindId验证设备合法性）
             Tio.bindBsId(channelContext, deviceId);

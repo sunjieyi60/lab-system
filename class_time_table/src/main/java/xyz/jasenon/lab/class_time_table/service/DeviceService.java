@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO;
 import xyz.jasenon.lab.class_time_table.entity.Device;
 import xyz.jasenon.lab.class_time_table.mapper.DeviceMapper;
 
@@ -114,23 +115,23 @@ public class DeviceService extends ServiceImpl<DeviceMapper, Device> {
      * @param deviceId 设备ID（用于回填到配置中）
      * @return 默认配置DTO
      */
-    private xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO getDefaultConfig(String deviceId) {
-        return xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.builder()
+    private DeviceConfigDTO getDefaultConfig(String deviceId) {
+        return DeviceConfigDTO.builder()
                 .deviceId(deviceId)
-                .backendServer(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.BackendServerConfig.builder()
-                        .host("192.168.10.100")
-                        .port(9999)
+                .backendServer(DeviceConfigDTO.BackendServerConfig.builder()
+                        .host("10.0.2.2")
+                        .port(9000)
                         .timeout(5000L)
                         .heartPeriod(5000L)
                         .build())
-                .weatherConfig(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.WeatherConfig.builder()
+                .weatherConfig(DeviceConfigDTO.WeatherConfig.builder()
                         .location(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.Location.builder()
                                 .longitude(114.39297)
                                 .latitude(30.48748)
                                 .build())
                         .updateInterval(120)
                         .build())
-                .heziConfig(xyz.jasenon.lab.class_time_table.dto.DeviceConfigDTO.HeziConfig.builder()
+                .heziConfig(DeviceConfigDTO.HeziConfig.builder()
                         .pollIntervalMinutes(120)
                         .openId("10009395")
                         .appKey("7ebc0bc70c240ed63d9ddfcaf156db45")

@@ -31,8 +31,8 @@ device:
       # 服务端RSA私钥（Base64编码，用于解密设备信息）
       # 方式1：直接配置Base64字符串
       private-key: ""
-      # 方式2：从文件读取（推荐，更安全）
-      private-key-file: "/resources/private_key.pem"
+      # 方式2：从文件读取（推荐）。classpath 表示从 src/main/resources 或 jar 内加载，不依赖绝对路径
+      private-key-file: "classpath:private_key.pem"
   # 人脸上传存储路径（按 deviceId/faceId.jpg 落盘）
   face:
     enroll:

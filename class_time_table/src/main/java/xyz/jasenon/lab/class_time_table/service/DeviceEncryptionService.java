@@ -59,7 +59,7 @@ public class DeviceEncryptionService {
             } else if (privateKeyResource != null && privateKeyResource.exists()) {
                 loadPrivateKeyFromFile(privateKeyResource);
             } else {
-                log.warn("服务端私钥未配置，设备加密验证功能将不可用");
+                log.warn("服务端私钥未配置：private-key-file 指向的资源不存在或不可读，path={}，设备加密验证功能将不可用", privateKeyResource);
             }
         } catch (Exception e) {
             log.error("加载服务端私钥失败", e);
