@@ -1,9 +1,13 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/lab_sys4?useSSL=false&serverTimezone=UTC
+#    url: jdbc:mysql://localhost:3306/lab_sys4?useSSL=false&serverTimezone=UTC
+#    username: root
+#    password: sbx159357!?.
+    url: jdbc:mysql://10.230.80.109:3306/lab_sys4?useSSL=false&serverTimezone=UTC
     username: root
-    password: sbx159357!?.
+    password: lab_system
+
   data:
     redis:
       host: localhost
@@ -19,3 +23,17 @@ t-io:
     host: "localhost"
     port: 9000
     heartbeat: 10000
+
+# 设备认证配置
+device:
+  auth:
+    server:
+      # 服务端RSA私钥（Base64编码，用于解密设备信息）
+      # 方式1：直接配置Base64字符串
+      private-key: ""
+      # 方式2：从文件读取（推荐）。classpath 表示从 src/main/resources 或 jar 内加载，不依赖绝对路径
+      private-key-file: "classpath:private_key.pem"
+  # 人脸上传存储路径（按 deviceId/faceId.jpg 落盘）
+  face:
+    enroll:
+      store-path: "data/faces"

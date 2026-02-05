@@ -46,8 +46,7 @@ public class Task implements Comparable<Task> {
     @NotEmpty(message = "参数列表不能为空")
     private Integer[] args;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Device device;
+    private Device device = null;
 
     /**
      * asc order

@@ -34,6 +34,9 @@ public class MqttSendCallback implements MqttCallbackExtended {
         } catch (MqttException e) {
             log.error("mqttClient:{},reconnect to topic:{} error:{}", mqttClient.getClientId(), mqttClient.topic, e.getMessage());
             throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            log.error("redisson lock error:{}", e.getMessage());
+            throw new RuntimeException(e);
         } finally {
             mqttNx.unlock();
         }

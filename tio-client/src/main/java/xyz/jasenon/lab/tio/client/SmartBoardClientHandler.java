@@ -40,6 +40,10 @@ public class SmartBoardClientHandler implements TioClientHandler {
         packet.setReserved(headerBuffer.get());
         packet.setCheckSum(headerBuffer.get());
         int bodyLength = headerBuffer.getInt();
+        
+        // 重要：设置length字段，用于后续校验和验证
+        packet.setLength(bodyLength);
+        
         if (bodyLength < 0) {
             throw new TioDecodeException("消息体长度小于0");
         }
@@ -52,6 +56,12 @@ public class SmartBoardClientHandler implements TioClientHandler {
             byteBuffer.get(dst);
             packet.setPayload(dst);
         }
+        
+        // 验证校验和（必须在设置length和payload之后）
+        if (!packet.verifyCheckSum()) {
+            throw new TioDecodeException("数据包校验和验证失败");
+        }
+        
         return packet;
     }
 
@@ -60,6 +70,19 @@ public class SmartBoardClientHandler implements TioClientHandler {
         SmartBoardPacket sendPacket = (SmartBoardPacket) packet;
         byte[] body = sendPacket.getPayload() == null ? new byte[0] : sendPacket.getPayload();
         int bodyLength = body.length;
+        
+        // 确保length字段已设置（必须在计算校验和之前）
+        if (sendPacket.getLength() == null) {
+            sendPacket.setLength(bodyLength);
+        } else if (sendPacket.getLength() != bodyLength) {
+            // 如果length与payload长度不一致，以payload为准
+            sendPacket.setLength(bodyLength);
+        }
+        
+        // 确保校验和已计算（在设置length之后）
+        if (sendPacket.getCheckSum() == null) {
+            sendPacket.calculateCheckSum();
+        }
 
         ByteBuffer buffer = ByteBuffer.allocate(SmartBoardPacket.HEADER_LENGTH + bodyLength);
         buffer.order(tioConfig.getByteOrder());
@@ -72,10 +95,13 @@ public class SmartBoardClientHandler implements TioClientHandler {
         buffer.put(sendPacket.getFlags());
         buffer.put(sendPacket.getReserved());
         buffer.put(sendPacket.getCheckSum());
-        buffer.putInt(bodyLength);
+        buffer.putInt(bodyLength); // 使用已设置的length值
+
         if (bodyLength > 0) {
             buffer.put(body);
         }
+        
+        // 只调用一次flip，准备读取
         buffer.flip();
         return buffer;
     }
@@ -85,7 +111,12 @@ public class SmartBoardClientHandler implements TioClientHandler {
         SmartBoardPacket p = (SmartBoardPacket) packet;
         byte cmd = p.getCmdType();
         String cmdName = cmdName(cmd);
-        System.out.println("[收到] cmdType=" + cmdName + " (0x" + Integer.toHexString(cmd & 0xff) + ") seqId=" + p.getSeqId() + " payloadLen=" + (p.getPayload() == null ? 0 : p.getPayload().length));
+        String logMsg = String.format("[收到] cmdType=%s (0x%02X) seqId=%d qos=%s flags=0x%02X payloadLen=%d checkSum=0x%02X",
+                cmdName, cmd & 0xff, p.getSeqId(), p.getQosLevel(), 
+                p.getFlags() != null ? p.getFlags() : 0, 
+                p.getPayload() != null ? p.getPayload().length : 0,
+                p.getCheckSum() != null ? p.getCheckSum() : 0);
+        System.out.println(logMsg);
     }
 
     private static String cmdName(byte cmd) {

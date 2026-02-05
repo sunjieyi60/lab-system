@@ -5,6 +5,8 @@ package xyz.jasenon.lab.class_time_table.t_io.protocol;
  * @date 2026/1/31
  */
 public record CommandType(Byte cmdType) {
+
+    public static final Byte QOS_ACK = 0x00;
     // 注册
     public static final Byte REGISTER = 0x01;
     public static final Byte REGISTER_ACK = 0x02;
@@ -13,9 +15,9 @@ public record CommandType(Byte cmdType) {
     public static final Byte HEARTBEAT = 0x10;
     public static final Byte HEARTBEAT_ACK = 0x11;
 
-    // 人脸
-    public static final Byte FACE_ENROLL = 0x20;
-    public static final Byte FACE_ENROLL_ACK = 0x21;
+    // 人脸：send = Server 发出，send_ack = Client 回复（Web 下发到班牌本地特征库，一次请求内得知插入结果）
+    public static final Byte FACE_SEND = 0x20;
+    public static final Byte FACE_SEND_ACK = 0x21;
     public static final Byte FEATURE_UPLOAD = 0x22;
 
     // 门禁

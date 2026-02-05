@@ -31,7 +31,6 @@ public class MqttAcceptCallback implements MqttCallbackExtended {
             log.error("reconnect error:{},mqttClient:{},mqttNx:{}", e, mqttClient.getClientId(), mqttNx.getKey());
         } finally {
             mqttNx.unlock();
-            ;
         }
     }
 
@@ -47,6 +46,7 @@ public class MqttAcceptCallback implements MqttCallbackExtended {
     @Override
     public void messageArrived(String arg0, MqttMessage arg1) {
         byte[] payloads = arg1.getPayload();
+        if ((payloads[0] & 0xFF) == 0x77) return;
         String topic = arg0;
         log.info("messageArrived, topic:{},payloads:{}", topic, payloads);
         executor.execute(() -> {

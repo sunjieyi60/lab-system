@@ -24,7 +24,7 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
     @Override
     LightRecord decryptPayload(byte[] payload, Long deviceId) {
         Integer address = payload[0] & 0xFF;
-        Integer selfId = payload[1] & 0xFF;
+        Integer selfId = payload[2] & 0xFF;
 
         LightRecord lightRecord = (LightRecord) new LightRecord()
                 .setAddress(address)
@@ -39,7 +39,7 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
     @Override
     Light parse(byte[] payload, Long rs485Id) {
         Integer address = payload[0] & 0xFF;
-        Integer selfId = payload[1] & 0xFF;
+        Integer selfId = payload[2] & 0xFF;
 
         Light light = new LambdaQueryChainWrapper<>(super.deviceMapper)
                 .eq(Light::getAddress, address)

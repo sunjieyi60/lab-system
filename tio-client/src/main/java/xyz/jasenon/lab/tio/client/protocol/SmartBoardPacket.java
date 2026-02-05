@@ -4,7 +4,11 @@ import lombok.Data;
 import org.tio.core.intf.Packet;
 
 /**
- * 与 class_time_table 服务端协议一致，用于测试解码。
+ * 智能班牌数据包协议
+ * 与 class_time_table 服务端协议一致
+ * 
+ * @author Jasenon_ce
+ * @date 2026/1/31
  */
 @Data
 public class SmartBoardPacket extends Packet {
@@ -24,4 +28,75 @@ public class SmartBoardPacket extends Packet {
     private Integer length;
 
     private byte[] payload;
+
+    /**
+     * 获取QoS级别
+     * 
+     * @return QoS级别
+     */
+    public QosLevel getQosLevel() {
+        return QosLevel.fromValue(qos != null ? qos : 0);
+    }
+
+    /**
+     * 设置QoS级别
+     * 
+     * @param qosLevel QoS级别
+     */
+    public void setQosLevel(QosLevel qosLevel) {
+        this.qos = qosLevel.getValue();
+    }
+
+    /**
+     * 检查是否包含指定标志
+     * 
+     * @param flag 标志位
+     * @return 是否包含
+     */
+    public boolean hasFlag(byte flag) {
+        return flags != null && PacketFlags.hasFlag(flags, flag);
+    }
+
+    /**
+     * 判断是否为分片包
+     * 
+     * @return 是否为分片包
+     */
+    public boolean isFragment() {
+        return flags != null && PacketFlags.isFragment(flags);
+    }
+
+    /**
+     * 判断是否为完整包
+     * 
+     * @return 是否为完整包
+     */
+    public boolean isComplete() {
+        return flags == null || PacketFlags.isComplete(flags);
+    }
+
+    /**
+     * 判断是否需要确认
+     * 
+     * @return 是否需要确认
+     */
+    public boolean requiresAck() {
+        return getQosLevel().requiresAck() || hasFlag(PacketFlags.ACK_REQUIRED);
+    }
+
+    /**
+     * 验证校验和
+     * 
+     * @return 校验是否通过
+     */
+    public boolean verifyCheckSum() {
+        return CheckSumCalculator.verify(this);
+    }
+
+    /**
+     * 计算并设置校验和
+     */
+    public void calculateCheckSum() {
+        CheckSumCalculator.setCheckSum(this);
+    }
 }

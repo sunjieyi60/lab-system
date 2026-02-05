@@ -23,7 +23,7 @@ public class CrcChecker {
         }
         // 传递数据长度，排除校验位
         int crc16 = calculateCRC16(bytes, bytes.length - 2);
-        String hexString = Integer.toHexString(bytes[bytes.length - 1]) + Integer.toHexString(bytes[bytes.length - 2]);
+        String hexString = Integer.toHexString(bytes[bytes.length - 1] & 0xff) + Integer.toHexString(bytes[bytes.length - 2] & 0xff);
         int crc16Hex = Integer.parseInt(hexString, 16);
         return crc16 == crc16Hex;
     }
