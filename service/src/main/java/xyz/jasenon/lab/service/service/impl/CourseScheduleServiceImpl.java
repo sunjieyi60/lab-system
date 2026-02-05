@@ -12,6 +12,7 @@ import xyz.jasenon.lab.service.dto.course.CreateCourseSchedule;
 import xyz.jasenon.lab.service.dto.course.DeleteCourseSchedule;
 import xyz.jasenon.lab.service.mapper.CourseScheduleMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
+import xyz.jasenon.lab.service.service.IAnalysisService;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
 import xyz.jasenon.lab.service.vo.CourseScheduleVo;
 
@@ -35,6 +36,8 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
 
     @Autowired
     private LaboratoryMapper laboratoryMapper;
+    @Autowired
+    private IAnalysisService analysisService;
 
     @Override
     public R createCourseSchedule(CreateCourseSchedule createCourseSchedule) {
@@ -67,6 +70,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         }
 
         this.save(courseSchedule);
+        analysisService.invalidateChartCache();
         return R.success("课程安排创建成功");
     }
 
@@ -77,6 +81,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
             return R.fail("课程表不存在");
         }
         this.removeById(deleteCourseSchedule.getCourseScheduleId());
+        analysisService.invalidateChartCache();
         return R.success("课程表删除成功");
     }
 

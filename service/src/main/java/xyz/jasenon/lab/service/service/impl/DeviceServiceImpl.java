@@ -14,6 +14,7 @@ import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.common.entity.device.gateway.SocketGateway;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.DeleteDevice;
+import xyz.jasenon.lab.service.dto.device.UpdateDevice;
 import xyz.jasenon.lab.service.mapper.record.DeviceMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.mapper.record.RS485GatewayMapper;
@@ -52,10 +53,36 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     @Override
     public R deleteDevice(DeleteDevice deleteDevice) {
         Long deviceId = deleteDevice.getDeviceId();
-        // 设备删除时联动取消该设备的轮询任务，避免孤儿任务和无效报警
         pollingScheduleExecutorPool.cancelPolling(deviceId);
         baseMapper.deleteById(deviceId);
         return R.success("删除成功");
+    }
+
+    @Override
+    public R updateDevice(UpdateDevice updateDevice) {
+        Long deviceId = updateDevice.getDeviceId();
+        Device device = baseMapper.selectById(deviceId);
+        if (device == null) {
+            return R.fail("设备不存在");
+        }
+        Boolean oldPolling = device.getPollingEnabled();
+        if (oldPolling == null) {
+            oldPolling = Boolean.TRUE;
+        }
+        if (updateDevice.getDeviceName() != null) {
+            device.setDeviceName(updateDevice.getDeviceName());
+        }
+        if (updateDevice.getPollingEnabled() != null) {
+            device.setPollingEnabled(updateDevice.getPollingEnabled());
+            Boolean newPolling = updateDevice.getPollingEnabled();
+            if (Boolean.TRUE.equals(oldPolling) && Boolean.FALSE.equals(newPolling)) {
+                pollingScheduleExecutorPool.cancelPolling(deviceId);
+            } else if (Boolean.FALSE.equals(oldPolling) && Boolean.TRUE.equals(newPolling)) {
+                DeviceFactory.getDeviceQMethod(device.getDeviceType()).startPollingById(deviceId);
+            }
+        }
+        baseMapper.updateById(device);
+        return R.success("更新成功");
     }
 
     @Override

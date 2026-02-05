@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.common.entity.record;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -10,6 +11,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @Accessors(chain = true)
 @TableName("air_condition_record")
 public class AirConditionRecord extends BaseRecord {
+
+    /** 本表无 device_id 列，不参与 SQL，避免查询报错 */
+    @TableField(exist = false)
+    private Long deviceId;
+
+    /**
+     * RS485 网关 id（关联 rs485_gateway.id）
+     */
+    private Long rs485Id;
 
     /**
      * 地址

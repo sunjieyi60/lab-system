@@ -36,12 +36,24 @@ public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
     public final R insertDevice(CreateDevice createDevice){
         T device = createDevice(createDevice);
         deviceMapper.insert(device);
-        startPolling(device);
+        if (Boolean.TRUE.equals(device.getPollingEnabled())) {
+            startPolling(device);
+        }
         return R.success("创建设备成功");
     }
 
     public T getDeviceById(Long id){
         return deviceMapper.selectById(id);
+    }
+
+    /**
+     * 按设备ID启动轮询（编辑设备时「启用检测」用）
+     */
+    public void startPollingById(Long deviceId) {
+        T device = getDeviceById(deviceId);
+        if (device != null) {
+            startPolling(device);
+        }
     }
 
     public abstract List<T> list(List<Long> laboratoryIds);
@@ -53,9 +65,12 @@ public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
             T device = deviceMapper.selectById(task.getDeviceId());
             if (device == null){
                 log.warn("轮询任务对应的设备已不存在，终止轮询任务! deviceId:{}", task.getDeviceId());
-                // 抛出异常以终止 ScheduledThreadPoolExecutor 的后续调度
-                // 这是设计意图：当设备被删除时，通过异常来停止该设备的轮询任务
                 throw new RuntimeException("轮询任务对应的设备已不存在! deviceId: " + task.getDeviceId());
+            }
+            if (!Boolean.TRUE.equals(device.getPollingEnabled())) {
+                log.info("设备已取消检测，终止轮询任务 deviceId:{}", task.getDeviceId());
+                pollingScheduleExecutorPool.cancelPolling(task.getDeviceId());
+                return;
             }
             log.info("开始执行轮询任务:{}",task);
             TaskDispatch.dispatch(task);

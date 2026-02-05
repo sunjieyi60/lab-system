@@ -64,4 +64,9 @@ public class EditLaboratory {
      */
     private String intro;
 
+    /**
+     * 用户名
+     */
+    private String username;
+
 }

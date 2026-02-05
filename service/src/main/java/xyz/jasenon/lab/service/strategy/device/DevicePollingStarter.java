@@ -37,21 +37,21 @@ public class DevicePollingStarter {
         List<CircuitBreak> circuitBreaks = circuitBreakCreateStrategy.list(laboratoryIds);
         List<Light> lights = lightCreateStrategy.list(laboratoryIds);
         List<Sensor> sensors = sensorCreateStrategy.list(laboratoryIds);
-        accesses.forEach(
-            access -> accessCreateStrategy.startPolling(access)
-        );
-        airConditions.forEach(
-            airCondition -> airConditionCreateStrategy.startPolling(airCondition)
-        );
-        circuitBreaks.forEach(
-            circuitBreak -> circuitBreakCreateStrategy.startPolling(circuitBreak)
-        );
-        lights.forEach(
-            light -> lightCreateStrategy.startPolling(light)
-        );
-        sensors.forEach(
-            sensor -> sensorCreateStrategy.startPolling(sensor)
-        );
+        accesses.stream()
+                .filter(a -> Boolean.TRUE.equals(a.getPollingEnabled()))
+                .forEach(accessCreateStrategy::startPolling);
+        airConditions.stream()
+                .filter(a -> Boolean.TRUE.equals(a.getPollingEnabled()))
+                .forEach(airConditionCreateStrategy::startPolling);
+        circuitBreaks.stream()
+                .filter(c -> Boolean.TRUE.equals(c.getPollingEnabled()))
+                .forEach(circuitBreakCreateStrategy::startPolling);
+        lights.stream()
+                .filter(l -> Boolean.TRUE.equals(l.getPollingEnabled()))
+                .forEach(lightCreateStrategy::startPolling);
+        sensors.stream()
+                .filter(s -> Boolean.TRUE.equals(s.getPollingEnabled()))
+                .forEach(sensorCreateStrategy::startPolling);
         log.info("轮询注册器完成注册");
     }
 

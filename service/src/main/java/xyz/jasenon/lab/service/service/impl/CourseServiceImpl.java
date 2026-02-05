@@ -3,6 +3,7 @@ package xyz.jasenon.lab.service.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.jasenon.lab.common.entity.class_time_table.Course;
 import xyz.jasenon.lab.common.utils.R;
@@ -10,6 +11,7 @@ import xyz.jasenon.lab.service.dto.course.CreateCourse;
 import xyz.jasenon.lab.service.dto.course.DeleteCourse;
 import xyz.jasenon.lab.service.dto.course.EditCourse;
 import xyz.jasenon.lab.service.mapper.CourseMapper;
+import xyz.jasenon.lab.service.service.IAnalysisService;
 import xyz.jasenon.lab.service.service.ICourseService;
 
 import java.util.List;
@@ -20,6 +22,9 @@ import java.util.List;
  */
 @Service
 public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> implements ICourseService {
+
+    @Autowired
+    private IAnalysisService analysisService;
 
     @Override
     public R createCourse(CreateCourse createCourse) {
@@ -39,6 +44,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             return R.fail("课程不存在");
         }
         this.removeById(deleteCourse.getCourseId());
+        analysisService.invalidateChartCache();
         return R.success("课程删除成功");
     }
 

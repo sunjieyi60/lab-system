@@ -98,23 +98,25 @@ CREATE TABLE IF NOT EXISTS user (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS device (
-                                      id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                      device_name VARCHAR(128) NULL,
-                                      device_type VARCHAR(32) NOT NULL,
-                                      belong_to_laboratory_id BIGINT NULL,
-                                      address INT NULL,
-                                      self_id INT NULL,
-                                      rs485_gateway_id BIGINT NULL,
-                                      socket_gateway_id BIGINT NULL,
-                                      group_id VARCHAR(64) NULL,
-                                      is_lock TINYINT(1) NULL,
-                                      create_time DATETIME NULL,
-                                      update_time DATETIME NULL,
-                                      deleted TINYINT(1) DEFAULT 0,
-                                      INDEX idx_device_lab (belong_to_laboratory_id),
-                                      INDEX idx_device_type (device_type)
+                                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                     device_name VARCHAR(128) NULL,
+                                     device_type VARCHAR(32) NOT NULL,
+                                     belong_to_laboratory_id BIGINT NULL,
+                                     address INT NULL,
+                                     self_id INT NULL,
+                                     rs485_gateway_id BIGINT NULL,
+                                     socket_gateway_id BIGINT NULL,
+                                     group_id VARCHAR(64) NULL,
+                                     is_lock TINYINT(1) NULL,
+                                     polling_enabled TINYINT(1) DEFAULT 1,
+                                     create_time DATETIME NULL,
+                                     update_time DATETIME NULL,
+                                     deleted TINYINT(1) DEFAULT 0,
+                                     INDEX idx_device_lab (belong_to_laboratory_id),
+                                     INDEX idx_device_type (device_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 已有库增加轮询开关列（若表已存在且无该列可执行）:
 CREATE TABLE IF NOT EXISTS rs485_gateway (
                                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                              gateway_name VARCHAR(64) NOT NULL,

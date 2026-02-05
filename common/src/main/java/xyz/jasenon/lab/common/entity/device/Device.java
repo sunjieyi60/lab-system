@@ -34,5 +34,9 @@ public class Device extends BaseEntity {
      */
     private Long belongToLaboratoryId;
 
+    /**
+     * 是否启用轮询检测，true=启用，false=取消检测（不删设备）
+     */
+    private Boolean pollingEnabled = Boolean.TRUE;
 
 }

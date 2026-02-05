@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.jasenon.lab.service.mapper.AnalysisMapper">
+
+    <sql id="analysisWhere">
+        cs.deleted = 0
+        <if test="semesterId != null">
+            AND cs.semester_id = #{semesterId}
+        </if>
+        <if test="deptId != null">
+            AND cs.dept_id = #{deptId}
+        </if>
+        <if test="labIds != null and labIds.size() > 0">
+            AND cs.laboratory_id IN
+            <foreach collection="labIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="aggByWeek" resultType="xyz.jasenon.lab.service.vo.DimensionPointVo">
+        SELECT
+            cs.start_week AS label,
+            COUNT(*) AS courseCount,
+            SUM(IF(cs.start_section IS NOT NULL AND cs.end_section IS NOT NULL AND cs.end_section &gt;= cs.start_section,
+                cs.end_section - cs.start_section + 1, 1)) AS sectionCount,
+            SUM(IF(cs.start_section IS NOT NULL AND cs.end_section IS NOT NULL AND cs.end_section &gt;= cs.start_section,
+                cs.end_section - cs.start_section + 1, 1) * COALESCE(c.volumn, 0)) AS studentSectionCount
+        FROM course_schedule cs
+        JOIN course c ON c.id = cs.course_id AND c.deleted = 0
+        WHERE
+        <include refid="analysisWhere"/>
+        GROUP BY cs.start_week
+    </select>
+
+    <select id="aggByWeekday" resultType="xyz.jasenon.lab.service.vo.DimensionPointVo">
+        SELECT
+            jt.wd AS label,
+            COUNT(*) AS courseCount,
+            SUM(IF(cs.start_section IS NOT NULL AND cs.end_section IS NOT NULL AND cs.end_section &gt;= cs.start_section,
+                cs.end_section - cs.start_section + 1, 1)) AS sectionCount,
+            SUM(IF(cs.start_section IS NOT NULL AND cs.end_section IS NOT NULL AND cs.end_section &gt;= cs.start_section,
+                cs.end_section - cs.start_section + 1, 1) * COALESCE(c.volumn, 0)) AS studentSectionCount
+        FROM course_schedule cs
+        JOIN course c ON c.id = cs.course_id AND c.deleted = 0
+        JOIN JSON_TABLE(cs.weekdays, '$[*]' COLUMNS (wd INT PATH '$')) AS jt
+        WHERE
+        <include refid="analysisWhere"/>
+        AND jt.wd BETWEEN 1 AND 7
+        GROUP BY jt.wd
+    </select>
+
+    <select id="aggBySectionSlot" resultType="xyz.jasenon.lab.service.vo.DimensionPointVo">
+        SELECT
+            FLOOR((cs.start_section - 1) / 2) AS label,
+            COUNT(*) AS courseCount,
+            SUM(IF(cs.start_section IS NOT NULL AND cs.end_section IS NOT NULL AND cs.end_section &gt;= cs.start_section,
+                cs.end_section - cs.start_section + 1, 1)) AS sectionCount,
+            SUM(IF(cs.start_section IS NOT NULL AND cs.end_section IS NOT NULL AND cs.end_section &gt;= cs.start_section,
+                cs.end_section - cs.start_section + 1, 1) * COALESCE(c.volumn, 0)) AS studentSectionCount
+        FROM course_schedule cs
+        JOIN course c ON c.id = cs.course_id AND c.deleted = 0
+        WHERE
+        <include refid="analysisWhere"/>
+        AND cs.start_section IS NOT NULL AND cs.start_section BETWEEN 1 AND 12
+        GROUP BY FLOOR((cs.start_section - 1) / 2)
+    </select>
+</mapper>
