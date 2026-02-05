@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.class_time_table.t_io.protocol;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.tio.core.ChannelContext;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class QosManager {
     
     /** 等待确认的消息缓存，key为channelId:seqId */
@@ -35,7 +37,9 @@ public class QosManager {
     
     /** 确认消息保留时间（毫秒），用于去重 */
     private static final long CONFIRMATION_RETENTION_TIME = 60000;
-    
+
+    private final PacketBuilder packetBuilder;
+
     /**
      * 待确认消息
      */
@@ -60,16 +64,18 @@ public class QosManager {
      * @param packet 数据包
      * @param channelContext 通道上下文
      */
-    public void sendWithQos(SmartBoardPacket packet, ChannelContext channelContext) {
+    public void qosStart(SmartBoardPacket packet, ChannelContext channelContext) {
+        if (packet == null || channelContext.isClosed){
+            return;
+        }
         QosLevel qosLevel = packet.getQosLevel();
         
         if (!qosLevel.requiresAck()) {
-            // AT_MOST_ONCE级别，直接发送，不需要确认
             Tio.send(channelContext, packet);
             return;
         }
         
-        // 检查是否需要去重（EXACTLY_ONCE）
+        // 检查是否需要去重（EXACTLY_ONCE）  防止业务重复触发
         if (qosLevel.requiresDeduplication()) {
             String messageKey = getMessageKey(channelContext, packet.getSeqId());
             if (confirmedMessages.containsKey(messageKey)) {
@@ -78,9 +84,6 @@ public class QosManager {
                 return;
             }
         }
-        
-        // 发送消息
-        Tio.send(channelContext, packet);
         
         // 添加到待确认列表
         String key = getMessageKey(channelContext, packet.getSeqId());
@@ -92,6 +95,11 @@ public class QosManager {
         
         log.debug("发送需要确认的消息: channel={}, seqId={}, qos={}", 
                 channelContext.getId(), packet.getSeqId(), qosLevel);
+    }
+
+    public void handleClientAckRequire(SmartBoardPacket packet, ChannelContext channelContext){
+        SmartBoardPacket ack = packetBuilder.buildAck(packet.getSeqId());
+        Tio.send(channelContext, ack);
     }
     
     /**
@@ -115,8 +123,6 @@ public class QosManager {
             }
             
             log.debug("收到ACK确认: channel={}, seqId={}", channelContext.getId(), ackSeqId);
-        } else {
-            log.warn("收到未知序列号的ACK: channel={}, seqId={}", channelContext.getId(), ackSeqId);
         }
     }
     

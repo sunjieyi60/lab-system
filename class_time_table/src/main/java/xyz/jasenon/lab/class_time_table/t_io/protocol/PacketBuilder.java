@@ -1,6 +1,7 @@
 package xyz.jasenon.lab.class_time_table.t_io.protocol;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * 数据包构建器
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2026/1/31
  */
 @Slf4j
+@Component
 public class PacketBuilder {
     
     private final SeqIdGenerator seqIdGenerator;
@@ -146,10 +148,10 @@ public class PacketBuilder {
     public SmartBoardPacket buildAck(Short ackSeqId) {
         SmartBoardPacket packet = new SmartBoardPacket();
         packet.setVersion((byte) 0x01);
-        packet.setCmdType(CommandType.HEARTBEAT_ACK); // 使用HEARTBEAT_ACK作为通用ACK
+        packet.setCmdType(CommandType.QOS_ACK);
         packet.setSeqId(ackSeqId);
         packet.setQos(QosLevel.AT_MOST_ONCE.getValue());
-        packet.setFlags(PacketFlags.ACK_REQUIRED);
+        packet.setFlags(PacketFlags.NONE);
         packet.setReserved((byte) 0);
         packet.setPayload(new byte[0]);
         packet.setLength(0);

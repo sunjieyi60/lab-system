@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.tio.core.ChannelContext;
 import xyz.jasenon.lab.class_time_table.dto.FaceSendAckPayload;
 import xyz.jasenon.lab.class_time_table.service.FaceEnrollService;
+import xyz.jasenon.lab.class_time_table.t_io.protocol.CommandType;
+import xyz.jasenon.lab.class_time_table.t_io.protocol.QosManager;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.SmartBoardPacket;
 
 import java.nio.charset.StandardCharsets;
@@ -27,30 +29,26 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 @Component
-public class FaceEnrollHandler {
+public class FaceEnrollHandler extends Handler {
 
     private final FaceEnrollService faceEnrollService;
 
     /** 使用 @Lazy 打破与 FaceEnrollService 的循环依赖：TioServerConfig -> SmartBoardTioHandler -> FaceEnrollHandler -> FaceEnrollService -> TioServer */
-    public FaceEnrollHandler(@Lazy FaceEnrollService faceEnrollService) {
+    public FaceEnrollHandler(QosManager qosManager, @Lazy FaceEnrollService faceEnrollService) {
+        super(qosManager);
         this.faceEnrollService = faceEnrollService;
     }
 
-    /**
-     * 处理班牌回复的 FACE_SEND_ACK，完成对应 Web 请求的 future
-     *
-     * <p>当班牌收到 FACE_SEND 后，在本地特征库插入一条新特征（成功或失败），
-     * 都会回复 FACE_SEND_ACK，payload 为 JSON：requestId、success、faceId、errorMessage。
-     * 本方法解析 payload 为 {@link FaceSendAckPayload}，根据 requestId 完成 {@link FaceEnrollService}
-     * 中等待的 future，从而 Web 端一次请求即可得到插入结果。
-     *
-     * @param packet         FACE_SEND_ACK 包，body 为 FaceSendAckPayload 的 JSON
-     * @param channelContext 班牌对应的 Channel 上下文
-     */
-    public void handleFaceSendAck(SmartBoardPacket packet, ChannelContext channelContext) {
+    @Override
+    void register() {
+        HandlerFactory.register(CommandType.FACE_SEND_ACK, this);
+    }
+
+    @Override
+    SmartBoardPacket bizPacket(SmartBoardPacket packet, ChannelContext ctx) {
         byte[] payload = packet.getPayload();
         if (payload == null || payload.length == 0) {
-            return;
+            return null;
         }
         try {
             String json = new String(payload, StandardCharsets.UTF_8);
@@ -63,5 +61,6 @@ public class FaceEnrollHandler {
         } catch (Exception e) {
             log.warn("解析 FACE_SEND_ACK 失败", e);
         }
+        return null;
     }
 }

@@ -34,7 +34,7 @@ public abstract class MqttMessageHandler<DM extends BaseMapper<D>, RM extends Ba
         }
         D device = parse(payloads, rs485Id);
         Assert.notNull(device, "设备数据解析失败, 未知的设备");
-        R record = decryptPayload(payloads, rs485Id);
+        R record = decryptPayload(payloads, device.getId());
         RBucket<R> recordSpace = redissonClient.getBucket(deviceType.getRedisPrefix() + device.getId());
         recordSpace.set(record, Duration.ofSeconds(30));
         recordMapper.insert(record);

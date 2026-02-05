@@ -5,6 +5,8 @@ package xyz.jasenon.lab.class_time_table.t_io.protocol;
  * @date 2026/1/31
  */
 public record CommandType(Byte cmdType) {
+
+    public static final Byte QOS_ACK = 0x00;
     // 注册
     public static final Byte REGISTER = 0x01;
     public static final Byte REGISTER_ACK = 0x02;

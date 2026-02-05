@@ -36,17 +36,17 @@ public class CircuitBreakMessageHandler
         boolean isOpen = openLockStatus.toCharArray()[1] == '1';
         boolean isLock = openLockStatus.toCharArray()[0] == '1';
 
-        byte[] payload2 = new byte[] { payload[7], payload[8], payload[9], payload[10] };
+        byte[] payload2 = new byte[] {(byte) (payload[7] & 0xff), (byte) (payload[8] & 0xff), (byte) (payload[9] & 0xff),(byte) (payload[10] & 0xff) };
         float leakage = reserverByteThenToFloat(payload2);
-        byte[] payload3 = new byte[] { payload[11], payload[12], payload[13], payload[14] };
+        byte[] payload3 = new byte[] { (byte) (payload[11] & 0xff),(byte) (payload[12] & 0xff),(byte) (payload[13] & 0xff),(byte) (payload[14] & 0xff) };
         float temperture = reserverByteThenToFloat(payload3);
-        byte[] payload4 = new byte[] { payload[55], payload[56], payload[57], payload[58] };
+        byte[] payload4 = new byte[] { (byte) (payload[55] & 0xff),(byte) (payload[56] & 0xff), (byte) (payload[57] & 0xff),(byte) (payload[58] & 0xff) };
         float voltage = reserverByteThenToFloat(payload4);
-        byte[] payload5 = new byte[] { payload[119], payload[120], payload[121], payload[122] };
+        byte[] payload5 = new byte[] { (byte) (payload[119] & 0xff), (byte) (payload[120] & 0xff), (byte) (payload[121] & 0xff),(byte) (payload[122] & 0xff) };
         float current = reserverByteThenToFloat(payload5);
-        byte[] payload6 = new byte[] { payload[151], payload[152], payload[153], payload[154] };
+        byte[] payload6 = new byte[] { (byte) (payload[151] & 0xff), (byte) (payload[152] & 0xff), (byte) (payload[153] & 0xff), (byte) (payload[154] & 0xff) };
         float power = reserverByteThenToFloat(payload6);
-        byte[] payload7 = new byte[] { payload[215], payload[216], payload[217], payload[218] };
+        byte[] payload7 = new byte[] { (byte) (payload[215] & 0xff), (byte) (payload[216] & 0xff), (byte) (payload[217] & 0xff), (byte) (payload[218] & 0xff) };
         float energy = reserverByteThenToFloat(payload7);
         log.info("电表地址:{}", payload[0]);
         log.info("漏电值:{}", leakage);
@@ -116,8 +116,8 @@ public class CircuitBreakMessageHandler
         }
         StringBuilder hexString = new StringBuilder();
         while (!reserver.isEmpty()) {
-            byte b = reserver.pop();
-            hexString.append(Integer.toHexString(b));
+            Integer b = reserver.pop() & 0xff;
+            hexString.append(Integer.toHexString(b).length() > 1? Integer.toHexString(b): "0" + Integer.toHexString(b));
         }
         int hexVal = Integer.parseInt(hexString.toString(), 16);
         return Float.intBitsToFloat(hexVal);

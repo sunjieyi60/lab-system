@@ -11,11 +11,11 @@ import org.tio.server.intf.TioServerHandler;
 import org.tio.core.Tio;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.CommandType;
 import xyz.jasenon.lab.class_time_table.t_io.protocol.SmartBoardPacket;
-import xyz.jasenon.lab.class_time_table.t_io.service.FaceEnrollHandler;
-import xyz.jasenon.lab.class_time_table.t_io.service.RegisterHandler;
-import xyz.jasenon.lab.class_time_table.service.DeviceRegisterService;
+import xyz.jasenon.lab.class_time_table.t_io.service.HandlerFactory;
+
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 /**
  * @author Jasenon_ce
@@ -25,10 +25,6 @@ import java.nio.ByteBuffer;
 @Slf4j
 @RequiredArgsConstructor
 public class SmartBoardTioHandler implements TioServerHandler {
-    
-    private final RegisterHandler registerHandler;
-    private final FaceEnrollHandler faceEnrollHandler;
-    private final DeviceRegisterService deviceRegisterService;
 
     @Override
     public Packet decode(ByteBuffer byteBuffer, int limit, int position, int readableLength, ChannelContext channelContext) throws TioDecodeException {
@@ -125,7 +121,8 @@ public class SmartBoardTioHandler implements TioServerHandler {
         buffer.put(sendPacket.getFlags());
         buffer.put(sendPacket.getReserved());
         buffer.put(sendPacket.getCheckSum());
-        buffer.putInt(bodyLength); // 使用已设置的length值
+        // 使用已设置的length值
+        buffer.putInt(bodyLength);
 
         if (bodyLength > 0) {
             buffer.put(body);
@@ -133,6 +130,7 @@ public class SmartBoardTioHandler implements TioServerHandler {
         
         // 只调用一次flip，准备读取
         buffer.flip();
+
         return buffer;
     }
 
@@ -140,27 +138,19 @@ public class SmartBoardTioHandler implements TioServerHandler {
     public void handler(Packet packet, ChannelContext channelContext) throws Exception {
         var acceptPacket = (SmartBoardPacket) packet;
         var cmdType = acceptPacket.getCmdType();
-        
-        // REGISTER指令不需要验证（正在注册）
-        if (cmdType == CommandType.REGISTER) {
-            registerHandler.handleRegister(acceptPacket, channelContext);
+
+        if (Objects.equals(cmdType, CommandType.REGISTER)) {
+            HandlerFactory.get(CommandType.REGISTER).handle(acceptPacket, channelContext);
             return;
         }
-        
+
         // 其他指令需要验证设备合法性（通过ChannelContext的bindId）
-        String deviceId = deviceRegisterService.verifyDevice(channelContext);
+        String deviceId = channelContext.getBsId();
         if (deviceId == null) {
             log.warn("收到来自未注册设备的请求，cmdType={}, 来自: {}", cmdType, channelContext.getClientNode());
             Tio.close(channelContext, "设备未注册，连接已关闭");
-            return;
         }
-        
-        // 根据指令类型分发到不同的处理器
-        log.debug("收到设备{}的指令，cmdType={}", deviceId, cmdType);
-        if (cmdType == CommandType.FACE_SEND_ACK) {
-            faceEnrollHandler.handleFaceSendAck(acceptPacket, channelContext);
-            return;
-        }
-        // 其他指令类型的处理将在后续实现
+
+        HandlerFactory.get(cmdType).handle(acceptPacket, channelContext);
     }
 }

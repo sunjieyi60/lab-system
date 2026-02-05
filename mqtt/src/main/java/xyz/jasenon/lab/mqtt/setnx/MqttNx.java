@@ -52,7 +52,9 @@ public class MqttNx {
     public void unlock() {
         pendingSend = false;
         RReadWriteLock rlock = redissonClient.getReadWriteLock(prefix + key);
-        rlock.writeLock().unlock();
+        if (rlock.writeLock() != null && rlock.writeLock().isHeldByCurrentThread()){
+            rlock.writeLock().unlock();
+        }
     }
 
     /** 标记当前有一次发送在等待 ACK（在 tryLock 成功并发送后调用） */
