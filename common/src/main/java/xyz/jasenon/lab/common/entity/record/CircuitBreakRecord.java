@@ -1,6 +1,5 @@
 package xyz.jasenon.lab.common.entity.record;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -11,14 +10,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @Accessors(chain = true)
 @TableName("circuit_break_record")
 public class CircuitBreakRecord extends BaseRecord {
-
-    @TableField(exist = false)
-    private Long deviceId;
-
-    /**
-     * RS485 网关 id（关联 rs485_gateway.id）
-     */
-    private Long rs485Id;
 
     /**
      * 地址

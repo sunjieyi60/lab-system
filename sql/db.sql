@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS course_schedule (
 CREATE TABLE IF NOT EXISTS access_record (
                                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                              create_time DATETIME NULL,
-                                             rs485_id BIGINT NULL,
+                                             device_id BIGINT NULL,
                                              address INT NULL,
                                              self_id INT NULL,
                                              is_open TINYINT(1) NULL,
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS access_record (
 CREATE TABLE IF NOT EXISTS air_condition_record (
                                                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                                     create_time DATETIME NULL,
-                                                    rs485_id BIGINT NULL,
+                                                    device_id BIGINT NULL,
                                                     address INT NULL,
                                                     self_id INT NULL,
                                                     is_open TINYINT(1) NULL,
@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS air_condition_record (
 CREATE TABLE IF NOT EXISTS circuit_break_record (
                                                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                                     create_time DATETIME NULL,
-                                                    rs485_id BIGINT NULL,
+                                                    device_id BIGINT NULL,
                                                     address INT NULL,
                                                     is_open TINYINT(1) NULL,
                                                     is_fix TINYINT(1) NULL,
@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS circuit_break_record (
 CREATE TABLE IF NOT EXISTS light_record (
                                             id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                             create_time DATETIME NULL,
-                                            rs485_id BIGINT NULL,
+                                            device_id BIGINT NULL,
                                             address INT NULL,
                                             self_id INT NULL,
                                             is_open TINYINT(1) NULL,
@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS light_record (
 CREATE TABLE IF NOT EXISTS sensor_record (
                                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                              create_time DATETIME NULL,
-                                             rs485_id BIGINT NULL,
+                                             device_id BIGINT NULL,
                                              address INT NULL,
                                              self_id INT NULL,
                                              temperature DOUBLE NULL,
@@ -459,28 +459,28 @@ ALTER TABLE course_schedule
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE access_record
-    ADD CONSTRAINT fk_access_record_rs485
-        FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
+    ADD CONSTRAINT fk_access_record_device
+        FOREIGN KEY (device_id) REFERENCES device(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE air_condition_record
-    ADD CONSTRAINT fk_air_record_rs485
-        FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
+    ADD CONSTRAINT fk_air_record_device
+        FOREIGN KEY (device_id) REFERENCES device(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE circuit_break_record
-    ADD CONSTRAINT fk_cb_record_rs485
-        FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
+    ADD CONSTRAINT fk_cb_record_device
+        FOREIGN KEY (device_id) REFERENCES device(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE light_record
-    ADD CONSTRAINT fk_light_record_rs485
-        FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
+    ADD CONSTRAINT fk_light_record_device
+        FOREIGN KEY (device_id) REFERENCES device(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE sensor_record
-    ADD CONSTRAINT fk_sensor_record_rs485
-        FOREIGN KEY (rs485_id) REFERENCES rs485_gateway(id)
+    ADD CONSTRAINT fk_sensor_record_device
+        FOREIGN KEY (device_id) REFERENCES device(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE user_permission

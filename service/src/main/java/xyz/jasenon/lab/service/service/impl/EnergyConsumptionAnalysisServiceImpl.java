@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 能耗统计：按 rs485_id + address 关联设备与记录，首尾 energy 相减得 Kwh
+ * 能耗统计：按 device_id 关联设备与记录，首尾 energy 相减得 Kwh
  */
 @Slf4j
 @Service
@@ -104,19 +104,16 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
      * 首尾相减：取 T1 前最近一条与 T2 前最近一条的 energy，能耗 = 尾 - 首。
      */
     private BigDecimal computeEnergyKwh(CircuitBreak device, LocalDateTime queryStart, LocalDateTime queryEnd) {
-        if (device.getRs485GatewayId() == null) return BigDecimal.ZERO;
         CircuitBreakRecord startRecord = circuitBreakRecordMapper.selectOne(
                 new LambdaQueryWrapper<CircuitBreakRecord>()
-                        .eq(CircuitBreakRecord::getRs485Id, device.getRs485GatewayId())
-                        .eq(CircuitBreakRecord::getAddress, device.getAddress())
+                        .eq(CircuitBreakRecord::getDeviceId, device.getId())
                         .le(CircuitBreakRecord::getCreateTime, queryStart)
                         .orderByDesc(CircuitBreakRecord::getCreateTime)
                         .last("LIMIT 1")
         );
         CircuitBreakRecord endRecord = circuitBreakRecordMapper.selectOne(
                 new LambdaQueryWrapper<CircuitBreakRecord>()
-                        .eq(CircuitBreakRecord::getRs485Id, device.getRs485GatewayId())
-                        .eq(CircuitBreakRecord::getAddress, device.getAddress())
+                        .eq(CircuitBreakRecord::getDeviceId, device.getId())
                         .le(CircuitBreakRecord::getCreateTime, queryEnd)
                         .orderByDesc(CircuitBreakRecord::getCreateTime)
                         .last("LIMIT 1")

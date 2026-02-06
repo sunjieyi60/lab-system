@@ -170,19 +170,13 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
     }
 
     /**
-     * 从 DB 按 rs485_id + address + self_id 取该设备在 [queryStart, queryEnd] 内的记录，
+     * 从 DB 按 device_id 取该设备在 [queryStart, queryEnd] 内的记录，
      * 合并 Redis 当前开启状态，得到开启时间区间并切分到查询区间内，汇总时长（小时）。
-     * 记录表无 device_id，通过设备所属网关与 address/self_id 关联。
      */
     private double computeRunningHours(AirCondition device, LocalDateTime queryStart, LocalDateTime queryEnd, AirConditionRecord redisRecord) {
-        if (device.getRs485GatewayId() == null) {
-            return 0;
-        }
         List<AirConditionRecord> records = airConditionRecordMapper.selectList(
                 new LambdaQueryWrapper<AirConditionRecord>()
-                        .eq(AirConditionRecord::getRs485Id, device.getRs485GatewayId())
-                        .eq(AirConditionRecord::getAddress, device.getAddress())
-                        .eq(AirConditionRecord::getSelfId, device.getSelfId())
+                        .eq(AirConditionRecord::getDeviceId, device.getId())
                         .ge(AirConditionRecord::getCreateTime, queryStart)
                         .le(AirConditionRecord::getCreateTime, queryEnd)
                         .orderByAsc(AirConditionRecord::getCreateTime)
