@@ -7,6 +7,7 @@ import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateCourseSchedule;
 import xyz.jasenon.lab.service.dto.course.DeleteCourseSchedule;
 import xyz.jasenon.lab.service.vo.CourseScheduleVo;
+import xyz.jasenon.lab.service.vo.LaboratoryListVo;
 
 import java.util.List;
 import java.util.Map;
@@ -23,5 +24,5 @@ public interface ICourseScheduleService extends IService<CourseSchedule> {
 
     R<Map<Long,List<CourseScheduleVo>>> listCourseSchedule(List<Long> laboratoryIds);
 
-    R<List<Laboratory>> listLaboratory();
+    R<List<LaboratoryListVo>> listLaboratory();
 }

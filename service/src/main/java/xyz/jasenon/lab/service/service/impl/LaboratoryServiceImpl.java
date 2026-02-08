@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import xyz.jasenon.lab.common.entity.base.*;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.laboratory.CreateLaboratory;
@@ -59,9 +60,19 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         laboratory.setBelongToDepts(createLaboratory.getBelongToDeptIds());
         this.save(laboratory);
 
+        // 负责人：若入参带了 username 则按用户名查用户并关联，否则用当前登录用户
+        Long managerUserId = doUserId;
+        if (StringUtils.hasText(createLaboratory.getUsername())) {
+            User manager = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .eq(User::getUsername, createLaboratory.getUsername().trim()));
+            if (manager == null) {
+                return R.fail("负责人用户不存在，请检查用户名");
+            }
+            managerUserId = manager.getId();
+        }
         LaboratoryManager laboratoryManager = new LaboratoryManager()
                 .setLaboratoryId(laboratory.getId())
-                .setUserId(doUserId);
+                .setUserId(managerUserId);
         laboratoryManagerMapper.insert(laboratoryManager);
 
         LaboratoryUser laboratoryUser = new LaboratoryUser()
