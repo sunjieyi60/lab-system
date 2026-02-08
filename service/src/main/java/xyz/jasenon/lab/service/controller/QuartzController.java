@@ -32,7 +32,7 @@ public class QuartzController {
 
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
-    @LogPoint(title = "报警联动设置", sqEl = "#scheduleConfigRoot", clazz = ScheduleConfigRoot.class)
+    @LogPoint(title = "'报警联动设置'", sqEl = "#scheduleConfigRoot", clazz = ScheduleConfigRoot.class)
     public R createConfig(ScheduleConfigRoot scheduleConfigRoot){
         Result<Boolean> res = configLoader.configCreate(scheduleConfigRoot);
         if (!res.getData()) {

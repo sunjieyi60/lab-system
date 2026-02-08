@@ -65,7 +65,7 @@ public class DeviceController {
     @RequestPermission(allowed = { Permissions.DEVICE_CONTROL })
     @PostMapping("/control")
     @ApiOperation("控制设备")
-    @LogPoint(title = "设备控制", sqEl = "#task", clazz = Task.class)
+    @LogPoint(title = "'设备控制'", sqEl = "#task", clazz = Task.class)
     public R controlDevice(@Validated @RequestBody Task task) {
         TaskDispatch.dispatch(task);
         return R.success("控制任务下达成功");
