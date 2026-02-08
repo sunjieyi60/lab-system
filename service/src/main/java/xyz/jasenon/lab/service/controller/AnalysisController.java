@@ -35,7 +35,7 @@ public class AnalysisController {
 
     @RequestPermission(allowed = {Permissions.ACADEMIC_AFFAIRS_ANALYSIS})
     @PostMapping("/chart")
-    @ApiOperation("获取图表数据")
+    @ApiOperation("获取教务数据")
     public R<AnalysisChartVo> getChartData(@RequestBody AnalysisQueryDto query) {
         return analysisService.getChartData(query != null ? query : new AnalysisQueryDto());
     }
