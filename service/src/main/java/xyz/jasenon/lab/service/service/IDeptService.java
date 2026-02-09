@@ -19,4 +19,9 @@ public interface IDeptService extends IService<Dept> {
 
     R deleteDept(DeleteDept deleteDept);
 
+    /**
+     * 获取部门列表
+     */
+    R listDept();
+
 }

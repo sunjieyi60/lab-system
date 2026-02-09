@@ -84,6 +84,11 @@ public class BuildingServiceImpl extends ServiceImpl<BuildingMapper, Building> i
         return R.success();
     }
 
+    @Override
+    public R listBuilding() {
+        return R.success(this.list(), "获取楼栋列表成功");
+    }
+
     /**
      * 判断楼栋是否属于当前操作人所属部门下的楼栋（仅允许操作自己所属部门的楼栋）
      */
