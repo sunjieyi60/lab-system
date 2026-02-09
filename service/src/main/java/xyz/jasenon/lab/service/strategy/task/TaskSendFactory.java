@@ -21,6 +21,4 @@ public class TaskSendFactory {
         return STRATEGY.get(type);
     }
 
-
-
 }
