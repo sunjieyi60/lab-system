@@ -8,8 +8,11 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import xyz.jasenon.lab.common.command.SendType;
 import xyz.jasenon.lab.common.dto.task.Task;
+import xyz.jasenon.lab.common.entity.device.Device;
+import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.task.TaskSendFactory;
 import xyz.jasenon.lab.service.strategy.task.TaskSendProperties;
 import xyz.jasenon.lab.service.strategy.task.TaskSendStrategy;
@@ -37,6 +40,9 @@ public class MqttTaskSendStrategy implements TaskSendStrategy {
 
     @Override
     public void send(Task task) {
+        Device device = DeviceFactory.getDeviceQMethod(task.getDeviceType()).getDeviceById(task.getDeviceId());
+        Assert.notNull(device,"设备不存在");
+        task.setDevice(device);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String body = objectMapper.writeValueAsString(task);

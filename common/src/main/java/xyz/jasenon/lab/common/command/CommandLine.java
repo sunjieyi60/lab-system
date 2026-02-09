@@ -12,9 +12,9 @@ public enum CommandLine {
     REQUEST_AIR_CONDITION_DATA_SOCKET(new Command("{0} 88 00 00",CheckType.SUM,SendType.SOCKET),"请求空调数据"),
 
 
+
     OPEN_ACCESS_ONCE(new Command("{0} 0B {1} 00 00 00",CheckType.SUM,SendType.MQTT),"单次开门"),
     REQUEST_ACCESS_DATA(new Command("{0} 03 {1} 00 00 00",CheckType.SUM,SendType.MQTT), "请求门禁数据"),
-
     OPEN_CIRCUITBREAK(new Command("{0} 10 00 19 00 01 02 00 01",CheckType.CRC16,SendType.MQTT),"断路器分闸"),
     CLOSE_CIRCUITBREAK(new Command("{0} 10 00 19 00 01 02 00 01",CheckType.CRC16,SendType.MQTT),"断路器合闸"),
     REQUEST_CIRCUITBREAK_DATA(new Command("{0} 03 00 18 00 74",CheckType.CRC16,SendType.MQTT),"请求断路器数据"),
