@@ -5,7 +5,7 @@ public class SumChecker {
     public static byte calculateCheckSum(byte[] data) {
         int sum = 0;
         for (int i = 0; i < data.length; i++) {
-            sum += data[i] & 0xFF;  // 使用 & 0xFF 确保使用无符号字节值
+            sum += data[i];  // 使用 & 0xFF 确保使用无符号字节值
         }
         return (byte) (sum % 0xFF);
     }

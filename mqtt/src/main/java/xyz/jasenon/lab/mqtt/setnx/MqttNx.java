@@ -38,12 +38,12 @@ public class MqttNx {
      * 尝试加锁：只有key不存在时才能设置成功（上一条已确认或已超时）
      */
     public boolean tryLock() throws InterruptedException {
-//        RBucket<String> bucket = redissonClient.getBucket(prefix + key);
+        RBucket<String> bucket = redissonClient.getBucket(prefix + key);
         // trySet = SET NX EX（原子操作）
-        RReadWriteLock rlock = redissonClient.getReadWriteLock(prefix + key);
+//        RReadWriteLock rlock = redissonClient.getReadWriteLock(prefix + key);
         // 只有当key不存在（上条已确认）时才设置成功，同时设置过期时间
-//        boolean result = bucket.setIfAbsent("locked", Duration.of(timeout, timeUnit.toChronoUnit()));
-        return rlock.writeLock().tryLock(timeout, timeUnit);
+        boolean result = bucket.setIfAbsent("locked", Duration.of(timeout, timeUnit.toChronoUnit()));
+        return result;
     }
 
     /**
@@ -51,10 +51,12 @@ public class MqttNx {
      */
     public void unlock() {
         pendingSend = false;
-        RReadWriteLock rlock = redissonClient.getReadWriteLock(prefix + key);
-        if (rlock.writeLock() != null && rlock.writeLock().isHeldByCurrentThread()){
-            rlock.writeLock().unlock();
-        }
+//        RReadWriteLock rlock = redissonClient.getReadWriteLock(prefix + key);
+//        if (rlock.writeLock() != null && rlock.writeLock().isHeldByCurrentThread()){
+//            rlock.writeLock().unlock();
+//        }
+        RBucket<String> bucket = redissonClient.getBucket(prefix + key);
+        bucket.delete();
     }
 
     /** 标记当前有一次发送在等待 ACK（在 tryLock 成功并发送后调用） */
