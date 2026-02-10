@@ -1,7 +1,6 @@
 package xyz.jasenon.lab.common.explain;
 
 
-import cn.hutool.core.lang.Assert;
 import xyz.jasenon.lab.common.command.Command;
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.dto.task.Task;
@@ -56,8 +55,9 @@ TaskExplain<T> {
 
     private final byte[] generatePayload(Command command,Byte[] orginalPayload){
         switch (command.getCheckType()) {
-            case SUM: return SumChecker.generatePayload(orginalPayload);
+            case SUM_SG: return SumChecker.generatePayload(orginalPayload);
             case CRC16: return CrcChecker.generatePayload(orginalPayload);
+            case SUM_UNSG: return SumChecker.generateUnsignedBytePayload(orginalPayload);
             default:
                 throw new IllegalArgumentException("不支持的校验类型");
         }
