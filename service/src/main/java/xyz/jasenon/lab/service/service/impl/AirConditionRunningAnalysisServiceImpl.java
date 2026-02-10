@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunningAnalysisService {
 
     private static final String REDIS_KEY_PATTERN = "AirCondition:Record:*";
-    /** 与前端表格一致：日期与时间用 - 连接，小时不补零，如 2025-09-01-8:00 至 2025-09-01-21:00 */
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd-H:mm");
     private static final int PARALLEL_THREADS = 8;
 

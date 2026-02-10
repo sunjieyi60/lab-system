@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xyz.jasenon.lab.common.entity.base.Dept;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
 import xyz.jasenon.lab.common.entity.device.CircuitBreak;
 import xyz.jasenon.lab.common.entity.record.CircuitBreakRecord;
@@ -165,8 +166,8 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
             if (lab.getBelongToDepts() != null) deptIds.addAll(lab.getBelongToDepts());
         }
         if (deptIds.isEmpty()) return Map.of();
-        List<xyz.jasenon.lab.common.entity.base.Dept> depts = deptMapper.selectBatchIds(deptIds);
-        return depts.stream().collect(Collectors.toMap(xyz.jasenon.lab.common.entity.base.Dept::getId, xyz.jasenon.lab.common.entity.base.Dept::getDeptName, (a, b) -> a));
+        List<Dept> depts = deptMapper.selectBatchIds(deptIds);
+        return depts.stream().collect(Collectors.toMap(Dept::getId, Dept::getDeptName, (a, b) -> a));
     }
 
     private String formatTimeRange(LocalDateTime start, LocalDateTime end) {
