@@ -35,8 +35,8 @@ public class CrcChecker {
         }
         int crc16 = calculateCRC16(payload, originalPayload.length);
         // 校验位在前，数据在后
-        payload[originalPayload.length] = (byte) ((crc16 >> 8) & 0xFF);
-        payload[originalPayload.length + 1] = (byte) (crc16 & 0xFF);
+        payload[originalPayload.length + 1] = (byte) ((crc16 >> 8) & 0xFF);
+        payload[originalPayload.length] = (byte) (crc16 & 0xFF);
         return payload;
     }
 }
