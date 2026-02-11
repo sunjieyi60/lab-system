@@ -110,13 +110,12 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
             );
             all.addAll(list);
         }
-        Map<Long, List<CourseScheduleVo>> map = all.stream().collect(Collectors.toMap(CourseScheduleVo::getLaboratoryId, List::of));
+        // 将相同实验室ID的课程表聚合到同一个列表中，避免重复 key 异常
+        Map<Long, List<CourseScheduleVo>> map = all.stream()
+                .collect(Collectors.groupingBy(CourseScheduleVo::getLaboratoryId));
         return R.success(map,"获取成功");
     }
 
-    /**
-     * 实验室列表。username、phone 为负责人（来自 laboratory_manager），非创建人。
-     */
     @Override
     public R<List<LaboratoryListVo>> listLaboratory() {
         List<LaboratoryListVo> lists = laboratoryMapper.selectJoinList(LaboratoryListVo.class,

@@ -12,6 +12,11 @@ import java.util.List;
 public class LaboratoryListVo {
 
     /**
+     * 实验室id
+     */
+    private Long id;
+
+    /**
      * 实验室编号
      */
     private String laboratoryId;
