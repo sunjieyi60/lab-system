@@ -53,12 +53,12 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
     @Override
     boolean needSave(byte[] payload) {
         if (payload[1] == 0x0A) {
-            log.info("地址:{0}", payload[0]);
+            log.info("地址:{}", payload[0]);
             log.info("用户操作成功");
             return false;
         }
         if (payload[1] == 0x03) {
-            log.info("地址:{0}", payload[0]);
+            log.info("地址:{}", payload[0]);
             log.info("polling成功");
             return true;
         }
@@ -67,7 +67,7 @@ public class LightMessageHandler extends MqttMessageHandler<LightMapper, LightRe
 
     @Override
     boolean verify(byte[] payload) {
-        return SumChecker.verifyCheckSum(payload);
+        return SumChecker.verifyUnsignedByteCheckSum(payload);
     }
 
 }
