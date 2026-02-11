@@ -23,7 +23,7 @@ public enum CommandLine {
     CLOSE_LIGHT(new Command("{0} 0A {1} 00 11 00",CheckType.SUM_UNSG,SendType.MQTT),"关闭灯光"),
     REQUEST_LIGHT_DATA(new Command("{0} 03 {1} 00 00 00",CheckType.SUM_UNSG,SendType.MQTT), "请求灯光数据"),
 
-    REQUEST_SENSOR_DATA(new Command("{0} 03 {1} 00 00",CheckType.SUM_SG,SendType.MQTT),"请求传感器数据"),;
+    REQUEST_SENSOR_DATA(new Command("{0} 03 {1} 00 00",CheckType.SUM_UNSG,SendType.MQTT),"请求传感器数据"),;
 
 
     private final Command command;
