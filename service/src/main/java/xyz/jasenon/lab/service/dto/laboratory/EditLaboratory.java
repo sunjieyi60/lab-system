@@ -69,4 +69,9 @@ public class EditLaboratory {
      */
     private String username;
 
+    /**
+     * 联系电话
+     */
+    private String phone;
+
 }

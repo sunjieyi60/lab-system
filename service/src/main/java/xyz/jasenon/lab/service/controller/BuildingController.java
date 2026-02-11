@@ -52,4 +52,11 @@ public class BuildingController {
         return buildingService.deleteBuilding(deleteBuilding);
     }
 
+    @RequestPermission(allowed = {Permissions.BASE_CUD, Permissions.BASE_VIEW})
+    @GetMapping("/list")
+    @ApiOperation("获取楼栋列表")
+    public R listBuilding() {
+        return buildingService.listBuilding();
+    }
+
 }

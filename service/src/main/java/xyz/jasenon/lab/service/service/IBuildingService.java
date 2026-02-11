@@ -18,4 +18,9 @@ public interface IBuildingService extends IService<Building> {
     R editBuilding(EditBuilding editBuilding);
 
     R deleteBuilding(DeleteBuilding deleteBuilding);
+
+    /**
+     * 获取楼栋列表
+     */
+    R listBuilding();
 }

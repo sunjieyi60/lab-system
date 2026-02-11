@@ -47,4 +47,11 @@ public class DeptController {
         return deptService.deleteDept(deleteDept);
     }
 
+    @RequestPermission(allowed = {Permissions.BASE_CUD, Permissions.BASE_VIEW})
+    @GetMapping("/list")
+    @ApiOperation("获取部门列表")
+    public R listDept(){
+        return deptService.listDept();
+    }
+
 }

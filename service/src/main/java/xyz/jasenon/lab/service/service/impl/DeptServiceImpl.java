@@ -63,4 +63,9 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements ID
         this.removeById(deleteDept.getDeptId());
         return R.success("删除部门成功");
     }
+
+    @Override
+    public R listDept() {
+        return R.success(this.list(), "获取部门列表成功");
+    }
 }
