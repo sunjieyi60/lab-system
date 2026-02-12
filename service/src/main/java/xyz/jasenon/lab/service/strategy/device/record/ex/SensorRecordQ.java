@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.service.strategy.device.record.ex;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
@@ -16,5 +17,13 @@ public class SensorRecordQ extends DeviceRecordQ<SensorRecordMapper, SensorRecor
     public SensorRecordQ(SensorRecordMapper recordMapper, RedissonClient client) {
         super(recordMapper, DeviceType.Sensor, client);
         register();
+    }
+
+    @Override
+    protected LambdaQueryWrapper<SensorRecord> buildQueryWrapper(Long deviceId) {
+        return new LambdaQueryWrapper<SensorRecord>()
+                .eq(SensorRecord::getDeviceId, deviceId)
+                .orderByDesc(SensorRecord::getId)
+                .last("LIMIT 1");
     }
 }

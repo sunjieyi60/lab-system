@@ -69,4 +69,10 @@ public class UserController {
     public R getCurrentUserDetail(){
         return userService.getCurrentUserDetail();
     }
+
+    @GetMapping("/getVisibleTree")
+    @ApiOperation("获取所有当前用户可见的用户")
+    public R getVisibleTree(){
+        return R.success(userService.visible());
+    }
 }

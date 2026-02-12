@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.service.strategy.device.record.ex;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
@@ -16,5 +17,13 @@ public class CircuitBreakRecordQ extends DeviceRecordQ<CircuitBreakRecordMapper,
     public CircuitBreakRecordQ(CircuitBreakRecordMapper recordMapper, RedissonClient client) {
         super(recordMapper, DeviceType.CircuitBreak, client);
         register();
+    }
+
+    @Override
+    protected LambdaQueryWrapper<CircuitBreakRecord> buildQueryWrapper(Long deviceId) {
+        return new LambdaQueryWrapper<CircuitBreakRecord>()
+                .eq(CircuitBreakRecord::getDeviceId, deviceId)
+                .orderByDesc(CircuitBreakRecord::getId)
+                .last("LIMIT 1");
     }
 }

@@ -32,6 +32,8 @@ public abstract class DeviceRecordQ<RM extends BaseMapper<R>, R extends BaseReco
         log.info("register device record method:{}",deviceType);
     }
 
+    protected abstract LambdaQueryWrapper<R> buildQueryWrapper(Long deviceId);
+
     public DeviceRecordVo<R> getRecord(Long deviceId){
         DeviceType deviceType = this.deviceType;
         RBucket<? extends BaseRecord> rBucket = redissonClient.getBucket(deviceType.getRedisPrefix() + deviceId);
@@ -41,17 +43,16 @@ public abstract class DeviceRecordQ<RM extends BaseMapper<R>, R extends BaseReco
             var object = rBucket.get();
             object.setOrigin(Origin.Redis);
             deviceRecordVo.setData(object);
+            deviceRecordVo.setDeviceType(deviceType);
             return deviceRecordVo;
         }
         DeviceRecordVo deviceRecordVo = new DeviceRecordVo();
         var object = recordMapper.selectOne(
-                new LambdaQueryWrapper<R>()
-                    .eq(BaseRecord::getDeviceId, deviceId)
-                    .orderByDesc(BaseRecord::getId)
-                    .last("limit 1")
+                buildQueryWrapper(deviceId)
         );
         object.setOrigin(Origin.MySql);
         deviceRecordVo.setData(object);
+        deviceRecordVo.setDeviceType(deviceType);
         return deviceRecordVo;
     }
 

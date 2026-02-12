@@ -26,6 +26,7 @@ import xyz.jasenon.lab.service.vo.base.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -316,11 +317,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         .leftJoin(Laboratory.class, on->on.eq(LaboratoryUser::getUserId, user.getId())
                                 .eq(LaboratoryUser::getLaboratoryId, Laboratory::getId))
         );
-        laboratories = laboratories.stream().filter(one -> one != null).toList();
+        laboratories = laboratories.stream().filter(Objects::nonNull).toList();
         laboratories.forEach(one->{
             var Q = new MPJLambdaWrapper<LaboratoryManager>()
                     .selectAll(User.class)
-                    .eq(LaboratoryManager::getLaboratoryId,one.getLaboratoryId())
+                    .eq(LaboratoryManager::getLaboratoryId,one.getId())
                     .leftJoin(User.class,User::getId, LaboratoryManager::getUserId);
             List<UserVo> managers = laboratoryManagerMapper.selectJoinList(UserVo.class,Q);
             one.setManagers(managers);
