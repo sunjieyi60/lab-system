@@ -3,18 +3,22 @@ package xyz.jasenon.lab.service.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.stream.CollectorUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.jasenon.lab.common.entity.base.*;
+import xyz.jasenon.lab.common.utils.FilterKit;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.laboratory.CreateLaboratory;
 import xyz.jasenon.lab.service.dto.laboratory.DeleteLaboratory;
 import xyz.jasenon.lab.service.dto.laboratory.EditLaboratory;
 import xyz.jasenon.lab.service.mapper.*;
 import xyz.jasenon.lab.service.service.ILaboratoryService;
+import xyz.jasenon.lab.service.service.IUserService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,7 +41,15 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
     private UserMapper userMapper;
     @Autowired
     private DeptUserMapper deptUserMapper;
+    @Autowired
+    private IUserService userService;
 
+    /**
+     *
+     * @param createLaboratory
+     *  通过{@link xyz.jasenon.lab.service.service.IUserService }获取visibletree 得到可以指派为实验室管理的用户
+     * @return
+     */
     @Override
     public R createLaboratory(CreateLaboratory createLaboratory) {
 
@@ -60,21 +72,31 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         laboratory.setBelongToDepts(createLaboratory.getBelongToDeptIds());
         this.save(laboratory);
 
-        // 负责人：若入参带了 username 则按用户名查用户并关联，否则用当前登录用户
-        Long managerUserId = doUserId;
-        if (StringUtils.hasText(createLaboratory.getUsername())) {
-            User manager = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .eq(User::getUsername, createLaboratory.getUsername().trim()));
-            if (manager == null) {
-                return R.fail("负责人用户不存在，请检查用户名");
+        // 负责人：若入参带了 userIds且不为空则关联，否则用当前登录用户
+        if (createLaboratory.getUserIds() != null && !createLaboratory.getUserIds().isEmpty()) {
+            List<Long> visibleUserIds = userService.visible().stream().map(User::getId).toList();
+            for (Long userId : createLaboratory.getUserIds()) {
+                if (visibleUserIds.contains(userId)) {
+                    //补充可见性
+                    LaboratoryUser laboratoryUser = new LaboratoryUser()
+                            .setLaboratoryId(laboratory.getId())
+                            .setUserId(userId);
+                    laboratoryUserMapper.insert(laboratoryUser);
+                    //添加管理信息
+                    LaboratoryManager laboratoryManager = new LaboratoryManager()
+                            .setLaboratoryId(laboratory.getId())
+                            .setUserId(userId);
+                    laboratoryManagerMapper.insert(laboratoryManager);
+                }
             }
-            managerUserId = manager.getId();
+        }else{
+            LaboratoryManager laboratoryManager = new LaboratoryManager()
+                    .setLaboratoryId(laboratory.getId())
+                    .setUserId(doUserId);
+            laboratoryManagerMapper.insert(laboratoryManager);
         }
-        LaboratoryManager laboratoryManager = new LaboratoryManager()
-                .setLaboratoryId(laboratory.getId())
-                .setUserId(managerUserId);
-        laboratoryManagerMapper.insert(laboratoryManager);
 
+        // 创建该实验室的用户对实验室默认可见
         LaboratoryUser laboratoryUser = new LaboratoryUser()
                 .setLaboratoryId(laboratory.getId())
                 .setUserId(doUserId);
@@ -131,6 +153,33 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         return R.success("删除成功");
     }
 
+    @Override
+    public R editManagers(Long laboratoryId, List<Long> userIds) {
+
+        Long doUserId = StpUtil.getLoginIdAsLong();
+        LaboratoryUser laboratoryUser = laboratoryUserMapper.selectOne(new LambdaQueryWrapper<LaboratoryUser>()
+                .eq(LaboratoryUser::getUserId, doUserId)
+                .eq(LaboratoryUser::getLaboratoryId, laboratoryId));
+        if (laboratoryUser == null){
+            return R.fail("你没有权限编辑该实验室的管理员");
+        }
+
+        if (userIds !=null && !userIds.isEmpty()){
+            // 清除旧的记录
+            laboratoryManagerMapper.delete(new LambdaUpdateWrapper<LaboratoryManager>()
+                    .eq(LaboratoryManager::getLaboratoryId, laboratoryId));
+
+            // 防止unique索引出错导致回滚  手动去重
+            List<LaboratoryManager> updates = userIds.stream().map(userId -> new LaboratoryManager()
+                    .setLaboratoryId(laboratoryId)
+                    .setUserId(userId)).filter(FilterKit.distinctByKey(LaboratoryManager::getUserId)).toList();
+
+            laboratoryManagerMapper.insert(updates);
+            return R.success("编辑成功");
+        }
+        return R.fail("负责人不能为空");
+    }
+
     private List<User> fathers(User user, List<User> result){
         List<User> fathers = userMapper.selectList(new LambdaQueryWrapper<User>()
                 .eq(User::getId, user.getCreateBy()));
@@ -144,8 +193,4 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         return result;
     }
 
-    @Override
-    public List<Laboratory> listAll() {
-        return this.list();
-    }
 }

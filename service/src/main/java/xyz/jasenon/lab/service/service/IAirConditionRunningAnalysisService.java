@@ -2,7 +2,7 @@ package xyz.jasenon.lab.service.service;
 
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.AirConditionRunningQueryDto;
-import xyz.jasenon.lab.service.vo.AirConditionRunningResultVo;
+import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningResultVo;
 
 /**
  * 空调运行时长统计：遍历 Redis 在线状态 + DB 开启时间区间，切分后多线程汇总。

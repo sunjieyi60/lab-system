@@ -6,9 +6,9 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.DeleteDevice;
 import xyz.jasenon.lab.service.dto.device.UpdateDevice;
-import xyz.jasenon.lab.service.vo.DeviceVo;
-import xyz.jasenon.lab.service.vo.Rs485GatewayVo;
-import xyz.jasenon.lab.service.vo.SocketGatewayVo;
+import xyz.jasenon.lab.service.vo.device.DeviceVo;
+import xyz.jasenon.lab.service.vo.device.Rs485GatewayVo;
+import xyz.jasenon.lab.service.vo.device.SocketGatewayVo;
 
 import java.util.List;
 import java.util.Map;

@@ -23,10 +23,10 @@ import xyz.jasenon.lab.service.service.IDeviceService;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
 import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordFactory;
-import xyz.jasenon.lab.service.vo.DeviceRecordVo;
-import xyz.jasenon.lab.service.vo.DeviceVo;
-import xyz.jasenon.lab.service.vo.Rs485GatewayVo;
-import xyz.jasenon.lab.service.vo.SocketGatewayVo;
+import xyz.jasenon.lab.service.vo.device.DeviceRecordVo;
+import xyz.jasenon.lab.service.vo.device.DeviceVo;
+import xyz.jasenon.lab.service.vo.device.Rs485GatewayVo;
+import xyz.jasenon.lab.service.vo.device.SocketGatewayVo;
 
 import java.util.ArrayList;
 import java.util.HashSet;

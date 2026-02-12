@@ -1,12 +1,11 @@
 package xyz.jasenon.lab.service.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
-import xyz.jasenon.lab.common.entity.base.LaboratoryManager;
-import xyz.jasenon.lab.common.entity.base.User;
 import xyz.jasenon.lab.common.entity.class_time_table.*;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateCourseSchedule;
@@ -15,8 +14,7 @@ import xyz.jasenon.lab.service.mapper.CourseScheduleMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.service.IAnalysisService;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
-import xyz.jasenon.lab.service.vo.CourseScheduleVo;
-import xyz.jasenon.lab.service.vo.LaboratoryListVo;
+import xyz.jasenon.lab.service.vo.base.CourseScheduleVo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,15 +115,8 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
     }
 
     @Override
-    public R<List<LaboratoryListVo>> listLaboratory() {
-        List<LaboratoryListVo> lists = laboratoryMapper.selectJoinList(LaboratoryListVo.class,
-                new MPJLambdaWrapper<Laboratory>()
-                        .selectAll(Laboratory.class)
-                        .selectAs(User::getUsername, LaboratoryListVo::getUsername)
-                        .selectAs(User::getPhone, LaboratoryListVo::getPhone)
-                        .leftJoin(LaboratoryManager.class, LaboratoryManager::getLaboratoryId, Laboratory::getId)
-                        .leftJoin(User.class, User::getId, LaboratoryManager::getUserId)
-        );
+    public R<List<Laboratory>> listLaboratory() {
+        List<Laboratory> lists = laboratoryMapper.selectList(new LambdaQueryWrapper<Laboratory>());
         return R.success(lists, "获取成功");
     }
 

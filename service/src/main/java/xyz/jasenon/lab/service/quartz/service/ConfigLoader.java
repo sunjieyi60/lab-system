@@ -16,7 +16,7 @@ import xyz.jasenon.lab.service.quartz.model.*;
 import xyz.jasenon.lab.service.service.IUserService;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordFactory;
-import xyz.jasenon.lab.service.vo.DeviceRecordVo;
+import xyz.jasenon.lab.service.vo.device.DeviceRecordVo;
 import xyz.jasenon.lab.common.entity.record.BaseRecord;
 
 import java.text.MessageFormat;

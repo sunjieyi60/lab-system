@@ -43,8 +43,6 @@ public class CreateLaboratory {
 
     private String intro;
 
-    private String username;
-
-    private String phone;
+    private List<Long> userIds;
 
 }

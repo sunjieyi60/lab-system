@@ -18,7 +18,7 @@
         </if>
     </sql>
 
-    <select id="aggByWeek" resultType="xyz.jasenon.lab.service.vo.DimensionPointVo">
+    <select id="aggByWeek" resultType="xyz.jasenon.lab.service.vo.analysis.DimensionPointVo">
         SELECT
             cs.start_week AS label,
             COUNT(*) AS courseCount,
@@ -33,7 +33,7 @@
         GROUP BY cs.start_week
     </select>
 
-    <select id="aggByWeekday" resultType="xyz.jasenon.lab.service.vo.DimensionPointVo">
+    <select id="aggByWeekday" resultType="xyz.jasenon.lab.service.vo.analysis.DimensionPointVo">
         SELECT
             jt.wd AS label,
             COUNT(*) AS courseCount,
@@ -50,7 +50,7 @@
         GROUP BY jt.wd
     </select>
 
-    <select id="aggBySectionSlot" resultType="xyz.jasenon.lab.service.vo.DimensionPointVo">
+    <select id="aggBySectionSlot" resultType="xyz.jasenon.lab.service.vo.analysis.DimensionPointVo">
         SELECT
             FLOOR((cs.start_section - 1) / 2) AS label,
             COUNT(*) AS courseCount,

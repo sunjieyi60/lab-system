@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.service.vo;
+package xyz.jasenon.lab.service.vo.base;
 
 import lombok.Data;
 

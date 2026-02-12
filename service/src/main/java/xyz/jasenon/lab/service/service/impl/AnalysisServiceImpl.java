@@ -13,8 +13,8 @@ import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
 import xyz.jasenon.lab.service.mapper.AnalysisMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.service.IAnalysisService;
-import xyz.jasenon.lab.service.vo.AnalysisChartVo;
-import xyz.jasenon.lab.service.vo.DimensionPointVo;
+import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
+import xyz.jasenon.lab.service.vo.analysis.DimensionPointVo;
 
 import java.time.Duration;
 import java.util.*;

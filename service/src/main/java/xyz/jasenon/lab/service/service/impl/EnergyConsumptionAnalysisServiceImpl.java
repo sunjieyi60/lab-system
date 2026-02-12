@@ -15,7 +15,10 @@ import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.mapper.record.CircuitBreakRecordMapper;
 import xyz.jasenon.lab.service.service.IEnergyConsumptionAnalysisService;
 import xyz.jasenon.lab.service.strategy.device.ex.CircuitBreakQ;
-import xyz.jasenon.lab.service.vo.*;
+import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionChartSegmentVo;
+import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionResultVo;
+import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionRowVo;
+import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionSummaryVo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -2,7 +2,7 @@ package xyz.jasenon.lab.service.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import xyz.jasenon.lab.service.vo.DimensionPointVo;
+import xyz.jasenon.lab.service.vo.analysis.DimensionPointVo;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package xyz.jasenon.lab.service.service;
 
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.EnergyConsumptionQueryDto;
-import xyz.jasenon.lab.service.vo.EnergyConsumptionResultVo;
+import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionResultVo;
 
 /**
  * 能耗统计：按时间范围首尾读数相减得电能(Kwh)，返回列表+饼图+汇总行。

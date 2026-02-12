@@ -13,6 +13,8 @@ import xyz.jasenon.lab.service.dto.laboratory.DeleteLaboratory;
 import xyz.jasenon.lab.service.dto.laboratory.EditLaboratory;
 import xyz.jasenon.lab.service.service.ILaboratoryService;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/27
@@ -45,6 +47,13 @@ public class LaboratoryController {
     @ApiOperation("删除实验室")
     public R deleteLaboratory(@Validated @RequestBody DeleteLaboratory deleteLaboratory){
         return laboratoryService.deleteLaboratory(deleteLaboratory);
+    }
+
+    @RequestPermission(allowed = {Permissions.BASE_CUD})
+    @PutMapping("/editManagers")
+    @ApiOperation("编辑实验室管理员")
+    public R editManagers(@RequestParam Long laboratoryId, @RequestParam List<Long> userIds){
+        return laboratoryService.editManagers(laboratoryId, userIds);
     }
 
 }

@@ -8,7 +8,7 @@ import org.redisson.api.RedissonClient;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.record.BaseRecord;
 import xyz.jasenon.lab.common.entity.record.Origin;
-import xyz.jasenon.lab.service.vo.DeviceRecordVo;
+import xyz.jasenon.lab.service.vo.device.DeviceRecordVo;
 
 /**
  * @author Jasenon_ce

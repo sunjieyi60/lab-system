@@ -19,10 +19,10 @@ import xyz.jasenon.lab.service.mapper.record.AirConditionMapper;
 import xyz.jasenon.lab.service.mapper.record.AirConditionRecordMapper;
 import xyz.jasenon.lab.service.service.IAirConditionRunningAnalysisService;
 import xyz.jasenon.lab.service.strategy.device.ex.AirConditionQ;
-import xyz.jasenon.lab.service.vo.AirConditionRunningChartSegmentVo;
-import xyz.jasenon.lab.service.vo.AirConditionRunningResultVo;
-import xyz.jasenon.lab.service.vo.AirConditionRunningRowVo;
-import xyz.jasenon.lab.service.vo.AirConditionRunningSummaryVo;
+import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningChartSegmentVo;
+import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningResultVo;
+import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningRowVo;
+import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningSummaryVo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

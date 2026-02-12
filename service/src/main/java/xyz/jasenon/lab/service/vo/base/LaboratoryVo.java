@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.service.vo;
+package xyz.jasenon.lab.service.vo.base;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -10,6 +10,11 @@ import java.util.List;
 @Getter
 @Setter
 public class LaboratoryVo {
+
+    /**
+     *  实验室主键id
+     */
+    private Long id;
 
     /**
      * 实验室编号

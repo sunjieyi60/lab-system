@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.record.BaseRecord;
-import xyz.jasenon.lab.service.vo.DeviceRecordVo;
+import xyz.jasenon.lab.service.vo.device.DeviceRecordVo;
 
 import java.util.Map;
 

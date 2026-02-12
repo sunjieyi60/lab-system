@@ -8,8 +8,8 @@ import org.springframework.test.context.jdbc.Sql;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.ServiceApplication;
 import xyz.jasenon.lab.service.service.IUserService;
-import xyz.jasenon.lab.service.vo.DeptVo;
-import xyz.jasenon.lab.service.vo.UserBizVo;
+import xyz.jasenon.lab.service.vo.base.DeptVo;
+import xyz.jasenon.lab.service.vo.base.UserBizVo;
 
 
 import static org.junit.jupiter.api.Assertions.*;

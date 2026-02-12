@@ -11,9 +11,9 @@ import xyz.jasenon.lab.service.dto.analysis.EnergyConsumptionQueryDto;
 import xyz.jasenon.lab.service.service.IEnergyConsumptionAnalysisService;
 import xyz.jasenon.lab.service.service.IAirConditionRunningAnalysisService;
 import xyz.jasenon.lab.service.service.IAnalysisService;
-import xyz.jasenon.lab.service.vo.AirConditionRunningResultVo;
-import xyz.jasenon.lab.service.vo.AnalysisChartVo;
-import xyz.jasenon.lab.service.vo.EnergyConsumptionResultVo;
+import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningResultVo;
+import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
+import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionResultVo;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
 import xyz.jasenon.lab.service.constants.Permissions;
 

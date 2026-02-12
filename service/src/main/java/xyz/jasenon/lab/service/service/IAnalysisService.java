@@ -2,7 +2,7 @@ package xyz.jasenon.lab.service.service;
 
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
-import xyz.jasenon.lab.service.vo.AnalysisChartVo;
+import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
 
 /**
  * 数据分析：课程数、学时数、人学时数及按周次/星期/节次分布，供前端画图。

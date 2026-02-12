@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.service.vo;
+package xyz.jasenon.lab.service.vo.analysis;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,15 +7,15 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 
 /**
- * 空调运行时长统计：汇总行（总时长、实验室/单位/内机汇总、占比 100%）。
+ * 能耗统计：汇总行（总能耗、实验室/单位/智能空开汇总、100%）。
  */
 @Getter
 @Setter
 @Accessors(chain = true)
-public class AirConditionRunningSummaryVo {
+public class EnergyConsumptionSummaryVo {
 
     /**
-     * 时间范围文案
+     * 时间范围
      */
     private String timeRange;
 
@@ -30,14 +30,14 @@ public class AirConditionRunningSummaryVo {
     private String deptName;
 
     /**
-     * 空调内机汇总展示，如 "16-202-1..." 或 "全部"
+     * 智能空开汇总展示，如 "16-202-1..." 或 "全部"
      */
-    private String acUnitSummary;
+    private String switchSummary;
 
     /**
-     * 运行总时长（小时）
+     * 总能耗（Kwh）
      */
-    private BigDecimal totalHours;
+    private BigDecimal totalKwh;
 
     /**
      * 占比，汇总行为 "100%"

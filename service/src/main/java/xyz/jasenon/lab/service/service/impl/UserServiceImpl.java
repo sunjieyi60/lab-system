@@ -7,8 +7,6 @@ import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.yulichang.query.MPJLambdaQueryWrapper;
-import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,7 @@ import xyz.jasenon.lab.service.dto.user.UserLogin;
 import xyz.jasenon.lab.service.entity.UserPermission;
 import xyz.jasenon.lab.service.mapper.*;
 import xyz.jasenon.lab.service.service.IUserService;
-import xyz.jasenon.lab.service.vo.*;
+import xyz.jasenon.lab.service.vo.base.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;

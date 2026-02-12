@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.service.vo;
+package xyz.jasenon.lab.service.vo.analysis;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

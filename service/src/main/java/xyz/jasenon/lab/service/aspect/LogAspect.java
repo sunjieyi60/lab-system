@@ -29,15 +29,14 @@ import xyz.jasenon.lab.service.log.ScheduleConfigLogInterpreter;
 import xyz.jasenon.lab.service.log.UserLogInterpreter;
 import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
 import xyz.jasenon.lab.service.service.IUserService;
-import xyz.jasenon.lab.service.vo.UserBizVo;
-import xyz.jasenon.lab.service.vo.UserPermissionVo;
+import xyz.jasenon.lab.service.vo.base.UserBizVo;
+import xyz.jasenon.lab.service.vo.base.UserPermissionVo;
 import xyz.jasenon.lab.service.constants.Permissions;
 
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.LocalDateTime;
 

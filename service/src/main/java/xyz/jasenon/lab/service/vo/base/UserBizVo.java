@@ -1,11 +1,9 @@
-package xyz.jasenon.lab.service.vo;
+package xyz.jasenon.lab.service.vo.base;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.base.Building;
-import xyz.jasenon.lab.common.entity.base.Dept;
-import xyz.jasenon.lab.common.entity.base.Laboratory;
 
 import java.util.List;
 

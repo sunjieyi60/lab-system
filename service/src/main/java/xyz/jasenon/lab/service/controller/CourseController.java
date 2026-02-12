@@ -89,7 +89,7 @@ public class CourseController {
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
-    @GetMapping("/list/courseSchedule")
+    @PostMapping("/list/courseSchedule")
     @ApiOperation("获取课程表列表")
     public R listCourseSchedule(@RequestParam List<Long> laboratoryIds){
         return courseScheduleService.listCourseSchedule(laboratoryIds);

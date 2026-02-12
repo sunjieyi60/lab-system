@@ -1,4 +1,4 @@
-package xyz.jasenon.lab.service.vo;
+package xyz.jasenon.lab.service.vo.device;
 
 import lombok.Getter;
 import lombok.Setter;
