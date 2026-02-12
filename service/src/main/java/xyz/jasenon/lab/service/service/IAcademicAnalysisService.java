@@ -7,7 +7,7 @@ import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
 /**
  * 数据分析：课程数、学时数、人学时数及按周次/星期/节次分布，供前端画图。
  */
-public interface IAnalysisService {
+public interface IAcademicAnalysisService {
 
     /**
      * 按筛选条件统计并返回图表数据。

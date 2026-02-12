@@ -12,7 +12,7 @@ import xyz.jasenon.lab.service.dto.course.CreateCourseSchedule;
 import xyz.jasenon.lab.service.dto.course.DeleteCourseSchedule;
 import xyz.jasenon.lab.service.mapper.CourseScheduleMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
-import xyz.jasenon.lab.service.service.IAnalysisService;
+import xyz.jasenon.lab.service.service.IAcademicAnalysisService;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
 import xyz.jasenon.lab.service.vo.base.CourseScheduleVo;
 
@@ -37,7 +37,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
     @Autowired
     private LaboratoryMapper laboratoryMapper;
     @Autowired
-    private IAnalysisService analysisService;
+    private IAcademicAnalysisService analysisService;
 
     @Override
     public R createCourseSchedule(CreateCourseSchedule createCourseSchedule) {

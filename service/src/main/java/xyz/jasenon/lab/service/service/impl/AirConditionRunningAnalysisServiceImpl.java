@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunningAnalysisService {
 
     private static final String REDIS_KEY_PATTERN = "AirCondition:Record:*";
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd-H:mm");
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final int PARALLEL_THREADS = 8;
 
     @Autowired

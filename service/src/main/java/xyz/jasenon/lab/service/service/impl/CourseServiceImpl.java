@@ -11,7 +11,7 @@ import xyz.jasenon.lab.service.dto.course.CreateCourse;
 import xyz.jasenon.lab.service.dto.course.DeleteCourse;
 import xyz.jasenon.lab.service.dto.course.EditCourse;
 import xyz.jasenon.lab.service.mapper.CourseMapper;
-import xyz.jasenon.lab.service.service.IAnalysisService;
+import xyz.jasenon.lab.service.service.IAcademicAnalysisService;
 import xyz.jasenon.lab.service.service.ICourseService;
 
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.List;
 public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> implements ICourseService {
 
     @Autowired
-    private IAnalysisService analysisService;
+    private IAcademicAnalysisService analysisService;
 
     @Override
     public R createCourse(CreateCourse createCourse) {

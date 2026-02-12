@@ -18,17 +18,17 @@ import java.util.List;
 public class AirConditionRunningQueryDto {
 
     /**
-     * 统计开始时间（必填，适配格式：yyyy-MM-dd-HH:mm）
+     * 统计开始时间（必填，适配格式：yyyy-MM-dd HH:mm）
      */
     @NotNull(message = "统计开始时间不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd-HH:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime startTime;
 
     /**
-     * 统计结束时间（必填，适配格式：yyyy-MM-dd-HH:mm）
+     * 统计结束时间（必填，适配格式：yyyy-MM-dd HH:mm）
      */
     @NotNull(message = "统计结束时间不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd-HH:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime endTime;
 
     /**

@@ -21,14 +21,14 @@ public class EnergyConsumptionQueryDto {
      * 时间起始
      */
     @NotNull(message = "统计开始时间不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd-HH:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime startTime;
 
     /**
      * 时间结束
      */
     @NotNull(message = "统计结束时间不能为空")
-    @JsonFormat(pattern = "yyyy-MM-dd-HH:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime endTime;
 
     /**

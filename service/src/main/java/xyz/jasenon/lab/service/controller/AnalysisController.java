@@ -10,7 +10,7 @@ import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
 import xyz.jasenon.lab.service.dto.analysis.EnergyConsumptionQueryDto;
 import xyz.jasenon.lab.service.service.IEnergyConsumptionAnalysisService;
 import xyz.jasenon.lab.service.service.IAirConditionRunningAnalysisService;
-import xyz.jasenon.lab.service.service.IAnalysisService;
+import xyz.jasenon.lab.service.service.IAcademicAnalysisService;
 import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningResultVo;
 import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
 import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionResultVo;
@@ -27,7 +27,7 @@ import xyz.jasenon.lab.service.constants.Permissions;
 public class AnalysisController {
 
     @Autowired
-    private IAnalysisService analysisService;
+    private IAcademicAnalysisService analysisService;
     @Autowired
     private IAirConditionRunningAnalysisService airConditionRunningAnalysisService;
     @Autowired

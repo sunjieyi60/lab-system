@@ -12,7 +12,7 @@ import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
 import xyz.jasenon.lab.service.mapper.AnalysisMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
-import xyz.jasenon.lab.service.service.IAnalysisService;
+import xyz.jasenon.lab.service.service.IAcademicAnalysisService;
 import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
 import xyz.jasenon.lab.service.vo.analysis.DimensionPointVo;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * 数据分析服务实现：为前端图表提供课程数、学时数、人学时数及按周次/星期/节次的分布数据。
  */
 @Service
-public class AnalysisServiceImpl implements IAnalysisService {
+public class AcademicAnalysisServiceImpl implements IAcademicAnalysisService {
 
     // 周次维度：最小周
     private static final int WEEK_MIN = 1;
