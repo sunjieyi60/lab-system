@@ -34,4 +34,9 @@ public class AirConditionRunningResultVo {
      * 汇总行：时间范围、实验室/单位/内机汇总、总时长、100%
      */
     private AirConditionRunningSummaryVo summaryRow;
+
+    /**
+     * 可选提示：如「部分设备该时段无历史开关记录，未计入统计」
+     */
+    private String warningMessage;
 }

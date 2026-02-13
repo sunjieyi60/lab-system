@@ -43,4 +43,9 @@ public class AirConditionRunningRowVo {
      * 占比（百分比），如 "77.8"
      */
     private String proportion;
+
+    /**
+     * 数据来源：mysql / mysql_and_redis（部分时段由 Redis 补段）
+     */
+    private String dataSource;
 }

@@ -105,14 +105,16 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
     }
 
     /**
-     * 首尾相减：取 T1 前最近一条与 T2 前最近一条的 energy，能耗 = 尾 - 首。
+     * 区间用电 = 区间终点 - 区间起点。
+     * 取区间内第一条（createTime >= queryStart, orderBy createTime asc limit 1）与
+     * 区间内最后一条（createTime <= queryEnd, orderBy createTime desc limit 1），两条做差。
      */
     private BigDecimal computeEnergyKwh(CircuitBreak device, LocalDateTime queryStart, LocalDateTime queryEnd) {
         CircuitBreakRecord startRecord = circuitBreakRecordMapper.selectOne(
                 new LambdaQueryWrapper<CircuitBreakRecord>()
                         .eq(CircuitBreakRecord::getDeviceId, device.getId())
-                        .le(CircuitBreakRecord::getCreateTime, queryStart)
-                        .orderByDesc(CircuitBreakRecord::getCreateTime)
+                        .ge(CircuitBreakRecord::getCreateTime, queryStart)
+                        .orderByAsc(CircuitBreakRecord::getCreateTime)
                         .last("LIMIT 1")
         );
         CircuitBreakRecord endRecord = circuitBreakRecordMapper.selectOne(
@@ -122,9 +124,11 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
                         .orderByDesc(CircuitBreakRecord::getCreateTime)
                         .last("LIMIT 1")
         );
-        float startEnergy = startRecord != null && startRecord.getEnergy() != null ? startRecord.getEnergy() : 0f;
-        float endEnergy = endRecord != null && endRecord.getEnergy() != null ? endRecord.getEnergy() : 0f;
-        float diff = endEnergy - startEnergy;
+        if (startRecord == null || endRecord == null
+                || startRecord.getEnergy() == null || endRecord.getEnergy() == null) {
+            return null;
+        }
+        float diff = endRecord.getEnergy() - startRecord.getEnergy();
         if (diff < 0) diff = 0;
         return BigDecimal.valueOf(diff).setScale(2, RoundingMode.HALF_UP);
     }
@@ -136,7 +140,7 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
         } else {
             labs = laboratoryMapper.selectList(null);
         }
-        if (query.getDeptId() != null && !labs.isEmpty()) {
+        if (query.getDeptId() != null && query.getDeptId() != 0 && !labs.isEmpty()) {
             labs = labs.stream().filter(l -> l.getBelongToDepts() != null && l.getBelongToDepts().contains(query.getDeptId())).toList();
         }
         if (query.getLaboratoryIds() != null && !query.getLaboratoryIds().isEmpty()) {
