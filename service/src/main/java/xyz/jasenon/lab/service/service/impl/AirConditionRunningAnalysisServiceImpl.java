@@ -37,8 +37,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
- * 空调运行时长统计：遍历 Redis 统计在线状态，开启时间区间从 DB 取并切分到查询区间，
- * 每个设备起线程任务，线程安全 List 拼接结果。
+ * 空调运行时长统计：以 MySQL 历史开关记录为主，可选用 Redis 补段（条件收紧、有时长上限）。
+ * 区间内无 MySQL 记录时不使用 Redis 推导，该设备时长计为 0。
  */
 @Slf4j
 @Service
@@ -47,6 +47,32 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
     private static final String REDIS_KEY_PATTERN = "AirCondition:Record:*";
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final int PARALLEL_THREADS = 8;
+    /** Redis 补段单段最长小时数，防止单设备拉高整段统计 */
+    private static final double REDIS_SEGMENT_MAX_HOURS = 24.0;
+
+    /** 单设备运行时长及数据来源标记 */
+    private static final class RunningHoursResult {
+        final double hours;
+        final boolean hadMysqlData;
+        final boolean usedRedisSegment;
+
+        RunningHoursResult(double hours, boolean hadMysqlData, boolean usedRedisSegment) {
+            this.hours = hours;
+            this.hadMysqlData = hadMysqlData;
+            this.usedRedisSegment = usedRedisSegment;
+        }
+    }
+
+    /** 开启区间列表 + 是否使用了 Redis 补段 */
+    private static final class IntervalsResult {
+        final List<double[]> intervals;
+        final boolean usedRedisSegment;
+
+        IntervalsResult(List<double[]> intervals, boolean usedRedisSegment) {
+            this.intervals = intervals;
+            this.usedRedisSegment = usedRedisSegment;
+        }
+    }
 
     @Autowired
     private RedissonClient redissonClient;
@@ -83,11 +109,15 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
         LocalDateTime queryEnd = query.getEndTime();
 
         ConcurrentLinkedQueue<AirConditionRunningRowVo> resultQueue = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<Boolean> noDataFlags = new ConcurrentLinkedQueue<>();
         List<AirCondition> deviceList = devices;
         List<Callable<Void>> tasks = deviceList.stream().map(device -> (java.util.concurrent.Callable<Void>) () -> {
             try {
-                double hours = computeRunningHours(device, queryStart, queryEnd, redisStateByDeviceId.get(device.getId()));
-                if (hours <= 0) return null;
+                RunningHoursResult res = computeRunningHours(device, queryStart, queryEnd, redisStateByDeviceId.get(device.getId()));
+                if (!res.hadMysqlData) {
+                    noDataFlags.add(true);
+                }
+                if (res.hours <= 0) return null;
                 Laboratory lab = labMap.get(device.getBelongToLaboratoryId());
                 String deptName = lab != null && lab.getBelongToDepts() != null && !lab.getBelongToDepts().isEmpty()
                         ? deptNameMap.getOrDefault(lab.getBelongToDepts().get(0), "")
@@ -97,7 +127,8 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                         .setLaboratoryNo(lab != null ? lab.getLaboratoryId() : "")
                         .setDeptName(deptName)
                         .setAcUnitName(device.getDeviceName() != null ? device.getDeviceName() : ("设备" + device.getId()))
-                        .setDurationHours(BigDecimal.valueOf(hours).setScale(2, RoundingMode.HALF_UP));
+                        .setDurationHours(BigDecimal.valueOf(res.hours).setScale(2, RoundingMode.HALF_UP))
+                        .setDataSource(res.usedRedisSegment ? "mysql_and_redis" : "mysql");
                 resultQueue.add(row);
             } catch (Exception e) {
                 log.warn("空调运行时长统计单设备异常 deviceId={}", device.getId(), e);
@@ -133,11 +164,14 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
 
         AirConditionRunningSummaryVo summaryRow = buildSummaryRow(timeRangeStr, list, totalHours);
 
+        String warningMessage = noDataFlags.isEmpty() ? null : "部分设备该时段无历史开关记录，未计入统计";
+
         AirConditionRunningResultVo vo = new AirConditionRunningResultVo()
                 .setTotalHours(totalHours)
                 .setList(list)
                 .setChartSegments(chartSegments)
-                .setSummaryRow(summaryRow);
+                .setSummaryRow(summaryRow)
+                .setWarningMessage(warningMessage);
         return R.success(vo);
     }
 
@@ -169,10 +203,10 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
     }
 
     /**
-     * 从 DB 按 device_id 取该设备在 [queryStart, queryEnd] 内的记录，
-     * 合并 Redis 当前开启状态，得到开启时间区间并切分到查询区间内，汇总时长（小时）。
+     * 从 DB 取该设备在 [queryStart, queryEnd] 内的记录，构建开启区间并汇总时长。
+     * 区间内无 MySQL 记录时不使用 Redis 推导，返回 0 且 hadMysqlData=false。
      */
-    private double computeRunningHours(AirCondition device, LocalDateTime queryStart, LocalDateTime queryEnd, AirConditionRecord redisRecord) {
+    private RunningHoursResult computeRunningHours(AirCondition device, LocalDateTime queryStart, LocalDateTime queryEnd, AirConditionRecord redisRecord) {
         List<AirConditionRecord> records = airConditionRecordMapper.selectList(
                 new LambdaQueryWrapper<AirConditionRecord>()
                         .eq(AirConditionRecord::getDeviceId, device.getId())
@@ -180,34 +214,30 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                         .le(AirConditionRecord::getCreateTime, queryEnd)
                         .orderByAsc(AirConditionRecord::getCreateTime)
         );
-        List<double[]> intervals = buildOpenIntervals(records, queryStart, queryEnd, redisRecord);
-        return clipAndSumHours(intervals, queryStart, queryEnd);
+        if (records.isEmpty()) {
+            return new RunningHoursResult(0.0, false, false);
+        }
+        IntervalsResult ir = buildOpenIntervals(records, queryStart, queryEnd, redisRecord);
+        double hours = clipAndSumHours(ir.intervals, queryStart, queryEnd);
+        return new RunningHoursResult(hours, true, ir.usedRedisSegment);
     }
 
     /**
-     * 根据有序记录构建开启区间 [startSeconds, endSeconds]（相对某个基准的秒数或直接用 LocalDateTime）。
-     * 为简单用时间戳秒数计算时长。
+     * 根据有序记录构建开启区间。首段开启以记录创建时间为起点；Redis 补段仅当 createTime 落在查询区间内且单段时长不超过上限。
      */
-    private List<double[]> buildOpenIntervals(List<AirConditionRecord> records, LocalDateTime queryStart, LocalDateTime queryEnd, AirConditionRecord redisRecord) {
+    private IntervalsResult buildOpenIntervals(List<AirConditionRecord> records, LocalDateTime queryStart, LocalDateTime queryEnd, AirConditionRecord redisRecord) {
         List<double[]> out = new ArrayList<>();
         if (records.isEmpty()) {
-        if (redisRecord != null && Boolean.TRUE.equals(redisRecord.getIsOpen()) && redisRecord.getCreateTime() != null) {
-            LocalDateTime start = redisRecord.getCreateTime().isBefore(queryStart) ? queryStart : redisRecord.getCreateTime();
-            LocalDateTime end = queryEnd;
-            if (start.isBefore(end)) {
-                out.add(toSecondsPair(start, end));
-            }
-        }
-            return out;
+            return new IntervalsResult(out, false);
         }
         LocalDateTime intervalStart = null;
         for (AirConditionRecord r : records) {
             if (Boolean.TRUE.equals(r.getIsOpen())) {
-                if (intervalStart == null) {
-                    intervalStart = queryStart;
+                if (intervalStart == null && r.getCreateTime() != null) {
+                    intervalStart = r.getCreateTime();
                 }
             } else {
-                if (intervalStart != null) {
+                if (intervalStart != null && r.getCreateTime() != null) {
                     out.add(toSecondsPair(intervalStart, r.getCreateTime()));
                     intervalStart = null;
                 }
@@ -216,14 +246,23 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
         if (intervalStart != null) {
             out.add(toSecondsPair(intervalStart, queryEnd));
         }
+        boolean usedRedisSegment = false;
         if (redisRecord != null && Boolean.TRUE.equals(redisRecord.getIsOpen()) && redisRecord.getCreateTime() != null) {
-            boolean covered = out.stream().anyMatch(p -> p[1] >= toSeconds(redisRecord.getCreateTime()));
-            if (!covered) {
-                LocalDateTime start = redisRecord.getCreateTime().isBefore(queryStart) ? queryStart : redisRecord.getCreateTime();
-                out.add(toSecondsPair(start, queryEnd));
+            LocalDateTime rt = redisRecord.getCreateTime();
+            if (!rt.isBefore(queryStart) && !rt.isAfter(queryEnd)) {
+                boolean covered = out.stream().anyMatch(p -> p[1] >= toSeconds(rt));
+                if (!covered) {
+                    double qe = toSeconds(queryEnd);
+                    double maxStart = qe - REDIS_SEGMENT_MAX_HOURS * 3600;
+                    double start = Math.max(toSeconds(rt), maxStart);
+                    if (start < qe) {
+                        out.add(new double[]{start, qe});
+                        usedRedisSegment = true;
+                    }
+                }
             }
         }
-        return out;
+        return new IntervalsResult(out, usedRedisSegment);
     }
 
     private static double toSeconds(LocalDateTime t) {
@@ -253,7 +292,7 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
         } else {
             labs = laboratoryMapper.selectList(null);
         }
-        if (query.getDeptId() != null && !labs.isEmpty()) {
+        if (query.getDeptId() != null && query.getDeptId() != 0 && !labs.isEmpty()) {
             labs = labs.stream()
                     .filter(l -> l.getBelongToDepts() != null && l.getBelongToDepts()
                             .contains(query.getDeptId())).toList();
@@ -324,6 +363,7 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                 .setTotalHours(BigDecimal.ZERO)
                 .setList(List.of())
                 .setChartSegments(List.of())
-                .setSummaryRow(null);
+                .setSummaryRow(null)
+                .setWarningMessage("该时间范围内无运行记录，仅基于 MySQL 历史开关数据统计");
     }
 }
