@@ -50,7 +50,9 @@ public class TaskProcessorsManage {
     private void initManage() throws MqttException {
         List<RS485Gateway> rs485Gateways = rs485GatewayService.listAllRS485Gateway();
         for (RS485Gateway rs485Gateway : rs485Gateways) {
-            MqttNx mqttNx = new MqttNx(redissonClient);
+            // 设置 mqttNx 超时时间为 6 秒（大于轮询间隔 5 秒，确保有足够时间等待应答）
+            // 如果消息在 6 秒内没有收到应答，Redis key 会自动过期，允许发送下一条消息
+            MqttNx mqttNx = new MqttNx(redissonClient, 6000L, java.util.concurrent.TimeUnit.MILLISECONDS);
             MqttSendClient mqttSendClient = new MqttSendClient(mqttProperties, mqttNx, rs485Gateway.getSendTopic(), rs485Gateway.getId());
             MqttAcceptClient mqttAcceptClient = new MqttAcceptClient(mqttProperties, mqttNx, rs485Gateway.getAcceptTopic(),
                     rs485Gateway.getId(), executor, mqttMessageDispatcher);

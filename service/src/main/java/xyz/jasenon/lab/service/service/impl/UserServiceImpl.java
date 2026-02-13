@@ -69,6 +69,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return R.fail("用户已存在");
         }
 
+        User doUser = baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, createBy));
+        String doUserPath = doUser.getPath();
+
         User user = new User()
                 .setUsername(username)
                 .setPassword(password)
@@ -77,6 +80,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .setPhone(phone)
                 .setCreateBy(createBy);
         this.save(user);
+        
+        // 设置用户的path：父用户的path + 当前用户ID + '/'（包含自身）
+        String userPath;
+        if (doUserPath == null || doUserPath.isEmpty()) {
+            // 如果父用户没有path，说明是根用户，设置为 /用户ID/
+            userPath = "/" + user.getId() + "/";
+        } else {
+            // 父用户的path + 当前用户ID + '/'
+            userPath = doUserPath + user.getId() + "/";
+        }
+        user.setPath(userPath);
+        this.updateById(user);
 
         // 分配权限
         List<Permissions> permissions = createUser.getPermissions();
@@ -351,23 +366,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public List<User> visible() {
         Long doUserId = StpUtil.getLoginIdAsLong();
         User self = baseMapper.selectById(doUserId);
-        List<User> users = this.lambdaQuery().eq(User::getCreateBy, doUserId).list();
-        List<User> res = dfs(users, new ArrayList<>());
-        res.add(self);
-        return res;
-    }
-
-    private List<User> dfs(List<User> users, List<User> res){
-        if (users.isEmpty()){
-            return res;
+        if (self == null) {
+            return new ArrayList<>();
         }
-        res.addAll(users);
-        for (User user : users){
-            List<User> children = this.lambdaQuery().eq(User::getCreateBy, user.getId()).list();
-            if(!children.isEmpty()){
-                return dfs(children, res);
-            }
+        
+        // 使用path路径枚举查询所有子孙用户（包含自身）
+        String selfPath = self.getPath();
+        if (selfPath == null || selfPath.isEmpty()) {
+            // 如果当前用户没有path，说明是根用户，只返回自身
+            return List.of(self);
         }
-        return res;
+        
+        // 查询所有path以当前用户path开头的用户（包含自身和所有子孙）
+        // 例如：当前用户path为 "/1/"，查询 path LIKE "/1/%" OR path = "/1/" 的所有用户
+        List<User> descendants = this.lambdaQuery()
+                .and(wrapper -> wrapper
+                        .likeRight(User::getPath, selfPath)  // 匹配所有子孙：path LIKE "/1/%"
+                        .or()
+                        .eq(User::getPath, selfPath)         // 匹配自身：path = "/1/"
+                )
+                .list();
+        
+        return descendants;
     }
 }

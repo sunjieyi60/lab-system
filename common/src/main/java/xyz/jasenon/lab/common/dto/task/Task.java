@@ -48,6 +48,8 @@ public class Task implements Comparable<Task> {
 
     private Device device = null;
 
+    private String sendThreadName = null;
+
     /**
      * asc order
      */
@@ -63,6 +65,7 @@ public class Task implements Comparable<Task> {
         this.commandLine = task.getCommandLine();
         this.args = task.getArgs();
         this.device = task.getDevice();
+        this.sendThreadName = task.getSendThreadName();
     }
 
 }

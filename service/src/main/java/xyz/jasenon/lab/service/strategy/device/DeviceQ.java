@@ -62,6 +62,7 @@ public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
 
     protected Runnable pollingTask(Task task){
         return () ->{
+            task.setSendThreadName(Thread.currentThread().getName());
             T device = deviceMapper.selectById(task.getDeviceId());
             if (device == null){
                 log.warn("轮询任务对应的设备已不存在，终止轮询任务! deviceId:{}", task.getDeviceId());

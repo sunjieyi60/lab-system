@@ -63,9 +63,10 @@ public class PollingScheduleExecutorPool {
      * @return Future对象，可用于取消任务
      */
     public Future<?> submit(Long deviceId, Runnable task){
+        Long randomDelay = (long) (Math.random() * (10 - pollingProperties.getInitialDelay() + 1)) + pollingProperties.getInitialDelay(); // 随机初始延迟，避免同时启动多个设备时瞬间的密集轮询
         log.debug("提交轮询任务，deviceId: {}, 初始延迟: {} {}, 执行间隔: {} {}", 
                 deviceId,
-                pollingProperties.getInitialDelay(), 
+                randomDelay,
                 pollingProperties.getPollingTimeUnit(),
                 pollingProperties.getPeriod(),
                 pollingProperties.getPollingTimeUnit());

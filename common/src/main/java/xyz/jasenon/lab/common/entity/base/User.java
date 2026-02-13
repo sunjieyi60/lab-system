@@ -2,7 +2,6 @@ package xyz.jasenon.lab.common.entity.base;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,6 +50,11 @@ public class User extends BaseEntity {
      * 创建者ID
      */
     private Long createBy;
+
+    /**
+     *  路径枚举
+     */
+    private String path;
 
     @TableLogic
     private Boolean deleted;

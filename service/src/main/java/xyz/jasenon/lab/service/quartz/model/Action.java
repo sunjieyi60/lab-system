@@ -61,6 +61,7 @@ public class Action {
         task.setDeviceId(deviceId);
         task.setCommandLine(commandLine);
         task.setArgs(args);
+        task.setSendThreadName(Thread.currentThread().getName());
         return task;
     }
 

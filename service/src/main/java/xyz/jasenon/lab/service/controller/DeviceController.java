@@ -67,6 +67,7 @@ public class DeviceController {
     @ApiOperation("控制设备")
     @LogPoint(title = "'设备控制'", sqEl = "#task", clazz = Task.class)
     public R controlDevice(@Validated @RequestBody Task task) {
+        task.setSendThreadName(Thread.currentThread().getName());
         TaskDispatch.dispatch(task);
         return R.success("控制任务下达成功");
     }

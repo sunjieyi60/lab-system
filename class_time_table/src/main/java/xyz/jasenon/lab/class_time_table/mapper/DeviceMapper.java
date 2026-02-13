@@ -14,3 +14,5 @@ import xyz.jasenon.lab.class_time_table.entity.Device;
 public interface DeviceMapper extends BaseMapper<Device> {
 }
 
+
+
