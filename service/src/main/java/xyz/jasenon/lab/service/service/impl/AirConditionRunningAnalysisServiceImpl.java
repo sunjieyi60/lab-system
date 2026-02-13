@@ -204,7 +204,8 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
 
     /**
      * 从 DB 取该设备在 [queryStart, queryEnd] 内的记录，构建开启区间并汇总时长。
-     * 区间内无 MySQL 记录时不使用 Redis 推导，返回 0 且 hadMysqlData=false。
+     * 如果查询时间段内最后一条记录是开启状态，会查 Redis 确认当前状态。
+     * 如果查询时间段内无 MySQL 记录，会查 Redis，如果 Redis 是开启状态则从 queryStart 到 queryEnd 算时长。
      */
     private RunningHoursResult computeRunningHours(AirCondition device, LocalDateTime queryStart, LocalDateTime queryEnd, AirConditionRecord redisRecord) {
         List<AirConditionRecord> records = airConditionRecordMapper.selectList(
@@ -214,27 +215,44 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                         .le(AirConditionRecord::getCreateTime, queryEnd)
                         .orderByAsc(AirConditionRecord::getCreateTime)
         );
-        if (records.isEmpty()) {
-            return new RunningHoursResult(0.0, false, false);
-        }
         IntervalsResult ir = buildOpenIntervals(records, queryStart, queryEnd, redisRecord);
         double hours = clipAndSumHours(ir.intervals, queryStart, queryEnd);
-        return new RunningHoursResult(hours, true, ir.usedRedisSegment);
+        return new RunningHoursResult(hours, !records.isEmpty(), ir.usedRedisSegment);
     }
 
     /**
-     * 根据有序记录构建开启区间。首段开启以记录创建时间为起点；Redis 补段仅当 createTime 落在查询区间内且单段时长不超过上限。
+     * 根据有序记录构建开启区间。
+     * 1. 如果查询时间段内无 MySQL 记录，查 Redis：如果 Redis 是开启状态，从 queryStart（或 Redis 记录的 createTime）到 queryEnd 算时长。
+     * 2. 如果最后一条记录是开启状态，查 Redis 确认当前状态：
+     *    - 如果 Redis 是开启或没有数据，从最后一条开启记录的时间到 MySQL 中最新的一条开启记录的时间点算时长
+     *    - 如果 Redis 是关闭，从最后一条开启记录的时间到 Redis 记录的关闭时间算时长（如果关闭时间在查询区间内）
      */
     private IntervalsResult buildOpenIntervals(List<AirConditionRecord> records, LocalDateTime queryStart, LocalDateTime queryEnd, AirConditionRecord redisRecord) {
         List<double[]> out = new ArrayList<>();
+        boolean usedRedisSegment = false;
+        
+        // 情况1：查询时间段内无 MySQL 记录，查 Redis
         if (records.isEmpty()) {
-            return new IntervalsResult(out, false);
+            if (redisRecord != null && Boolean.TRUE.equals(redisRecord.getIsOpen()) && redisRecord.getCreateTime() != null) {
+                LocalDateTime start = redisRecord.getCreateTime().isBefore(queryStart) ? queryStart : redisRecord.getCreateTime();
+                if (start.isBefore(queryEnd)) {
+                    out.add(toSecondsPair(start, queryEnd));
+                    usedRedisSegment = true;
+                }
+            }
+            return new IntervalsResult(out, usedRedisSegment);
         }
+        
+        // 情况2：有 MySQL 记录，遍历构建开启区间
         LocalDateTime intervalStart = null;
+        LocalDateTime lastOpenRecordTime = null; // 记录最后一条开启记录的时间
         for (AirConditionRecord r : records) {
             if (Boolean.TRUE.equals(r.getIsOpen())) {
                 if (intervalStart == null && r.getCreateTime() != null) {
                     intervalStart = r.getCreateTime();
+                }
+                if (r.getCreateTime() != null) {
+                    lastOpenRecordTime = r.getCreateTime(); // 更新最后一条开启记录的时间
                 }
             } else {
                 if (intervalStart != null && r.getCreateTime() != null) {
@@ -243,25 +261,31 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                 }
             }
         }
-        if (intervalStart != null) {
-            out.add(toSecondsPair(intervalStart, queryEnd));
-        }
-        boolean usedRedisSegment = false;
-        if (redisRecord != null && Boolean.TRUE.equals(redisRecord.getIsOpen()) && redisRecord.getCreateTime() != null) {
-            LocalDateTime rt = redisRecord.getCreateTime();
-            if (!rt.isBefore(queryStart) && !rt.isAfter(queryEnd)) {
-                boolean covered = out.stream().anyMatch(p -> p[1] >= toSeconds(rt));
-                if (!covered) {
-                    double qe = toSeconds(queryEnd);
-                    double maxStart = qe - REDIS_SEGMENT_MAX_HOURS * 3600;
-                    double start = Math.max(toSeconds(rt), maxStart);
-                    if (start < qe) {
-                        out.add(new double[]{start, qe});
-                        usedRedisSegment = true;
+        
+        // 情况3：最后一条记录是开启状态，查 Redis 确认当前状态
+        if (intervalStart != null && lastOpenRecordTime != null) {
+            if (redisRecord != null && redisRecord.getCreateTime() != null) {
+                LocalDateTime redisTime = redisRecord.getCreateTime();
+                if (Boolean.TRUE.equals(redisRecord.getIsOpen())) {
+                    // Redis 是开启状态：从最后一条开启记录的时间到 MySQL 中最新的一条开启记录的时间点
+                    out.add(toSecondsPair(intervalStart, lastOpenRecordTime));
+                    usedRedisSegment = true;
+                } else {
+                    // Redis 是关闭状态：从最后一条开启记录的时间到 Redis 记录的关闭时间（如果关闭时间在查询区间内）
+                    if (!redisTime.isBefore(queryStart) && !redisTime.isAfter(queryEnd) && redisTime.isAfter(intervalStart)) {
+                        out.add(toSecondsPair(intervalStart, redisTime));
+                    } else {
+                        // Redis 关闭时间不在查询区间内，只算到 MySQL 中最新的一条开启记录的时间点
+                        out.add(toSecondsPair(intervalStart, lastOpenRecordTime));
                     }
+                    usedRedisSegment = true;
                 }
+            } else {
+                // Redis 没有数据：从最后一条开启记录的时间到 MySQL 中最新的一条开启记录的时间点
+                out.add(toSecondsPair(intervalStart, lastOpenRecordTime));
             }
         }
+        
         return new IntervalsResult(out, usedRedisSegment);
     }
 
