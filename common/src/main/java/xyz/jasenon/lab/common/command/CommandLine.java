@@ -14,9 +14,9 @@ public enum CommandLine {
 
 
     OPEN_ACCESS_ONCE(new Command("{0} 0B {1} 00 00 00",CheckType.SUM_SG,SendType.MQTT),"单次开门"),
+    CLOSE_ACCESS_ONCE(new Command("{0} 0A {1} 00 FF 00",CheckType.SUM_SG,SendType.MQTT),"单次关门"),
     REQUEST_ACCESS_DATA(new Command("{0} 03 {1} 00 00 00",CheckType.SUM_SG,SendType.MQTT), "请求门禁数据"),
-    OPEN_CIRCUITBREAK(new Command("{0} 10 00 19 00 01 02 00 01",CheckType.CRC16,SendType.MQTT),"断路器分闸"),
-    CLOSE_CIRCUITBREAK(new Command("{0} 10 00 19 00 01 02 00 01",CheckType.CRC16,SendType.MQTT),"断路器合闸"),
+    CLOSE_CIRCUITBREAK(new Command("{0} 10 00 19 00 01 02 00 00",CheckType.CRC16,SendType.MQTT),"断路器分闸"),
     REQUEST_CIRCUITBREAK_DATA(new Command("{0} 03 00 18 00 74",CheckType.CRC16,SendType.MQTT),"请求断路器数据"),
 
     OPEN_LIGHT(new Command("{0} 0A {1} FF 11 00",CheckType.SUM_UNSG,SendType.MQTT),"打开灯光"),
