@@ -23,4 +23,6 @@ public interface ILaboratoryService extends IService<Laboratory> {
 
     R editManagers(Long laboratoryId, List<Long> userIds);
 
+    R getLaboratoryDetailById(Long laboratoryId);
+
 }

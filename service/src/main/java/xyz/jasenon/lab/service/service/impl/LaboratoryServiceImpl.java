@@ -4,9 +4,13 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.stream.CollectorUtil;
+import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.yulichang.query.MPJLambdaQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -19,6 +23,8 @@ import xyz.jasenon.lab.service.dto.laboratory.EditLaboratory;
 import xyz.jasenon.lab.service.mapper.*;
 import xyz.jasenon.lab.service.service.ILaboratoryService;
 import xyz.jasenon.lab.service.service.IUserService;
+import xyz.jasenon.lab.service.vo.base.LaboratoryVo;
+import xyz.jasenon.lab.service.vo.base.UserVo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,6 +34,7 @@ import java.util.List;
  * @author Jasenon_ce
  * @date 2025/11/26
  */
+@Slf4j
 @Service
 public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laboratory> implements ILaboratoryService {
 
@@ -37,8 +44,6 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
     private LaboratoryUserMapper laboratoryUserMapper;
     @Autowired
     private DeptMapper deptMapper;
-    @Autowired
-    private UserMapper userMapper;
     @Autowired
     private DeptUserMapper deptUserMapper;
     @Autowired
@@ -102,8 +107,7 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
                 .setUserId(doUserId);
         laboratoryUserMapper.insert(laboratoryUser);
 
-        User user = userMapper.selectById(doUserId);
-        List<User> fathers = fathers(user, new ArrayList<>());
+        List<User> fathers = userService.visible();
         for(User father : fathers){
             LaboratoryUser fzUser = new LaboratoryUser()
                     .setLaboratoryId(laboratory.getId())
@@ -165,32 +169,53 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         }
 
         if (userIds !=null && !userIds.isEmpty()){
-            // 清除旧的记录
-            laboratoryManagerMapper.delete(new LambdaUpdateWrapper<LaboratoryManager>()
-                    .eq(LaboratoryManager::getLaboratoryId, laboratoryId));
-
-            // 防止unique索引出错导致回滚  手动去重
-            List<LaboratoryManager> updates = userIds.stream().map(userId -> new LaboratoryManager()
-                    .setLaboratoryId(laboratoryId)
-                    .setUserId(userId)).filter(FilterKit.distinctByKey(LaboratoryManager::getUserId)).toList();
-
-            laboratoryManagerMapper.insert(updates);
-            return R.success("编辑成功");
+            List<LaboratoryManager> managers = laboratoryManagerMapper.selectList(
+                    new LambdaQueryWrapper<LaboratoryManager>()
+                            .eq(LaboratoryManager::getLaboratoryId, laboratoryId)
+            );
+            boolean different = new HashSet<>(managers.stream().map(LaboratoryManager::getUserId).toList())
+                    .containsAll(userIds);
+            if (different){
+                var visible = userService.visible().stream().toList();
+                boolean allUserVisible = new HashSet<>(visible.stream().map(User::getId).toList()).containsAll(userIds);
+                if (!allUserVisible){
+                    List<Long> unvisibleUserIds = userIds.stream().filter(u -> !visible.stream().map(User::getId).toList().contains(u)).toList();
+                    return R.fail(HttpStatus.HTTP_BAD_REQUEST,"你无权调整实验室的负责人，因为该用户不由你管辖", unvisibleUserIds);
+                }
+                laboratoryManagerMapper.deleteByIds(managers);
+                List<LaboratoryManager> newManagers = userIds.stream().map(userId -> new LaboratoryManager()
+                        .setLaboratoryId(laboratoryId)
+                        .setUserId(userId)).toList();
+                laboratoryManagerMapper.insert(newManagers);
+            }
         }
         return R.fail("负责人不能为空");
     }
 
-    private List<User> fathers(User user, List<User> result){
-        List<User> fathers = userMapper.selectList(new LambdaQueryWrapper<User>()
-                .eq(User::getId, user.getCreateBy()));
-        if(fathers.isEmpty()){
-            return result;
+    @Override
+    public R getLaboratoryDetailById(Long laboratoryId) {
+        Long doUserId = StpUtil.getLoginIdAsLong();
+        LaboratoryUser laboratoryUser = laboratoryUserMapper.selectOne(new LambdaQueryWrapper<LaboratoryUser>()
+                .eq(LaboratoryUser::getUserId, doUserId)
+                .eq(LaboratoryUser::getLaboratoryId, laboratoryId));
+        if (laboratoryUser == null){
+            return R.fail("你没有权限查看该实验室的详情");
         }
-        result.addAll(fathers);
-        for(User father : fathers){
-            fathers(father, result);
-        }
-        return result;
+
+
+        List<UserVo> managersVo = laboratoryManagerMapper.selectJoinList(UserVo.class,
+                new MPJLambdaWrapper<LaboratoryManager>()
+                        .eq(LaboratoryManager::getLaboratoryId, laboratoryId)
+                        .leftJoin(User.class, User::getId, LaboratoryManager::getUserId)
+                        .selectAll(User.class)
+        );
+
+        LaboratoryVo vo = this.baseMapper.selectJoinOne(LaboratoryVo.class,
+                new MPJLambdaWrapper<Laboratory>()
+                        .eq(Laboratory::getId, laboratoryId)
+                        .selectAll(Laboratory.class));
+        vo.setManagers(managersVo);
+        return R.success(vo,"查询成功");
     }
 
 }

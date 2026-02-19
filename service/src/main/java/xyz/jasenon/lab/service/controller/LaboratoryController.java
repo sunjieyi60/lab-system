@@ -56,4 +56,10 @@ public class LaboratoryController {
         return laboratoryService.editManagers(laboratoryId, userIds);
     }
 
+    @GetMapping("/detail")
+    @ApiOperation("获取实验室详情")
+    public R getLaboratoryDetail(@RequestParam Long laboratoryId){
+        return laboratoryService.getLaboratoryDetailById(laboratoryId);
+    }
+
 }

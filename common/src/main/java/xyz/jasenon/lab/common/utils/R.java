@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.common.utils;
 
+import cn.hutool.http.HttpStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,6 +47,23 @@ public class R<T> implements Serializable {
         R<T> r = new R<>();
         r.setOk(false);
         r.setMsg(msg);
+        return r;
+    }
+
+    public static <T> R<T> fail(Integer code, String msg) {
+        R<T> r = new R<>();
+        r.setOk(false);
+        r.setMsg(msg);
+        r.setCode(code);
+        return r;
+    }
+
+    public static <T> R<T> fail(Integer code, String msg, T data) {
+        R<T> r = new R<>();
+        r.setOk(false);
+        r.setMsg(msg);
+        r.setCode(code);
+        r.setData(data);
         return r;
     }
 
