@@ -1,39 +1,16 @@
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/lab_sys4?useSSL=false&serverTimezone=UTC
-#    username: root
-#    password: sbx159357!?.
-    url: jdbc:mysql://10.230.80.109:3306/lab_sys4?useSSL=false&serverTimezone=UTC
-    username: root
-    password: lab_system
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 2
-
 server:
   port: 8083
 
+# t-io TCP 服务器配置
 t-io:
   server:
-    name: tio-server
-    host: "localhost"
+    name: smart-board-server
+    host: 0.0.0.0
     port: 9000
-    heartbeat: 10000
+    heartbeat: 60000
 
-# 设备认证配置
-device:
-  auth:
-    server:
-      # 服务端RSA私钥（Base64编码，用于解密设备信息）
-      # 方式1：直接配置Base64字符串
-      private-key: ""
-      # 方式2：从文件读取（推荐）。classpath 表示从 src/main/resources 或 jar 内加载，不依赖绝对路径
-      private-key-file: "classpath:private_key.pem"
-  # 人脸上传存储路径（按 deviceId/faceId.jpg 落盘）
-  face:
-    enroll:
-      store-path: "data/faces"
+# 日志配置
+logging:
+  level:
+    xyz.jasenon.lab.class_time_table: DEBUG
+    xyz.jasenon.lab.tioprotocol: DEBUG
