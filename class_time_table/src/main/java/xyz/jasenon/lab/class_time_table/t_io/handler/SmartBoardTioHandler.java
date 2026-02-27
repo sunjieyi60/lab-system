@@ -11,6 +11,7 @@ import org.tio.server.intf.TioServerHandler;
 import xyz.jasenon.lab.class_time_table.t_io.adapter.TioPacketAdapter;
 import xyz.jasenon.lab.class_time_table.t_io.adapter.TioQosAdapter;
 import xyz.jasenon.lab.class_time_table.t_io.codec.TioProtocolCodec;
+import xyz.jasenon.lab.tioprotocol.CommandType;
 import xyz.jasenon.lab.tioprotocol.PacketHeader;
 import xyz.jasenon.lab.tioprotocol.ProtocolPacket;
 
@@ -102,11 +103,11 @@ public class SmartBoardTioHandler implements TioServerHandler {
                 channelContext.getClientNode(), cmdType, protocolPacket.getSeqId());
         
         // 示例：如果是心跳包，直接回复（实际业务中可能不需要）
-        if (cmdType == xyz.jasenon.lab.tioprotocol.CommandType.HEARTBEAT) {
+        if (cmdType == CommandType.HEARTBEAT) {
             ProtocolPacket heartbeatAck = new ProtocolPacket();
             heartbeatAck.setMagic(PacketHeader.MAGIC_NUMBER);
             heartbeatAck.setVersion(PacketHeader.VERSION);
-            heartbeatAck.setCmdType(xyz.jasenon.lab.tioprotocol.CommandType.HEARTBEAT_ACK);
+            heartbeatAck.setCmdType(CommandType.HEARTBEAT_ACK);
             heartbeatAck.setSeqId(protocolPacket.getSeqId());
             heartbeatAck.setPayload(new byte[0]);
             heartbeatAck.calculateCheckSum();

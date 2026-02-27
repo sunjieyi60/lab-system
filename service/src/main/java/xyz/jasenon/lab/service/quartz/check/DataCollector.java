@@ -19,9 +19,9 @@ public class DataCollector {
     }
 
     public static Result<Boolean> check(Data data){
-        if (data.getValue().getData().getOrigin() == Origin.MySql){
-            return Result.error(false, MessageFormat.format("离线数据不可靠! 数据源为:{0}", data));
-        }
+//        if (data.getValue().getData().getOrigin() == Origin.MySql){
+//            return Result.error(false, MessageFormat.format("离线数据不可靠! 数据源为:{0}", data));
+//        }
         return Result.success(true);
     }
 }

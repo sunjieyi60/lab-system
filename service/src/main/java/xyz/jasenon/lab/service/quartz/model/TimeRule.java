@@ -1,6 +1,8 @@
 package xyz.jasenon.lab.service.quartz.model;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.lab.common.entity.class_time_table.Schedule;
@@ -36,6 +38,7 @@ public class TimeRule {
     /**
      * 星期遮罩
      */
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Integer> weekdays;
 
     /**

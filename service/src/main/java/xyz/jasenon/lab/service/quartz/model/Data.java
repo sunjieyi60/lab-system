@@ -45,7 +45,7 @@ public class Data {
     private DeviceRecordVo<? extends BaseRecord> value;
 
     public Map<String,Object> value2Map(){
-        return BeanUtil.beanToMap(value);
+        return BeanUtil.beanToMap(value.getData());
     }
 
 }

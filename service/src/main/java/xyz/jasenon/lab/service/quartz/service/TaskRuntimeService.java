@@ -332,10 +332,10 @@ public class TaskRuntimeService {
         if (cfg == null) {
             return "任务不存在";
         }
-        if ("0".equals(cfg.getTask().getEnable())) {
+        if (Boolean.FALSE.equals(cfg.getTask().getEnable())) {
             return "任务已是禁用状态";
         }
-        configLoader.updateTaskEnable(taskId, "0");
+        configLoader.updateTaskEnable(taskId, false);
         try {
             quartzRegister.cancelTask(taskId);
         } catch (SchedulerException e) {
@@ -352,10 +352,10 @@ public class TaskRuntimeService {
         if (cfg == null) {
             return "任务不存在";
         }
-        if ("1".equals(cfg.getTask().getEnable())) {
+        if (Boolean.TRUE.equals(cfg.getTask().getEnable())) {
             return "任务已是启用状态";
         }
-        configLoader.updateTaskEnable(taskId, "1");
+        configLoader.updateTaskEnable(taskId, true);
         try {
             quartzRegister.scheduleTask(cfg);
         } catch (SchedulerException e) {

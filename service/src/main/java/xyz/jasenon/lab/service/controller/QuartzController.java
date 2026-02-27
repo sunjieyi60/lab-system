@@ -33,7 +33,7 @@ public class QuartzController {
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
     @LogPoint(title = "'报警联动设置'", sqEl = "#scheduleConfigRoot", clazz = ScheduleConfigRoot.class)
-    public R createConfig(ScheduleConfigRoot scheduleConfigRoot){
+    public R createConfig(@RequestBody ScheduleConfigRoot scheduleConfigRoot){
         Result<Boolean> res = configLoader.configCreate(scheduleConfigRoot);
         if (!res.getData()) {
             return R.fail(res.getMessage());
@@ -79,9 +79,9 @@ public class QuartzController {
 
     @GetMapping("/list")
     @ApiOperation("获取定时任务列表")
-    public R<List<ScheduleTask>> getAllScheduleTask(@RequestParam(required = false) String enable) {
+    public R<List<ScheduleTask>> getAllScheduleTask(@RequestParam(required = false) Boolean enable) {
         List<ScheduleTask> tasks = taskRuntimeService.getAllScheduleTask();
-        if (enable != null && !enable.isBlank()) {
+        if (enable != null) {
             tasks = tasks.stream()
                     .filter(t -> enable.equals(t.getEnable()))
                     .toList();

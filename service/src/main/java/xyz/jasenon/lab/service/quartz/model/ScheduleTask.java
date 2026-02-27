@@ -31,7 +31,7 @@ public class ScheduleTask {
     /**
      * 是否启用
      */
-    private String enable;
+    private Boolean enable;
 
     /**
      * 开始日期，结束日期

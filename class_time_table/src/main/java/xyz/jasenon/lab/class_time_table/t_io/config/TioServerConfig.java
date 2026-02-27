@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tio.server.TioServer;
-import org.tio.server.TioServerConfig;
 import xyz.jasenon.lab.class_time_table.t_io.adapter.TioQosAdapter;
 import xyz.jasenon.lab.class_time_table.t_io.handler.SmartBoardTioHandler;
 import xyz.jasenon.lab.class_time_table.t_io.listener.SmartBoardTioListener;
@@ -29,7 +28,7 @@ public class TioServerConfig {
     
     @Bean
     public TioServer tioServer() throws IOException {
-        TioServerConfig tioServerConfig = new TioServerConfig(
+        org.tio.server.TioServerConfig tioServerConfig = new org.tio.server.TioServerConfig(
                 properties.getName(), handler, listener
         );
         tioServerConfig.setHeartbeatTimeout(properties.getHeartbeatTimeout());

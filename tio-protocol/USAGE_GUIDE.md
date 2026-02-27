@@ -18,8 +18,11 @@
 `tio-protocol` 是一个**纯 Java** 实现的 TCP 协议层，提供可靠的消息传输机制（QoS），适用于：
 
 - **服务端**：配合 t-io 框架使用（如 class-time-table 模块）
-- **客户端**：Android 电子门禁班牌设备
-- **特点**：零框架依赖，纯 Java 实现，可被 Android 直接复用
+- **客户端**：Android 电子门禁班牌设备（同样基于 t-io 客户端）
+- **特点**：
+  - 纯 Java 实现，协议层零框架依赖
+  - 服务端与客户端使用统一的 t-io 通信框架
+  - Android 端可直接复用 `tio-protocol` 的编解码和 QoS 逻辑
 
 ### 核心功能
 
@@ -332,233 +335,538 @@ t-io:
 
 ## Android 客户端使用
 
+Android 班牌端同样使用 **t-io 客户端**（`TioClient`）作为基础通信框架，配合 `tio-protocol` 实现 QoS 机制。
+
 ### 1. 引入依赖
-
-#### 方式一：源码复制（推荐）
-
-将 `tio-protocol/src/main/java` 下的所有 Java 文件复制到 Android 项目的 `java/xyz/jasenon/lab/tioprotocol` 目录。
-
-#### 方式二：打包 AAR
 
 ```groovy
 // build.gradle (Module: app)
 dependencies {
+    // t-io 客户端（与服务器同版本）
+    implementation 'org.t-io:tio-core:3.8.7.v20250626-RELEASE'
+    
+    // tio-protocol（QoS 协议层）
     implementation 'xyz.jasenon.lab:tio-protocol:0.0.1-SNAPSHOT'
-    implementation 'org.slf4j:slf4j-android:2.0.16'  // SLF4J Android 实现
+    
+    // SLF4J Android 实现
+    implementation 'org.slf4j:slf4j-android:2.0.16'
 }
 ```
 
-### 2. 实现 PacketSender
+### 2. 创建 t-io Packet 适配器
+
+与服务器端类似，需要将 `ProtocolPacket` 适配为 t-io 的 `Packet`：
 
 ```java
-public class TcpConnection implements QosManager.PacketSender {
+/**
+ * Android 端 t-io Packet 适配器
+ */
+public class AndroidPacketAdapter extends Packet {
     
-    private Socket socket;
-    private OutputStream outputStream;
-    private PacketCodec codec = new PacketCodec();
-    private QosManager qosManager;
+    private final ProtocolPacket protocolPacket;
     
-    public TcpConnection() {
-        // 创建 QoS 管理器，传入发送器实现
-        this.qosManager = new QosManager(this::send);
+    public AndroidPacketAdapter(ProtocolPacket protocolPacket) {
+        this.protocolPacket = protocolPacket;
+    }
+    
+    public ProtocolPacket getProtocolPacket() {
+        return protocolPacket;
+    }
+    
+    public byte getCmdType() {
+        return protocolPacket.getCmdType();
+    }
+    
+    public short getSeqId() {
+        return protocolPacket.getSeqId();
+    }
+    
+    public boolean requiresAck() {
+        return protocolPacket.requiresAck();
+    }
+}
+```
+
+### 3. 实现 t-io 客户端处理器
+
+```java
+/**
+ * Android 端 t-io 客户端处理器
+ */
+public class SmartBoardClientHandler implements TioClientHandler {
+    
+    private static final String TAG = "SmartBoardClient";
+    private final PacketCodec codec = new PacketCodec();
+    private final QosManager qosManager;
+    private final ClientEventListener eventListener;
+    
+    public SmartBoardClientHandler(QosManager qosManager, ClientEventListener listener) {
+        this.qosManager = qosManager;
+        this.eventListener = listener;
+    }
+    
+    @Override
+    public Packet decode(ByteBuffer buffer, int limit, int position, 
+                         int readableLength, ChannelContext channelContext) 
+                         throws TioDecodeException {
+        // 检查是否有足够的数据读取头部
+        if (readableLength < PacketHeader.HEADER_LENGTH) {
+            return null;
+        }
         
-        // 配置参数
-        qosManager.setDefaultRetryTimeout(5000)
-                  .setMaxRetryCount(3)
-                  .setConfirmationRetentionTime(60000);
+        buffer.position(position);
+        
+        // 读取魔数
+        int magic = buffer.getInt(position);
+        if (magic != PacketHeader.MAGIC_NUMBER) {
+            throw new TioDecodeException("魔数不匹配");
+        }
+        
+        // 读取长度字段（头部最后4字节）
+        int bodyLength = buffer.getInt(position + 12);
+        if (bodyLength < 0) {
+            throw new TioDecodeException("消息体长度无效");
+        }
+        
+        // 检查是否有完整的数据包
+        int totalLength = PacketHeader.HEADER_LENGTH + bodyLength;
+        if (readableLength < totalLength) {
+            return null;
+        }
+        
+        // 解码数据包
+        try {
+            ProtocolPacket protocolPacket = codec.decode(buffer);
+            if (protocolPacket == null) {
+                return null;
+            }
+            
+            Log.d(TAG, "收到消息: cmdType=" + protocolPacket.getCmdType() 
+                      + ", seqId=" + protocolPacket.getSeqId());
+            
+            return new AndroidPacketAdapter(protocolPacket);
+        } catch (Exception e) {
+            throw new TioDecodeException("解码失败: " + e.getMessage());
+        }
+    }
+    
+    @Override
+    public ByteBuffer encode(Packet packet, TioConfig tioConfig, 
+                             ChannelContext channelContext) {
+        AndroidPacketAdapter adapter = (AndroidPacketAdapter) packet;
+        byte[] data = codec.encode(adapter.getProtocolPacket());
+        return ByteBuffer.wrap(data);
+    }
+    
+    @Override
+    public void handler(Packet packet, ChannelContext channelContext) throws Exception {
+        AndroidPacketAdapter adapter = (AndroidPacketAdapter) packet;
+        ProtocolPacket protocolPacket = adapter.getProtocolPacket();
+        
+        String channelId = channelContext.getId();
+        
+        // 1. 交给 QoS 管理器处理（自动回复 ACK 如果需要）
+        boolean isAckHandled = qosManager.handleReceived(channelId, protocolPacket);
+        
+        // 2. 如果是 QOS_ACK，说明是我们之前发送的消息被确认了
+        if (protocolPacket.getCmdType() == CommandType.QOS_ACK) {
+            // QoS 管理器内部已处理，这里可以回调给业务层
+            Log.d(TAG, "收到 ACK，seqId=" + protocolPacket.getSeqId());
+            return;
+        }
+        
+        // 3. 业务层处理
+        eventListener.onMessageReceived(protocolPacket);
+    }
+    
+    public interface ClientEventListener {
+        void onMessageReceived(ProtocolPacket packet);
+        void onConnected();
+        void onDisconnected();
+    }
+}
+```
+
+### 4. 创建 t-io 客户端并集成 QoS
+
+```java
+/**
+ * Android 班牌客户端（基于 t-io）
+ */
+public class SmartBoardClient {
+    
+    private static final String TAG = "SmartBoardClient";
+    
+    private TioClient tioClient;
+    private TioClientConfig clientConfig;
+    private ChannelContext channelContext;
+    private QosManager qosManager;
+    private PacketBuilder packetBuilder;
+    
+    private final String serverHost;
+    private final int serverPort;
+    private final ClientEventListener listener;
+    
+    // 连接状态
+    private volatile boolean connected = false;
+    private volatile boolean registered = false;
+    
+    public SmartBoardClient(String host, int port, ClientEventListener listener) {
+        this.serverHost = host;
+        this.serverPort = port;
+        this.listener = listener;
+        this.packetBuilder = new PacketBuilder();
     }
     
     /**
-     * 实现 PacketSender 接口
-     * 实际发送数据到 socket
+     * 初始化并连接服务器
      */
-    @Override
-    public boolean send(String channelId, ProtocolPacket packet) {
-        try {
-            byte[] data = codec.encode(packet);
-            outputStream.write(data);
-            outputStream.flush();
-            return true;
-        } catch (IOException e) {
-            Log.e("TcpConnection", "发送失败", e);
-            return false;
+    public void connect() throws Exception {
+        // 1. 创建 QoS 管理器
+        this.qosManager = new QosManager(this::doSend);
+        qosManager.setDefaultRetryTimeout(5000)
+                  .setMaxRetryCount(3)
+                  .setConfirmationRetentionTime(60000);
+        
+        // 2. 创建 t-io 客户端配置
+        SmartBoardClientHandler handler = new SmartBoardClientHandler(qosManager, 
+            new SmartBoardClientHandler.ClientEventListener() {
+                @Override
+                public void onMessageReceived(ProtocolPacket packet) {
+                    handleBusinessMessage(packet);
+                }
+                @Override
+                public void onConnected() {
+                    connected = true;
+                    listener.onConnected();
+                }
+                @Override
+                public void onDisconnected() {
+                    connected = false;
+                    listener.onDisconnected();
+                }
+            });
+        
+        SmartBoardClientListener clientListener = new SmartBoardClientListener(this);
+        
+        clientConfig = new TioClientConfig("smart-board-client", handler, clientListener);
+        clientConfig.setHeartbeatTimeout(60000);
+        
+        // 3. 创建并启动客户端
+        tioClient = new TioClient(clientConfig);
+        
+        // 4. 连接到服务器
+        ClientChannelContext ctx = tioClient.connect(serverHost, serverPort);
+        if (ctx != null) {
+            this.channelContext = ctx;
+            Log.i(TAG, "连接服务器成功: " + serverHost + ":" + serverPort);
+        } else {
+            throw new IOException("连接服务器失败");
         }
     }
     
     /**
-     * 连接服务器
+     * 实际发送数据（被 QosManager 回调）
      */
-    public void connect(String host, int port) {
-        socket = new Socket();
-        socket.connect(new InetSocketAddress(host, port), 10000);
-        outputStream = socket.getOutputStream();
+    private boolean doSend(String channelId, ProtocolPacket packet) {
+        if (channelContext == null || !connected) {
+            Log.e(TAG, "未连接，无法发送");
+            return false;
+        }
         
-        // 启动接收线程
-        new Thread(this::receiveLoop).start();
+        AndroidPacketAdapter adapter = new AndroidPacketAdapter(packet);
+        return Tio.send(channelContext, adapter);
     }
-}
-```
-
-### 3. 注册流程实现
-
-```java
-public class DeviceRegistrar {
-    
-    private TcpConnection connection;
-    private PacketBuilder packetBuilder = new PacketBuilder();
-    private CompletableFuture<RegisterResult> pendingRegistration;
     
     /**
-     * 发起设备注册
-     * 
-     * @param deviceId 设备ID
-     * @param token 认证令牌
-     * @return 注册结果（异步）
+     * 发送消息（带 QoS）
+     */
+    public boolean send(ProtocolPacket packet) {
+        if (channelContext == null) {
+            Log.e(TAG, "未连接");
+            return false;
+        }
+        return qosManager.send(channelContext.getId(), packet);
+    }
+    
+    /**
+     * 设备注册
      */
     public CompletableFuture<RegisterResult> register(String deviceId, String token) {
-        pendingRegistration = new CompletableFuture<>();
+        CompletableFuture<RegisterResult> future = new CompletableFuture<>();
         
-        // 构造注册请求（qos=1，确保服务端收到）
+        // 构造注册请求（qos=1）
         RegisterRequest request = new RegisterRequest(deviceId, token);
         ProtocolPacket packet = packetBuilder.build(
             CommandType.REGISTER,
             serialize(request),
-            QosLevel.AT_LEAST_ONCE  // qos=1
+            QosLevel.AT_LEAST_ONCE  // 确保送达
         );
         
-        // 发送（QoS 管理器自动等待 ACK）
-        connection.getQosManager().send("server", packet);
+        // 发送（QoS 管理器自动处理重传）
+        boolean sent = send(packet);
+        if (!sent) {
+            future.completeExceptionally(new IOException("发送失败"));
+            return future;
+        }
         
         // 设置超时
-        pendingRegistration.orTimeout(15, TimeUnit.SECONDS)
+        return future.orTimeout(15, TimeUnit.SECONDS)
             .exceptionally(e -> {
-                Log.e("DeviceRegistrar", "注册超时", e);
+                Log.e(TAG, "注册超时", e);
                 return RegisterResult.fail("超时");
             });
-        
-        return pendingRegistration;
     }
     
     /**
-     * 处理收到的消息
+     * 发送心跳
      */
-    public void onPacketReceived(ProtocolPacket packet) {
-        // 交给 QoS 管理器处理（自动回复 ACK）
-        boolean isAck = connection.getQosManager().handleReceived("server", packet);
-        if (isAck) {
-            // 这是协议层 ACK，已自动处理
-            Log.d("DeviceRegistrar", "收到 ACK，消息已送达");
-            return;
-        }
-        
-        // 处理业务响应
+    public void sendHeartbeat() {
+        ProtocolPacket heartbeat = packetBuilder.build(
+            CommandType.HEARTBEAT,
+            new byte[0],
+            QosLevel.AT_MOST_ONCE  // qos=0
+        );
+        send(heartbeat);
+    }
+    
+    /**
+     * 处理业务消息
+     */
+    private void handleBusinessMessage(ProtocolPacket packet) {
         switch (packet.getCmdType()) {
             case CommandType.REGISTER_ACK:
                 handleRegisterAck(packet);
                 break;
-                
             case CommandType.TIMETABLE_PUSH:
                 handleTimetablePush(packet);
                 break;
-                
             case CommandType.HEARTBEAT_ACK:
-                // 心跳响应，更新连接状态
+                Log.d(TAG, "心跳响应");
                 break;
+            // ... 其他命令
         }
     }
     
     private void handleRegisterAck(ProtocolPacket packet) {
-        // 解析配置
         DeviceConfig config = deserialize(packet.getPayload(), DeviceConfig.class);
-        
-        // 保存配置
         ConfigManager.save(config);
-        
-        // 完成注册流程
-        pendingRegistration.complete(RegisterResult.success(config));
-        
-        Log.i("DeviceRegistrar", "注册成功，配置已保存");
+        registered = true;
+        Log.i(TAG, "注册成功，配置已保存");
     }
     
     private void handleTimetablePush(ProtocolPacket packet) {
         Timetable timetable = deserialize(packet.getPayload(), Timetable.class);
-        
-        // 保存课表
         TimetableManager.save(timetable);
-        
-        Log.i("DeviceRegistrar", "收到课表更新");
+        listener.onTimetableUpdated(timetable);
     }
-}
-```
-
-### 4. 心跳保活
-
-```java
-public class HeartbeatManager {
-    
-    private TcpConnection connection;
-    private PacketBuilder packetBuilder = new PacketBuilder();
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     
     /**
-     * 启动心跳
+     * 断开连接
      */
-    public void start() {
-        scheduler.scheduleAtFixedRate(
-            this::sendHeartbeat,
-            0, 30, TimeUnit.SECONDS  // 每30秒发送一次
-        );
+    public void disconnect() {
+        if (tioClient != null) {
+            tioClient.stop();
+        }
+        if (qosManager != null) {
+            qosManager.shutdown();
+        }
+        connected = false;
     }
     
-    private void sendHeartbeat() {
-        // 构造心跳包（qos=0，不需要确认）
-        ProtocolPacket heartbeat = packetBuilder.build(
-            CommandType.HEARTBEAT,
-            new byte[0],
-            QosLevel.AT_MOST_ONCE  // qos=0，减少网络开销
-        );
-        
-        // 发送（不等待确认）
-        connection.send(heartbeat);
+    // Getters
+    public boolean isConnected() { return connected; }
+    public boolean isRegistered() { return registered; }
+    public QosManager getQosManager() { return qosManager; }
+    
+    public interface ClientEventListener {
+        void onConnected();
+        void onDisconnected();
+        void onTimetableUpdated(Timetable timetable);
     }
 }
 ```
 
-### 5. 完整使用示例
+### 5. 创建 t-io 客户端监听器
+
+```java
+/**
+ * Android 端 t-io 客户端监听器
+ */
+public class SmartBoardClientListener implements TioClientListener {
+    
+    private final SmartBoardClient client;
+    
+    public SmartBoardClientListener(SmartBoardClient client) {
+        this.client = client;
+    }
+    
+    @Override
+    public void onAfterConnected(ChannelContext channelContext, boolean isConnected, 
+                                  boolean isReconnect) {
+        Log.i("SmartBoardClient", "连接成功，isConnected=" + isConnected 
+                                 + ", isReconnect=" + isReconnect);
+    }
+    
+    @Override
+    public void onBeforeClose(ChannelContext channelContext, Throwable throwable, 
+                               String remark, boolean isRemove) {
+        Log.w("SmartBoardClient", "连接关闭: " + remark);
+        // 清理 QoS 数据
+        if (client.getQosManager() != null) {
+            client.getQosManager().clearChannel(channelContext.getId());
+        }
+    }
+    
+    @Override
+    public void onAfterDecoded(ChannelContext channelContext, Packet packet, int packetSize) {
+        // 解码后的回调
+    }
+    
+    @Override
+    public void onAfterReceivedBytes(ChannelContext channelContext, int receivedBytes) {
+        // 收到字节的回调
+    }
+    
+    @Override
+    public void onAfterSent(ChannelContext channelContext, Packet packet, boolean isSentSuccess) {
+        // 发送后的回调
+    }
+    
+    @Override
+    public void onAfterHandled(ChannelContext channelContext, Packet packet, long cost) {
+        // 处理完成后的回调
+    }
+    
+    @Override
+    public boolean onHeartbeatTimeout(ChannelContext channelContext, Long interval, 
+                                       int heartbeatTimeoutCount) {
+        Log.w("SmartBoardClient", "心跳超时，interval=" + interval 
+                                 + ", count=" + heartbeatTimeoutCount);
+        return false;
+    }
+}
+```
+
+### 6. 在 Activity 中使用
 
 ```java
 public class MainActivity extends AppCompatActivity {
     
-    private TcpConnection connection;
-    private DeviceRegistrar registrar;
+    private static final String TAG = "MainActivity";
+    private SmartBoardClient client;
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         
-        // 初始化连接
-        connection = new TcpConnection();
-        registrar = new DeviceRegistrar(connection);
-        
-        // 连接服务器并注册
-        new Thread(() -> {
-            try {
-                connection.connect("10.0.2.2", 9000);
-                
-                RegisterResult result = registrar.register("DEVICE001", "token123")
-                    .get(15, TimeUnit.SECONDS);
-                
-                if (result.isSuccess()) {
+        // 初始化客户端
+        initClient();
+    }
+    
+    private void initClient() {
+        client = new SmartBoardClient("10.0.2.2", 9000, 
+            new SmartBoardClient.ClientEventListener() {
+                @Override
+                public void onConnected() {
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, 
+                            "已连接服务器", Toast.LENGTH_SHORT).show();
+                    });
+                    // 连接成功后立即注册
+                    doRegister();
+                }
+                
+                @Override
+                public void onDisconnected() {
+                    runOnUiThread(() -> {
+                        Toast.makeText(MainActivity.this, 
+                            "连接断开", Toast.LENGTH_SHORT).show();
                     });
                 }
+                
+                @Override
+                public void onTimetableUpdated(Timetable timetable) {
+                    runOnUiThread(() -> {
+                        updateTimetableUI(timetable);
+                        Toast.makeText(MainActivity.this, 
+                            "课表已更新", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        
+        // 异步连接
+        new Thread(() -> {
+            try {
+                client.connect();
             } catch (Exception e) {
-                Log.e("MainActivity", "连接失败", e);
+                Log.e(TAG, "连接失败", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, 
+                        "连接失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
             }
         }).start();
     }
+    
+    private void doRegister() {
+        String deviceId = "DEVICE001";  // 实际从设备获取
+        String token = "your-auth-token";  // 实际从安全存储获取
+        
+        client.register(deviceId, token)
+            .thenAccept(result -> {
+                if (result.isSuccess()) {
+                    Log.i(TAG, "注册成功");
+                    // 启动心跳
+                    startHeartbeat();
+                } else {
+                    Log.e(TAG, "注册失败: " + result.getErrorMessage());
+                }
+            })
+            .exceptionally(e -> {
+                Log.e(TAG, "注册异常", e);
+                return null;
+            });
+    }
+    
+    private void startHeartbeat() {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(() -> {
+            if (client.isConnected()) {
+                client.sendHeartbeat();
+            }
+        }, 30, 30, TimeUnit.SECONDS);  // 每30秒心跳
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (client != null) {
+            client.disconnect();
+        }
+    }
 }
+```
+
+### 7. 项目结构（Android）
+
+```
+app/src/main/java/com/example/smartboard/
+├── client/
+│   ├── SmartBoardClient.java           # 主客户端类
+│   ├── SmartBoardClientHandler.java    # t-io 消息处理器
+│   └── SmartBoardClientListener.java   # t-io 连接监听器
+├── adapter/
+│   └── AndroidPacketAdapter.java       # ProtocolPacket 适配器
+├── protocol/
+│   └── (tio-protocol 源码或依赖)
+├── model/
+│   ├── RegisterRequest.java
+│   ├── DeviceConfig.java
+│   └── Timetable.java
+└── MainActivity.java
 ```
 
 ---
@@ -570,46 +878,47 @@ public class MainActivity extends AppCompatActivity {
 ```mermaid
 sequenceDiagram
     autonumber
-    participant A as Android班牌
+    participant A as Android班牌<br/>(TioClient)
     participant QC as Client QoSManager
     participant S as t-io Server
     participant QS as Server QoSManager
     participant H as 业务Handler
     
     Note over A,S: ========== 建立连接 ==========
-    A->>S: TCP 连接
-    S->>A: 连接成功
+    A->>S: TioClient.connect()
+    S->>A: onAfterConnected()
     
     Note over A,S: ========== 注册流程 ==========
-    A->>QC: register(deviceId, token)
+    A->>QC: SmartBoardClient.register()
     Note right of QC: 构造 REGISTER 包<br/>(qos=1, seqId=100)
     
-    QC->>S: REGISTER (seqId=100, qos=1)
+    QC->>A: Tio.send()
+    A->>S: REGISTER (seqId=100, qos=1)
     activate QC
     Note right of QC: 启动超时计时器(5s)
     
-    S->>QS: 收到 REGISTER
+    S->>QS: decode() -> handler()
     QS->>A: QOS_ACK (seqId=100)
     A->>QC: 收到 ACK
     deactivate QC
     Note right of QC: 确认送达
     
-    QS->>H: 递交给业务层
+    QS->>H: SmartBoardTioHandler
     
     H->>H: 验证设备合法性
     H->>H: 生成配置数据
     
-    H->>QS: 发送配置 (REGISTER_ACK, qos=1, seqId=200)
+    H->>QS: TioQosAdapter.send()
+    QS->>S: Tio.send()
     activate QS
-    Note right of QS: 启动超时计时器
+    Note right of QS: REGISTER_ACK (qos=1, seqId=200)<br/>启动超时计时器
     
-    QS->>A: REGISTER_ACK (seqId=200, payload=配置)
+    S->>A: REGISTER_ACK (payload=配置)
+    A->>QC: decode() -> handler()
     
-    A->>QC: 收到 REGISTER_ACK
-    QC->>S: QOS_ACK (seqId=200)
-    S->>QS: 收到 ACK
+    A->>S: QOS_ACK (seqId=200)
+    S->>QS: 收到确认
     deactivate QS
-    Note right of QS: 确认送达
     
     QC->>A: 递交业务层
     A->>A: 保存配置
@@ -617,16 +926,18 @@ sequenceDiagram
     
     Note over A,S: ========== 心跳保活 ==========
     loop 每30秒
+        A->>A: SmartBoardClient.sendHeartbeat()
         A->>S: HEARTBEAT (qos=0)
         Note right of A: 无需确认
         S->>A: HEARTBEAT_ACK (可选)
     end
     
     Note over A,S: ========== 服务端主动推送 ==========
-    H->>QS: 课表更新 (TIMETABLE_PUSH, qos=1)
+    H->>QS: DevicePushService.pushTimetable()
+    QS->>S: Tio.send()
     activate QS
-    QS->>A: TIMETABLE_PUSH
-    A->>QC: 收到推送
+    QS->>A: TIMETABLE_PUSH (qos=1)
+    A->>QC: handler() 自动回复 QOS_ACK
     QC->>S: QOS_ACK
     S->>QS: 收到确认
     deactivate QS
@@ -637,26 +948,30 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant A as Android班牌
+    participant A as Android班牌<br/>(TioClient)
     participant QC as Client QoSManager
-    participant S as 服务器
+    participant S as t-io Server
     
-    A->>QC: 发送消息 (seqId=100)
+    A->>QC: SmartBoardClient.send()
+    Note right of QC: 构造消息<br/>(qos=1, seqId=100)
+    
     activate QC
-    
-    QC->>S: SEND
+    QC->>A: Tio.send()
+    A->>S: SEND (seqId=100)
     Note right of QC: 等待 ACK (5s)
     
     Note over S: 网络丢包
     
     Note right of QC: 超时未收到...
-    QC->>S: RESEND (seqId=100, 重传标志)
+    QC->>A: Tio.send()
+    A->>S: RESEND (seqId=100, 重传标志)
     Note right of QC: 重试次数: 1<br/>超时时间: 10s
     
     Note over S: 再次丢包
     
     Note right of QC: 超时未收到...
-    QC->>S: RESEND (seqId=100, 重传标志)
+    QC->>A: Tio.send()
+    A->>S: RESEND (seqId=100, 重传标志)
     Note right of QC: 重试次数: 2<br/>超时时间: 20s
     
     S->>A: QOS_ACK
@@ -742,21 +1057,46 @@ public enum ConnectionState {
 ### Q3: Android 端如何检测连接断开？
 
 **A**: 
-- 心跳超时检测：如果连续 N 次心跳无响应，认为连接断开
-- Socket 异常捕获：在 `receiveLoop` 中捕获 `IOException`
-- 重连策略：指数退避重连（1s → 2s → 4s → ... → 60s）
+- t-io 自动心跳检测：配置 `heartbeatTimeout`，超时自动触发 `onHeartbeatTimeout`
+- 连接状态监听：通过 `TioClientListener.onBeforeClose` 监听连接关闭
+- 重连策略：在监听器中调度重连任务
 
 ```java
-private void receiveLoop() {
-    try {
-        while (isConnected) {
-            ProtocolPacket packet = codec.decode(inputStream);
-            onPacketReceived(packet);
-        }
-    } catch (IOException e) {
-        Log.e("TcpConnection", "连接断开", e);
-        onDisconnected();
-        scheduleReconnect();  // 调度重连
+public class SmartBoardClientListener implements TioClientListener {
+    
+    @Override
+    public void onBeforeClose(ChannelContext channelContext, Throwable throwable, 
+                               String remark, boolean isRemove) {
+        Log.w("SmartBoardClient", "连接关闭: " + remark);
+        
+        // 清理 QoS 数据
+        qosManager.clearChannel(channelContext.getId());
+        
+        // 调度重连（指数退避）
+        scheduleReconnect();
+    }
+    
+    @Override
+    public boolean onHeartbeatTimeout(ChannelContext channelContext, Long interval, 
+                                       int heartbeatTimeoutCount) {
+        Log.w("SmartBoardClient", "心跳超时");
+        // 返回 false 让 t-io 关闭连接，然后通过 onBeforeClose 重连
+        return false;
+    }
+    
+    private void scheduleReconnect() {
+        // 指数退避：1s -> 2s -> 4s -> ... -> 60s(max)
+        long delay = Math.min(1000 * (1L << reconnectCount), 60000);
+        reconnectCount++;
+        
+        scheduler.schedule(() -> {
+            try {
+                client.connect();
+                reconnectCount = 0;  // 重置计数
+            } catch (Exception e) {
+                scheduleReconnect();  // 继续重试
+            }
+        }, delay, TimeUnit.MILLISECONDS);
     }
 }
 ```

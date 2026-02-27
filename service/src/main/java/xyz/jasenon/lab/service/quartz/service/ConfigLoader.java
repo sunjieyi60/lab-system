@@ -51,7 +51,7 @@ public class ConfigLoader {
     /**
      * 更新任务的启用状态。
      */
-    public void updateTaskEnable(String taskId, String enable) {
+    public void updateTaskEnable(String taskId, Boolean enable) {
         ScheduleTask t = scheduleTaskMapper.selectById(taskId);
         if (t != null) {
             t.setEnable(enable);
@@ -147,6 +147,7 @@ public class ConfigLoader {
         for (Alarm alarm : scheduleConfig.getAlarmGroup()){
             alarmMapper.insert(alarm);
         }
+        timeRuleMapper.insert(scheduleConfig.getTimeRule());
         // 注意：任务注册由调用者（如Controller）负责，避免循环依赖
         return Result.success(true);
     }
@@ -259,7 +260,7 @@ public class ConfigLoader {
                 String[] args = new String[2];
                 String expr = condition.getExpr();
                 if (expr.startsWith("#") && expr.contains(".")){
-                    String[] split = expr.replace("#","").split("\\.");
+                    String[] split = expr.replace("#","").replace("{","").replace("}","").split(" ")[0].split("\\.");
                     args[0] = split[0];
                     args[1] = split[1];
                 }else {
@@ -303,10 +304,10 @@ public class ConfigLoader {
 
     public Result<Boolean> verifyTimeRule(TimeRule timeRule, ScheduleTask task){
         if (!timeRule.getScheduleTaskId().equals(task.getId())){
-            return Result.error(false, MessageFormat.format("TimeRule:{}不属于当前任务",timeRule.getId()));
+            return Result.error(false, MessageFormat.format("TimeRule:{0} 不属于当前任务",timeRule.getId()));
         }
-        if (timeRule.getStartWeek()<=0 && timeRule.getEndWeek()<timeRule.getStartWeek()) {
-            return Result.error(false, MessageFormat.format("TimeRule:{}的开始周和结束周不合法", timeRule.getId()));
+        if (timeRule.getStartWeek()<=0 && timeRule.getEndWeek()>timeRule.getStartWeek()) {
+            return Result.error(false, MessageFormat.format("TimeRule:{0} 的开始周和结束周不合法", timeRule.getId()));
         }
         return Result.success(true);
     }
