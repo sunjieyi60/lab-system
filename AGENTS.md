@@ -1,43 +1,50 @@
-# 实验室管理系统 (Laboratory Management System)
+# Lab System - 实验室综合管理系统
 
 ## 项目概述
 
-本项目是一个**实验室管理系统**（Lab System），用于管理高校或研究机构的实验室资源，包括：
-- 用户与权限管理
-- 实验室、楼栋、院系基础数据管理
-- 教务排课管理（课程、教师、学期、课表）
-- IoT设备管理（空调、灯光、门禁、传感器、断路器等）
-- 智能任务调度与自动控制
-- 数据分析和能耗统计
+这是一个实验室综合管理系统（Lab Management System），用于管理高校或研究机构的实验室、设备、课程安排和门禁控制。系统采用多模块架构，包含后端服务、MQTT通信服务、智慧班牌服务和Android客户端。
 
-项目采用**多模块 Maven 架构**，主要语言为 **Java 17**，基于 **Spring Boot 3.5.5** 构建。
+### 核心功能
+
+- **实验室管理**：楼宇、院系、实验室的基础数据管理
+- **设备管理**：支持多种设备类型（空调、照明、门禁、传感器、断路器）
+- **课程排课**：学期、课程、教师、课表安排
+- **定时任务**：基于Quartz的条件-动作调度系统
+- **设备控制**：通过MQTT协议与RS485/Socket网关通信
+- **智慧班牌**：TCP长连接班牌系统，支持人脸识别门禁
 
 ---
 
 ## 技术栈
 
-### 核心技术
-| 组件 | 版本 | 说明 |
-|------|------|------|
-| Java | 17 | 编程语言 |
-| Spring Boot | 3.5.5 | 基础框架 |
-| MyBatis Plus | 3.5.12 | ORM 框架 |
-| MyBatis Plus Join | 1.5.4 | 联表查询扩展 |
-| MySQL | 9.x | 数据库（Connector 9.4.0）|
-| Redis | - | 缓存与会话（Redisson 3.52.0）|
+### 后端技术
 
-### 中间件与工具
-| 组件 | 版本 | 说明 |
+| 技术 | 版本 | 用途 |
 |------|------|------|
-| Sa-Token | 1.44.0 | 权限认证与会话管理 |
+| Java | 17 | 开发语言 |
+| Spring Boot | 3.5.5 | 基础框架 |
+| Maven | - | 构建工具 |
+| MySQL | 8.x | 关系型数据库 |
+| Redis | - | 缓存与会话 |
+| MyBatis Plus | 3.5.12 | ORM框架 |
 | Quartz | - | 定时任务调度 |
-| Eclipse Paho | 1.2.5 | MQTT 客户端 |
-| t-io | 3.8.7 | TCP 通信框架 |
-| Jackson | 2.20.0 | JSON 处理 |
-| FastJSON2 | 2.0.43 | 备用 JSON 处理 |
+| t-io | 3.8.7 | TCP通信框架 |
+| MQTT (Paho) | 1.2.5 | 物联网消息协议 |
+| Sa-Token | 1.44.0 | 权限认证 |
+| Redisson | 3.52.0 | Redis客户端 |
 | Hutool | 5.8.40 | 工具类库 |
 | Lombok | 1.18.30 | 代码简化 |
-| Swagger | 3.0.0 | API 文档 |
+
+### Android客户端技术
+
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| Kotlin | 2.0.21 | 开发语言 |
+| Android Gradle Plugin | 9.0.0 | 构建工具 |
+| Jetpack Compose | 2024.09.00 | UI框架 |
+| t-io | 3.8.7 | TCP通信 |
+| FaceAISDK | 2026.01.15 | 人脸识别 |
+| minSdk/targetSdk | 30 | Android版本 |
 
 ---
 
@@ -45,350 +52,332 @@
 
 ```
 lab-system/
-├── pom.xml                 # 根 POM，统一管理依赖版本
+├── pom.xml                          # 父POM，统一管理依赖版本
 ├── sql/
-│   └── db.sql             # 数据库初始化脚本
-├── common/                # 公共模块（实体、工具、常量）
-├── service/               # 主服务模块（REST API，端口 8088）
-├── mqtt/                  # MQTT 服务模块（端口 8089）
-├── class_time_table/      # 智慧班牌服务（端口 8083）
-├── schedule/              # 排课相关（含前端 demo）
-└── tio-client/            # t-io 通信客户端
+│   └── db.sql                       # 数据库初始化脚本（含表结构和初始数据）
+│
+├── common/                          # 公共模块
+│   ├── entity/                      # 实体类（JPA/MyBatis注解）
+│   │   ├── base/                    # 基础数据实体（楼宇、院系、用户等）
+│   │   ├── device/                  # 设备相关实体
+│   │   ├── class_time_table/        # 课表相关实体
+│   │   └── record/                  # 设备状态记录实体
+│   ├── command/                     # 命令定义（设备控制指令）
+│   ├── dto/task/                    # 任务DTO
+│   └── utils/                       # 工具类（R统一响应、CRC校验等）
+│
+├── service/                         # 主业务服务模块（端口8088）
+│   ├── controller/                  # REST API控制器
+│   ├── service/                     # 业务逻辑层
+│   ├── mapper/                      # MyBatis数据访问层
+│   ├── dto/                         # 数据传输对象
+│   ├── vo/                          # 视图对象
+│   ├── quartz/                      # 定时任务配置与实现
+│   ├── strategy/                    # 策略模式实现
+│   │   ├── device/                  # 设备轮询策略
+│   │   └── task/                    # 任务发送策略（MQTT/Socket）
+│   └── aspect/                      # AOP切面（日志、权限）
+│
+├── mqtt/                            # MQTT通信服务模块（端口8089）
+│   ├── mqtt/client/                 # MQTT客户端实现
+│   ├── service/                     # 设备服务实现
+│   └── controller/TaskController.java # 任务接收接口
+│
+├── class_time_table/                # 智慧班牌服务模块（端口8083/9000）
+│   └── t_io/                        # t-io TCP服务器相关
+│       ├── adapter/                 # 协议适配器
+│       ├── codec/                   # 编解码器
+│       ├── config/                  # 服务器配置
+│       ├── handler/                 # 消息处理器
+│       └── listener/                # 连接监听器
+│
+├── tio-protocol/                    # 纯Java TCP协议层（可被Android复用）
+│   ├── ProtocolPacket.java          # 协议数据包
+│   ├── PacketBuilder.java           # 数据包构建器
+│   ├── codec/PacketCodec.java       # 编解码器
+│   ├── qos/QosManager.java          # QoS管理器（三级QoS实现）
+│   └── ...
+│
+├── tio-client/                      # t-io测试客户端
+│
+└── class_time_table_android/        # 智慧班牌Android客户端
+    ├── app/                         # 主应用模块
+    │   ├── MainActivity.kt          # 主界面
+    │   ├── network/                 # 网络通信（t-io客户端）
+    │   ├── ui/                      # Jetpack Compose UI
+    │   └── config/                  # 配置管理
+    └── faceAILib/                   # 人脸识别库模块
 ```
 
-### 模块说明
+---
 
-#### 1. common 模块
-- **定位**：公共依赖模块，被其他模块引用
-- **内容**：
-  - `entity/`：数据库实体类（BaseEntity、设备实体、教务实体等）
-  - `dto/`：数据传输对象（Task、TaskPriority）
-  - `command/`：设备命令相关（Command、CommandLine、CheckType、SendType）
-  - `utils/`：工具类（R 统一响应、CRC 校验、表达式求值等）
-  - `service/`：通用 Service 接口定义
+## 模块依赖关系
 
-#### 2. service 模块（核心服务）
-- **端口**：8088
-- **主类**：`xyz.jasenon.lab.service.ServiceApplication`
-- **功能**：
-  - 用户管理（创建、编辑、删除、登录）
-  - 基础数据（部门、楼栋、实验室）
-  - 设备管理（增删改查、控制指令下发）
-  - 教务管理（课程、教师、学期、课表 CRUD）
-  - 数据分析（能耗统计、空调运行数据）
-  - 智能调度（Quartz 定时任务、策略配置）
-
-**包结构**：
 ```
-service/
-├── controller/      # REST API 控制器
-├── service/         # 业务逻辑层（接口 + impl）
-├── mapper/          # MyBatis 数据访问层
-├── dto/             # 请求参数对象（CreateXXX、EditXXX、DeleteXXX）
-├── vo/              # 响应视图对象
-├── entity/          # 业务实体（如 UserPermission）
-├── aspect/          # AOP 切面（权限检查、日志）
-├── annotation/      # 自定义注解（@RequestPermission、@LogPoint）
-├── strategy/        # 策略模式（设备轮询、任务发送）
-├── quartz/          # 定时任务相关
-├── config/          # 配置类
-└── exception/       # 全局异常处理
+                    ┌─────────────┐
+                    │   parent    │
+                    │   (pom.xml) │
+                    └──────┬──────┘
+                           │
+       ┌───────────┬───────┴───────┬───────────┐
+       │           │               │           │
+       ▼           ▼               ▼           ▼
+  ┌────────┐  ┌────────┐    ┌──────────┐  ┌──────────┐
+  │ common │  │tio-protocol│ │tio-client│  │service   │
+  └───┬────┘  └────┬───┘    └──────────┘  └────┬─────┘
+      │            │                            │
+      │            └────────────────────────────┘
+      │                         │
+      ▼                         ▼
+ ┌─────────┐              ┌──────────┐
+ │  mqtt   │              │class_time│
+ │(端口8089)│              │_table    │
+ └─────────┘              │(端口8083)│
+                          └──────────┘
 ```
-
-#### 3. mqtt 模块
-- **端口**：8089
-- **主类**：`xyz.jasenon.lab.mqtt.MqttApplication`
-- **功能**：
-  - MQTT 客户端连接管理（订阅/发布）
-  - 设备消息处理（空调、灯光、门禁、传感器、断路器）
-  - 任务队列管理（优先级阻塞队列）
-  - 报警上报
-
-#### 4. class_time_table 模块（智慧班牌）
-- **端口**：8083
-- **t-io 端口**：9000
-- **主类**：`xyz.jasenon.lab.class_time_table.ClassTimeTableApplication`
-- **状态**：已重构为**基础架构版本**，业务逻辑待重新规划
-- **功能**：
-  - 智能班牌设备 TCP 长连接管理（t-io）
-  - 基于 tio-protocol 的 QoS 机制（支持 AT_LEAST_ONCE/EXACTLY_ONCE）
-  - 协议编解码（可复用于 Android）
-
-**重构说明（2026-02-22）**：
-1. 新增 `tio-protocol` 模块：纯 Java QoS 协议实现，可被 Android 复用
-2. 移除复杂的分片机制，仅保留 QoS 核心功能
-3. 清除所有业务实现代码（注册认证、课表、人脸等），待重新规划
-4. 保留 t-io 基础设施和协议适配层
-
-**新模块**：
-- `tio-protocol`：通用 TCP 协议层（QoS、编解码），零框架依赖
-- `class_time_table/t_io/adapter`：t-io 与 tio-protocol 的适配层
 
 ---
 
 ## 构建与运行
 
 ### 环境要求
+
 - JDK 17+
 - Maven 3.8+
 - MySQL 8.0+
 - Redis 6.0+
+- Android Studio (用于Android客户端)
 
-### 构建命令
+### 数据库初始化
+
 ```bash
-# 编译整个项目
-mvn clean compile
-
-# 打包（生成可执行 JAR）
-mvn clean package
-
-# 跳过测试打包
-mvn clean package -DskipTests
-
-# 安装到本地仓库
-mvn clean install
+# 执行SQL脚本创建数据库和初始数据
+mysql -u root -p < sql/db.sql
 ```
 
-### 运行服务
+### 后端服务构建
+
 ```bash
-# 运行主服务（端口 8088）
+# 编译整个项目（跳过测试）
+mvn clean install -DskipTests
+
+# 运行主服务（端口8088）
 cd service
 mvn spring-boot:run
-# 或
-java -jar target/service-0.0.1-SNAPSHOT.jar
 
-# 运行 MQTT 服务（端口 8089）
+# 运行MQTT服务（端口8089）
 cd mqtt
 mvn spring-boot:run
 
-# 运行智慧班牌服务（端口 8083）
+# 运行智慧班牌服务（端口8083）
 cd class_time_table
 mvn spring-boot:run
 ```
 
-### 数据库初始化
-1. 创建数据库 `lab_sys4`
-2. 执行 `sql/db.sql` 初始化表结构
+### Android客户端构建
 
-### 配置文件
-各模块的 `application.yaml` 位于 `src/main/resources/` 下：
+```bash
+cd class_time_table_android
 
-**service 模块关键配置**：
-```yaml
-server:
-  port: 8088
+# 编译
+./gradlew build
 
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/lab_sys4?...
-    username: root
-    password: your_password
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 0
-
-task:
-  send:
-    mqtt-task-host: http://localhost:8089/task/add  # MQTT 服务地址
-  polling:
-    core-pool-size: 8       # 设备轮询线程数
-    period: 5               # 轮询间隔（秒）
+# 安装到设备
+./gradlew installDebug
 ```
 
 ---
 
-## 代码规范与约定
+## 服务端口配置
 
-### 1. 包命名
-- 基础包：`xyz.jasenon.lab.{module}`
-- 示例：`xyz.jasenon.lab.service.controller`
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| service | 8088 | 主业务API服务 |
+| mqtt | 8089 | MQTT消息服务（HTTP接口） |
+| class_time_table | 8083 | HTTP管理接口 |
+| class_time_table | 9000 | t-io TCP长连接端口 |
 
-### 2. 类命名规范
+---
+
+## 数据库表结构
+
+### 核心表
+
+| 表名 | 说明 |
+|------|------|
+| `user` | 用户表 |
+| `dept` | 院系部门 |
+| `building` | 楼宇 |
+| `laboratory` | 实验室 |
+| `device` | 设备主表 |
+| `rs485_gateway` | RS485网关 |
+| `socket_gateway` | Socket网关 |
+
+### 设备记录表
+
+| 表名 | 说明 |
+|------|------|
+| `access_record` | 门禁记录 |
+| `air_condition_record` | 空调状态记录 |
+| `light_record` | 照明状态记录 |
+| `sensor_record` | 传感器数据记录 |
+| `circuit_break_record` | 断路器状态记录 |
+
+### 课表相关
+
+| 表名 | 说明 |
+|------|------|
+| `semester` | 学期 |
+| `course` | 课程 |
+| `teacher` | 教师 |
+| `course_schedule` | 课程安排 |
+
+### 定时任务（Quartz）
+
+| 表名 | 说明 |
+|------|------|
+| `schedule_task` | 任务定义 |
+| `condition_group` | 条件组 |
+| `condition` | 条件定义 |
+| `action_group` | 动作组 |
+| `action` | 动作定义 |
+| `time_rule` | 时间规则 |
+
+---
+
+## tio-protocol 协议规范
+
+### 数据包结构
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           MAGIC (0x5A5A5A5A)                  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| VER | CMD   |    SEQ_ID       | QOS | FLAGS | RSV | CHECKSUM  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           LENGTH                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                           PAYLOAD                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+### QoS级别
+
+| 级别 | 值 | 说明 | 使用场景 |
+|------|-----|------|----------|
+| AT_MOST_ONCE | 0 | 最多一次 | 心跳包 |
+| AT_LEAST_ONCE | 1 | 至少一次 | 指令下发、数据同步 |
+| EXACTLY_ONCE | 2 | 精确一次 | 关键业务操作 |
+
+### 命令类型
+
+```java
+public class CommandType {
+    public static final byte QOS_ACK = 0x00;        // QoS确认
+    public static final byte REGISTER = 0x01;       // 设备注册
+    public static final byte REGISTER_ACK = 0x02;   // 注册响应
+    public static final byte HEARTBEAT = 0x10;      // 心跳
+    public static final byte HEARTBEAT_ACK = 0x11;  // 心跳响应
+    // 0x20-0xFF 业务扩展
+}
+```
+
+---
+
+## 代码规范
+
+### 包命名规范
+
+- 基础包名：`xyz.jasenon.lab`
+- 模块子包：`xyz.jasenon.lab.{module}`
+
+### 类命名规范
+
 | 类型 | 后缀 | 示例 |
 |------|------|------|
-| 实体类 | 无 | `User`、`Device`、`Course` |
-| 数据传输对象 | DTO | `CreateUser`、`EditUser` |
-| 视图对象 | Vo | `UserVo`、`DeviceVo` |
-| 服务接口 | I + Service | `IUserService` |
-| 服务实现 | Impl | `UserServiceImpl` |
-| Mapper | Mapper | `UserMapper` |
-| 控制器 | Controller | `UserController` |
-| 工具类 | 无/Util | `R`、`CrcChecker` |
+| 实体类 | 无 | `User`, `Device` |
+| 服务接口 | `I`前缀 + `Service` | `IUserService` |
+| 服务实现 | `ServiceImpl` | `UserServiceImpl` |
+| 控制器 | `Controller` | `UserController` |
+| Mapper | `Mapper` | `UserMapper` |
+| DTO | 无（动词前缀） | `CreateUser`, `EditUser` |
+| VO | `Vo` | `UserVo` |
 
-### 3. 统一响应格式
-使用 `R<T>` 类包装所有 API 响应：
-```json
-{
-  "ok": true,
-  "code": 0,
-  "msg": "业务处理成功",
-  "data": {}
-}
-```
+### 统一响应格式
 
-### 4. 权限注解
-使用 `@RequestPermission` 标注需要权限的接口：
+使用 `common.utils.R<T>` 作为统一响应包装：
+
 ```java
-@RequestPermission(allowed = {Permissions.USER_ADD})
-@PostMapping("/create")
-public R createUser(@RequestBody CreateUser dto) {
-    // ...
-}
-```
+// 成功响应
+R.success(data);
+R.success(data, "操作成功");
 
-### 5. 日志注解
-使用 `@LogPoint` 记录操作日志：
-```java
-@LogPoint(title = "'账号管理'", sqEl = "#createUser", clazz = CreateUser.class)
+// 失败响应
+R.fail("错误消息");
+R.fail(500, "错误消息");
 ```
-
-### 6. 参数校验
-- 使用 JSR-380 注解（`@NotNull`、`@NotBlank` 等）
-- 控制器参数使用 `@Validated` 注解
 
 ---
 
 ## 测试
 
-### 测试框架
-- JUnit 5（Spring Boot Starter Test）
+### 测试文件位置
+
+```
+{module}/src/test/java/xyz/jasenon/lab/{module}/
+```
 
 ### 运行测试
+
 ```bash
 # 运行所有测试
 mvn test
 
 # 运行特定模块测试
-cd service && mvn test
+cd service
+mvn test
 
-# 运行单个测试类
+# 运行特定测试类
 mvn test -Dtest=UserControllerTest
 ```
 
-### 测试结构
-```
-src/test/java/xyz/jasenon/lab/{module}/
-├── controller/          # 控制器测试
-├── service/             # 服务层测试
-└── integration/         # 集成测试
-```
+---
+
+## 安全注意事项
+
+1. **数据库密码**：配置文件中的数据库密码为开发环境使用，生产环境应使用环境变量或配置中心
+2. **JWT密钥**：Sa-Token的密钥配置应在生产环境重新生成
+3. **MQTT凭证**：MQTT连接用户名/密码应从配置中心获取
+4. **设备认证**：智慧班牌设备注册需要实现设备证书验证
+5. **人脸识别数据**：人脸特征数据在本地加密存储，不得上传服务器
 
 ---
 
-## 安全与权限
+## 开发参考资料
 
-### 权限体系
-采用**树形权限结构**（定义在 `Permissions` 枚举）：
-```
-ROOT
-├── USER（用户管理）
-│   ├── USER_ADD
-│   ├── USER_EDIT
-│   └── USER_DELETE
-├── ACADEMIC_AFFAIRS_MANAGEMENT（教务管理）
-│   ├── SCHEDULE_CLASSES
-│   ├── SCHEDULE_CLASSES_VIEW
-│   └── SEMESTER_SETTINGS
-├── CONTROL_CENTER（控制中心）
-│   ├── DEVICE_ADD
-│   ├── DEVICE_CONTROL
-│   ├── DEVICE_SMART_CONTROL
-│   └── DEVICE_ALARM_SETTINGS
-├── DATA_ANALYSIS（数据分析）
-│   ├── ACADEMIC_AFFAIRS_ANALYSIS
-│   ├── LABORATORY_POWER_CONSUMPTION
-│   └── LABORATORY_CENTRAL_AIRCONDITION
-└── BASE_SETTINGS（基础设置）
-    ├── BASE_CUD
-    └── BASE_VIEW
-```
+项目根目录下的 `后端开发参考资料/` 包含以下文档：
 
-### 认证机制
-- **Sa-Token**：负责登录态管理与权限校验
-- **Token**：登录成功后返回，后续请求携带
-- **切面检查**：`PermissionCheck` 切面拦截带 `@RequestPermission` 的方法
-
-### 密码加密
-- 使用 MD5 加密（`Md5Encrypt` 处理器）
+- 门禁系统开发参考
+- 电源控制系统开发参考  
+- 通视智能设备通讯协议
+- 考勤系统开发参考
+- 综合采集器开发参考
+- RS-485接口设备地址分配表
+- 电子班牌移动端部署文档
+- 远程接入说明
+- 教室系统开发参考
+- 整体功能介绍PPT
 
 ---
 
-## 核心业务概念
+## 作者
 
-### 1. 多态设备创建
-创建设备时通过 `deviceType` 字段路由到具体子类型：
-- `AirCondition`：空调设备
-- `Light`：灯光设备
-- `Access`：门禁设备
-- `Sensor`：传感器
-- `CircuitBreak`：断路器
-
-### 2. 网关类型
-- **RS485 Gateway**：MQTT 通信网关，通过 Topic 收发消息
-- **Socket Gateway**：TCP 长连接网关，通过 MAC 地址识别
-
-### 3. 任务调度
-- **Quartz**：定时任务调度（如定时开关设备）
-- **任务优先级**：NORMAL、HIGH、URGENT
-- **任务分发策略**：MQTT 策略、Socket 策略
-
-### 4. 课表排课冲突检测
-创建课表时自动检测冲突：
-- 主体重叠（同实验室或同教师）
-- 星期交集
-- 周次交集（单双周匹配）
-- 时间段或节次重叠
+**Jasenon_ce**
 
 ---
 
-## 部署建议
-
-### 开发环境
-```bash
-# 1. 启动 MySQL 和 Redis
-# 2. 初始化数据库（执行 sql/db.sql）
-# 3. 启动 service 模块（端口 8088）
-# 4. 启动 mqtt 模块（端口 8089）
-# 5. 启动 class_time_table 模块（端口 8083）
-```
-
-### 生产环境
-1. 修改各模块 `application.yaml` 中的数据库、Redis、MQTT 地址
-2. 使用 `mvn package` 打包生成 JAR
-3. 使用 `nohup` 或系统服务（systemd）运行 JAR
-4. 配置反向代理（Nginx）处理跨域和负载均衡
-
-### 端口占用
-| 服务 | 端口 | 说明 |
-|------|------|------|
-| service | 8088 | 主 API 服务 |
-| mqtt | 8089 | MQTT 通信服务 |
-| class_time_table | 8083 | 智慧班牌 HTTP |
-| class_time_table | 9000 | t-io TCP 端口 |
-
----
-
-## API 文档
-
-详见 `API.md` 文件，包含完整的接口定义、请求/响应示例。
-
-主要接口分类：
-- 用户管理：`/user/*`
-- 部门管理：`/dept/*`
-- 楼栋管理：`/building/*`
-- 实验室管理：`/laboratory/*`
-- 网关管理：`/gateway/*`
-- 设备管理：`/device/*`
-- 教务管理：`/academic/*`
-- 数据分析：`/analysis/*`
-- 日志查询：`/log/*`
-
----
-
-## 参考资料
-
-- `后端开发参考资料/`：项目相关技术文档
-- `API.md`：接口文档
-- `sql/db.sql`：数据库脚本
+*最后更新：2026-02-25*
