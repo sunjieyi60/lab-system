@@ -10,6 +10,8 @@ import xyz.jasenon.lab.core.cache.redis.RedisCacheManager;
 import xyz.jasenon.lab.core.exception.ImException;
 import xyz.jasenon.lab.core.listener.AbstractImStoreBindListener;
 import xyz.jasenon.lab.core.message.MessageHelper;
+import xyz.jasenon.lab.core.packets.ClassTimeTable;
+import xyz.jasenon.lab.core.packets.ClassTimeTableStatusType;
 import xyz.jasenon.lab.core.packets.Group;
 import xyz.jasenon.lab.core.packets.User;
 import xyz.jasenon.lab.core.packets.UserStatusType;
@@ -60,13 +62,13 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 	}
 
 	@Override
-	public void onAfterUserBind(ImChannelContext imChannelContext, User user) throws ImException {
-		if(!isStore() || Objects.isNull(user)) {
+	public void onAfterUserBind(ImChannelContext imChannelContext, ClassTimeTable classTimeTable) throws ImException {
+		if(!isStore() || Objects.isNull(classTimeTable)) {
 			return;
 		}
-		user.setStatus(UserStatusType.ONLINE.getStatus());
-		this.messageHelper.updateUserTerminal(user);
-		initUserInfo(user);
+		classTimeTable.setStatus(ClassTimeTableStatusType.ONLINE.getStatus());
+		this.messageHelper.updateClassTimeTableTerminal(classTimeTable);
+		initClassTimeTableInfo(user);
 	}
 
 	@Override
@@ -75,7 +77,7 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 			return;
 		}
 		user.setStatus(UserStatusType.OFFLINE.getStatus());
-		this.messageHelper.updateUserTerminal(user);
+		this.messageHelper.updateClassTimeTableTerminal(user);
 	}
 
 	/**
@@ -134,19 +136,20 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 
 	/**
 	 * 初始化用户终端协议类型;
-	 * @param user
+	 *
+	 * @param classTimeTable
 	 */
-	public void initUserInfo(User user){
-		if(!isStore() || user == null) {
+	public void initClassTimeTableInfo(ClassTimeTable classTimeTable){
+		if(!isStore() || classTimeTable == null) {
 			return;
 		}
-		String userId = user.getUserId();
-		if(StringUtils.isEmpty(userId)) {
+		String uuid = classTimeTable.getUuid();
+		if(StringUtils.isEmpty(uuid)) {
 			return;
 		}
 		RedisCache userCache = RedisCacheManager.getCache(USER);
-		userCache.put(userId+SUFFIX+INFO, user.clone());
-		List<Group> friends = user.getFriends();
+		userCache.put(uuid+SUFFIX+INFO, classTimeTable.clone());
+		List<Group> friends = classTimeTable.getFriends();
 		if(CollectionUtils.isEmpty(friends))return;
 		userCache.put(userId+SUFFIX+FRIENDS, (Serializable) friends);
 	}

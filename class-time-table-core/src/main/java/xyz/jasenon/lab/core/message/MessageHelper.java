@@ -88,7 +88,7 @@ public interface MessageHelper {
 	 * 更新用户终端协议类型及在线状态;(在线:online:离线:offline)
 	 * @param classTimeTable 客户端信息
 	 */
-	 boolean updateUserTerminal(ClassTimeTable classTimeTable);
+	 boolean updateClassTimeTableTerminal(ClassTimeTable classTimeTable);
 
 
 }
