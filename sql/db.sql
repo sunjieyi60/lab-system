@@ -338,7 +338,7 @@ CREATE TABLE IF NOT EXISTS action (
                                       id              VARCHAR(64) PRIMARY KEY,
                                       device_type     VARCHAR(32) NOT NULL,
                                       device_id       BIGINT      NOT NULL,
-                                      command_line    JSON        NOT NULL,
+                                      command_line    VARCHAR(64) NOT NULL,
                                       args            JSON        NOT NULL,
                                       action_group_id VARCHAR(64) NOT NULL,
                                       schedule_task_id VARCHAR(64) NOT NULL,

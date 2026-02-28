@@ -2,6 +2,7 @@ package xyz.jasenon.lab.service.quartz.model;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@TableName(value = "time_rule", autoResultMap = true)
 public class TimeRule {
 
     /**

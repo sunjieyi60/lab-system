@@ -1,6 +1,7 @@
 package xyz.jasenon.lab.common.entity.class_time_table;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
+@TableName(value = "schedule", autoResultMap = true)
 public class Schedule extends BaseEntity {
 
     /**
