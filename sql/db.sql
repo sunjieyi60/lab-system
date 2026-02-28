@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS laboratory_user (
                                                INDEX idx_lab_user_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS classTimeTable (
                                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                     username VARCHAR(64) NOT NULL,
                                     password VARCHAR(64) NOT NULL,
@@ -396,7 +396,7 @@ ALTER TABLE dept_user
         FOREIGN KEY (dept_id) REFERENCES dept(id)
             ON DELETE CASCADE ON UPDATE CASCADE,
     ADD CONSTRAINT fk_dept_user_user
-        FOREIGN KEY (user_id) REFERENCES user(id)
+        FOREIGN KEY (user_id) REFERENCES classTimeTable(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE laboratory
@@ -409,7 +409,7 @@ ALTER TABLE laboratory_manager
         FOREIGN KEY (laboratory_id) REFERENCES laboratory(id)
             ON DELETE CASCADE ON UPDATE CASCADE,
     ADD CONSTRAINT fk_lab_manager_user
-        FOREIGN KEY (user_id) REFERENCES user(id)
+        FOREIGN KEY (user_id) REFERENCES classTimeTable(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE laboratory_user
@@ -417,7 +417,7 @@ ALTER TABLE laboratory_user
         FOREIGN KEY (laboratory_id) REFERENCES laboratory(id)
             ON DELETE CASCADE ON UPDATE CASCADE,
     ADD CONSTRAINT fk_lab_user_user
-        FOREIGN KEY (user_id) REFERENCES user(id)
+        FOREIGN KEY (user_id) REFERENCES classTimeTable(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE device
@@ -485,12 +485,12 @@ ALTER TABLE sensor_record
 
 ALTER TABLE user_permission
     ADD CONSTRAINT fk_user_permission_user
-        FOREIGN KEY (user_id) REFERENCES user(id)
+        FOREIGN KEY (user_id) REFERENCES classTimeTable(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE user
+ALTER TABLE classTimeTable
     ADD CONSTRAINT fk_user_created_by
-        FOREIGN KEY (create_by) REFERENCES user(id)
+        FOREIGN KEY (create_by) REFERENCES classTimeTable(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- 定时任务表外键
@@ -546,7 +546,7 @@ ALTER TABLE alarm
         FOREIGN KEY (schedule_task_id) REFERENCES schedule_task(id)
             ON DELETE CASCADE ON UPDATE CASCADE,
     ADD CONSTRAINT fk_alarm_user
-        FOREIGN KEY (user_id) REFERENCES user(id)
+        FOREIGN KEY (user_id) REFERENCES classTimeTable(id)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ============================================
@@ -567,7 +567,7 @@ INSERT IGNORE INTO dept_building (id, dept_id, building_id) VALUES
                                                                 (101, 10, 2),
                                                                 (102, 11, 2);
 
-INSERT IGNORE INTO user (id, username, password, real_name, phone, email, create_by) VALUES
+INSERT IGNORE INTO classTimeTable (id, username, password, real_name, phone, email, create_by) VALUES
                                                                                          (100, 'admin', 'e10adc3949ba59abbe56e057f20f883e', '管理员', '13900000001', 'admin@example.com', NULL),
                                                                                          (101, 'teacherA', 'e10adc3949ba59abbe56e057f20f883e', '张老师', '13900000002', 'teacherA@example.com', 100),
                                                                                          (102, 'assistantB', 'e10adc3949ba59abbe56e057f20f883e', '李助教', '13900000003', 'assistantB@example.com', 101);

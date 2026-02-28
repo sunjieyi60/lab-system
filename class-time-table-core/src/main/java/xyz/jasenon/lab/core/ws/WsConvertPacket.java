@@ -1,0 +1,48 @@
+/**
+ * 
+ */
+package xyz.jasenon.lab.core.ws;
+
+import xyz.jasenon.lab.core.ImChannelContext;
+import xyz.jasenon.lab.core.ImPacket;
+import xyz.jasenon.lab.core.ImSessionContext;
+import xyz.jasenon.lab.core.packets.Command;
+import xyz.jasenon.lab.core.protocol.IProtocolConverter;
+import xyz.jasenon.lab.core.ws.WsSessionContext;
+
+/**
+ * Ws协议消息转化包
+ * @author WChao
+ *
+ */
+public class WsConvertPacket implements IProtocolConverter {
+
+	/**
+	 * WebSocket响应包;
+	 */
+	@Override
+	public ImPacket RespPacket(byte[] body, Command command, ImChannelContext channelContext) {
+		ImSessionContext sessionContext = channelContext.getSessionContext();
+		//转ws协议响应包;
+		if(sessionContext instanceof WsSessionContext){
+			WsResponsePacket wsResponsePacket = new WsResponsePacket();
+			wsResponsePacket.setBody(body);
+			wsResponsePacket.setWsOpcode(Opcode.TEXT);
+			wsResponsePacket.setCommand(command);
+			return wsResponsePacket;
+		}
+		return null;
+	}
+
+	@Override
+	public ImPacket RespPacket(ImPacket imPacket, Command command, ImChannelContext imChannelContext) {
+
+		return this.RespPacket(imPacket.getBody(), command, imChannelContext);
+	}
+
+	@Override
+	public ImPacket ReqPacket(byte[] body, Command command, ImChannelContext channelContext) {
+		
+		return null;
+	}
+}
