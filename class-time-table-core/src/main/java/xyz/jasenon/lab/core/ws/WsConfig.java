@@ -1,7 +1,6 @@
 package xyz.jasenon.lab.core.ws;
 
 import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.core.ws.IWsMsgHandler;
 
 /**
  * 

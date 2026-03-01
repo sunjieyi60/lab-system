@@ -6,6 +6,7 @@ import xyz.jasenon.lab.core.listener.ImUserListener;
 import xyz.jasenon.lab.core.message.MessageHelper;
 import xyz.jasenon.lab.core.packets.User;
 import xyz.jasenon.lab.server.config.ImServerConfig;
+
 import java.util.Objects;
 
 /**

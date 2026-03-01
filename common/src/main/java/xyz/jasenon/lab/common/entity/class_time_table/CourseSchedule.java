@@ -1,9 +1,9 @@
 package xyz.jasenon.lab.common.entity.class_time_table;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 @Getter
 @Setter

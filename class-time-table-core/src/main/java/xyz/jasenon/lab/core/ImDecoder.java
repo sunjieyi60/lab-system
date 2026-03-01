@@ -3,11 +3,10 @@
  */
 package xyz.jasenon.lab.core;
 
-import java.nio.ByteBuffer;
-
-import xyz.jasenon.lab.core.ImPacket;
-import xyz.jasenon.lab.core.exception.ImDecodeException;
 import org.tio.core.ChannelContext;
+import xyz.jasenon.lab.core.exception.ImDecodeException;
+
+import java.nio.ByteBuffer;
 /**
  * 版本: [1.0]
  * 功能说明: 

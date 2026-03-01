@@ -1,7 +1,5 @@
 package xyz.jasenon.lab.core.exception;
 
-import xyz.jasenon.lab.core.exception.ImException;
-
 /**
  * @ClassName ImDecodeException
  * @Description TODO

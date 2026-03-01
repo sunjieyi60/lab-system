@@ -3,8 +3,6 @@ package xyz.jasenon.lab.service.quartz.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 /**
  * @author Jasenon_ce
  * @date 2026/1/4

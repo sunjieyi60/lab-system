@@ -3,6 +3,12 @@
  */
 package xyz.jasenon.lab.core.config;
 
+import org.tio.core.TioConfig;
+import org.tio.core.ssl.SslConfig;
+import org.tio.utils.Threads;
+import org.tio.utils.prop.MapWithLockPropSupport;
+import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import xyz.jasenon.lab.core.ImConst;
 import xyz.jasenon.lab.core.ImHandler;
 import xyz.jasenon.lab.core.banner.JimBanner;
@@ -11,12 +17,6 @@ import xyz.jasenon.lab.core.listener.ImClassTimeTableListener;
 import xyz.jasenon.lab.core.listener.ImGroupListener;
 import xyz.jasenon.lab.core.listener.ImGroupListenerAdapter;
 import xyz.jasenon.lab.core.listener.ImListener;
-import org.tio.core.TioConfig;
-import org.tio.core.ssl.SslConfig;
-import org.tio.utils.Threads;
-import org.tio.utils.prop.MapWithLockPropSupport;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
-import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
 import java.io.PrintStream;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -280,7 +280,7 @@ public abstract class ImConfig extends MapWithLockPropSupport implements ImConst
         }
     }
 
-    public ImClassTimeTableListener getImUserListener() {
+    public ImClassTimeTableListener getImClassTimeTableListener() {
         return imClassTimeTableListener;
     }
 

@@ -1,11 +1,10 @@
 package xyz.jasenon.lab.core.listener;
 
-import xyz.jasenon.lab.core.ImChannelContext;
-import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.core.listener.ImGroupListener;
-import xyz.jasenon.lab.core.packets.Group;
 import org.tio.core.ChannelContext;
 import org.tio.core.intf.GroupListener;
+import xyz.jasenon.lab.core.ImChannelContext;
+import xyz.jasenon.lab.core.ImConst;
+import xyz.jasenon.lab.core.packets.Group;
 
 /**
  * @ClassName ImGroupListenerAdapter

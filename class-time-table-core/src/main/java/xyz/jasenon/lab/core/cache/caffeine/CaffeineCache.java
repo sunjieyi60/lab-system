@@ -3,14 +3,13 @@
  */
 package xyz.jasenon.lab.core.cache.caffeine;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
-
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.apache.commons.lang3.StringUtils;
 import xyz.jasenon.lab.core.cache.ICache;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * 

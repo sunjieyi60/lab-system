@@ -11,7 +11,6 @@ import xyz.jasenon.lab.service.service.IUserService;
 import xyz.jasenon.lab.service.vo.base.DeptVo;
 import xyz.jasenon.lab.service.vo.base.UserBizVo;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = ServiceApplication.class)

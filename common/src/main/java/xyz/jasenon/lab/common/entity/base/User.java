@@ -2,13 +2,13 @@ package xyz.jasenon.lab.common.entity.base;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
 import xyz.jasenon.lab.common.entity.handler.Md5Encrypt;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * @author Jasenon_ce

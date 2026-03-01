@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 操作日志分页查询条件（不含分页参数，pageNum/pageSize 由 @RequestParam 单独传）。

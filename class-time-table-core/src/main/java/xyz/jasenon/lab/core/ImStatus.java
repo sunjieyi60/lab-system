@@ -3,8 +3,6 @@
  */
 package xyz.jasenon.lab.core;
 
-import xyz.jasenon.lab.core.Status;
-
 /**
  * 版本: [1.0]
  * 功能说明: 

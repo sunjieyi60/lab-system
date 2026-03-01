@@ -2,30 +2,31 @@ package xyz.jasenon.lab.server.helper.redis;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xyz.jasenon.lab.core.ImChannelContext;
-import xyz.jasenon.lab.core.config.ImConfig;
 import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.cache.redis.RedisCache;
 import xyz.jasenon.lab.core.cache.redis.RedisCacheManager;
+import xyz.jasenon.lab.core.config.ImConfig;
 import xyz.jasenon.lab.core.exception.ImException;
 import xyz.jasenon.lab.core.listener.AbstractImStoreBindListener;
 import xyz.jasenon.lab.core.message.MessageHelper;
 import xyz.jasenon.lab.core.packets.ClassTimeTable;
 import xyz.jasenon.lab.core.packets.ClassTimeTableStatusType;
 import xyz.jasenon.lab.core.packets.Group;
-import xyz.jasenon.lab.core.packets.User;
-import xyz.jasenon.lab.core.packets.UserStatusType;
 import xyz.jasenon.lab.server.config.ImServerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * 消息持久化绑定监听器
+ * 消息持久化绑定监听器（电子班牌版本）
+ * 支持班牌设备的分组绑定/解绑、在线状态管理
+ * 
  * @author WChao
+ * @author Jasenon_ce (重构: 将User概念替换为ClassTimeTable班牌实体)
  * @date 2018年4月8日 下午4:12:31
  */
 public class RedisImStoreBindListener extends AbstractImStoreBindListener {
@@ -43,7 +44,7 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 		if(!isStore()) {
 			return;
 		}
-		initGroupUsers(group, imChannelContext);
+		initGroupClassTimeTables(group, imChannelContext);
 	}
 
 	@Override
@@ -51,93 +52,92 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 		if(!isStore()) {
 			return;
 		}
-		String userId = imChannelContext.getUserId();
+		String uuid = imChannelContext.getUserId();
 		String groupId = group.getGroupId();
-		//移除群组成员;
-		RedisCacheManager.getCache(GROUP).listRemove(groupId+SUFFIX+USER, userId);
-		//移除成员群组;
-		RedisCacheManager.getCache(USER).listRemove(userId+SUFFIX+GROUP, groupId);
+		//移除群组中的班牌;
+		RedisCacheManager.getCache(GROUP).listRemove(groupId + SUFFIX + USER, uuid);
+		//移除班牌所属的群组;
+		RedisCacheManager.getCache(USER).listRemove(uuid + SUFFIX + GROUP, groupId);
 		//移除群组离线消息
-		RedisCacheManager.getCache(PUSH).remove(GROUP+SUFFIX+group+SUFFIX+userId);
+		RedisCacheManager.getCache(PUSH).remove(GROUP + SUFFIX + groupId + SUFFIX + uuid);
 	}
 
 	@Override
-	public void onAfterUserBind(ImChannelContext imChannelContext, ClassTimeTable classTimeTable) throws ImException {
+	public void onAfterClassTimeTableBind(ImChannelContext imChannelContext, ClassTimeTable classTimeTable) throws ImException {
 		if(!isStore() || Objects.isNull(classTimeTable)) {
 			return;
 		}
 		classTimeTable.setStatus(ClassTimeTableStatusType.ONLINE.getStatus());
 		this.messageHelper.updateClassTimeTableTerminal(classTimeTable);
-		initClassTimeTableInfo(user);
+		initClassTimeTableInfo(classTimeTable);
 	}
 
 	@Override
-	public void onAfterUserUnbind(ImChannelContext imChannelContext, User user) throws ImException {
-		if(!isStore() || Objects.isNull(user)) {
+	public void onAfterClassTimeTableUnbind(ImChannelContext imChannelContext, ClassTimeTable classTimeTable) throws ImException {
+		if(!isStore() || Objects.isNull(classTimeTable)) {
 			return;
 		}
-		user.setStatus(UserStatusType.OFFLINE.getStatus());
-		this.messageHelper.updateClassTimeTableTerminal(user);
+		classTimeTable.setStatus(ClassTimeTableStatusType.OFFLINE.getStatus());
+		this.messageHelper.updateClassTimeTableTerminal(classTimeTable);
 	}
 
 	/**
-	 * 初始化群组用户;
-	 * @param group
-	 * @param imChannelContext
+	 * 初始化群组班牌成员;
+	 * @param group 群组对象
+	 * @param imChannelContext 通道上下文
 	 */
-	public void initGroupUsers(Group group ,ImChannelContext imChannelContext){
+	public void initGroupClassTimeTables(Group group, ImChannelContext imChannelContext){
 		String groupId = group.getGroupId();
 		if(!isStore()) {
 			return;
 		}
-		String userId = imChannelContext.getUserId();
-		if(StringUtils.isEmpty(groupId) || StringUtils.isEmpty(userId)) {
+		String uuid = imChannelContext.getUserId();
+		if(StringUtils.isEmpty(groupId) || StringUtils.isEmpty(uuid)) {
 			return;
 		}
-		String group_user_key = groupId+SUFFIX+USER;
+		String groupClassTimeTableKey = groupId + SUFFIX + USER;
 		RedisCache groupCache = RedisCacheManager.getCache(GROUP);
-		List<String> users = groupCache.listGetAll(group_user_key);
-		if(!users.contains(userId)){
-			groupCache.listPushTail(group_user_key, userId);
+		List<String> classTimeTables = groupCache.listGetAll(groupClassTimeTableKey);
+		if(!classTimeTables.contains(uuid)){
+			groupCache.listPushTail(groupClassTimeTableKey, uuid);
 		}
-		initUserGroups(userId, groupId);
+		initClassTimeTableGroups(uuid, groupId);
 		ImSessionContext imSessionContext = imChannelContext.getSessionContext();
-		User onlineUser = imSessionContext.getImClientNode().getClassTimeTable();
-		if(onlineUser == null) {
+		ClassTimeTable onlineClassTimeTable = imSessionContext.getImClientNode().getClassTimeTable();
+		if(onlineClassTimeTable == null) {
 			return;
 		}
-		List<Group> groups = onlineUser.getGroups();
+		List<Group> groups = onlineClassTimeTable.getGroups();
 		if(groups == null) {
 			return;
 		}
 		for(Group storeGroup : groups){
-			if(!groupId.equals(storeGroup.getGroupId()))continue;
-			groupCache.put(groupId+SUFFIX+INFO, storeGroup);
+			if(!groupId.equals(storeGroup.getGroupId())) continue;
+			groupCache.put(groupId + SUFFIX + INFO, storeGroup);
 			break;
 		}
 	}
 
 	/**
-	 * 初始化用户拥有哪些群组;
-	 * @param userId
-	 * @param group
+	 * 初始化班牌拥有的群组列表;
+	 * @param uuid 班牌UUID
+	 * @param groupId 群组ID
 	 */
-	public void initUserGroups(String userId, String group){
+	public void initClassTimeTableGroups(String uuid, String groupId){
 		if(!isStore()) {
 			return;
 		}
-		if(StringUtils.isEmpty(group) || StringUtils.isEmpty(userId)) {
+		if(StringUtils.isEmpty(groupId) || StringUtils.isEmpty(uuid)) {
 			return;
 		}
-		List<String> groups = RedisCacheManager.getCache(USER).listGetAll(userId+SUFFIX+GROUP);
-		if(groups.contains(group))return;
-		RedisCacheManager.getCache(USER).listPushTail(userId+SUFFIX+GROUP, group);
+		List<String> groups = RedisCacheManager.getCache(USER).listGetAll(uuid + SUFFIX + GROUP);
+		if(groups.contains(groupId)) return;
+		RedisCacheManager.getCache(USER).listPushTail(uuid + SUFFIX + GROUP, groupId);
 	}
 
 	/**
-	 * 初始化用户终端协议类型;
-	 *
-	 * @param classTimeTable
+	 * 初始化班牌终端协议类型;
+	 * @param classTimeTable 班牌实体
 	 */
 	public void initClassTimeTableInfo(ClassTimeTable classTimeTable){
 		if(!isStore() || classTimeTable == null) {
@@ -148,15 +148,15 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 			return;
 		}
 		RedisCache userCache = RedisCacheManager.getCache(USER);
-		userCache.put(uuid+SUFFIX+INFO, classTimeTable.clone());
-		List<Group> friends = classTimeTable.getFriends();
-		if(CollectionUtils.isEmpty(friends))return;
-		userCache.put(userId+SUFFIX+FRIENDS, (Serializable) friends);
+		userCache.put(uuid + SUFFIX + INFO, classTimeTable.clone());
+		List<Group> friends = classTimeTable.getGroups(); // 使用groups作为关联分组
+		if(CollectionUtils.isEmpty(friends)) return;
+		userCache.put(uuid + SUFFIX + FRIENDS, (Serializable) friends);
 	}
 
 	/**
 	 * 是否开启持久化;
-	 * @return
+	 * @return true:已开启, false:未开启
 	 */
 	public boolean isStore(){
 		ImServerConfig imServerConfig = ImServerConfig.Global.get();

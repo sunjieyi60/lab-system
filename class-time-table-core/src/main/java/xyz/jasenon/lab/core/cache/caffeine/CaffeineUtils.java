@@ -3,13 +3,13 @@
  */
 package xyz.jasenon.lab.core.cache.caffeine;
 
-import java.util.concurrent.TimeUnit;
-import org.tio.utils.cache.caffeine.DefaultRemovalListener;
-
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+import org.tio.utils.cache.caffeine.DefaultRemovalListener;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wchao

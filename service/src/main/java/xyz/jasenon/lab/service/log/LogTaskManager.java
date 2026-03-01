@@ -8,8 +8,8 @@ import xyz.jasenon.lab.common.entity.device.gateway.RS485Gateway;
 import xyz.jasenon.lab.common.entity.log.AlarmLog;
 import xyz.jasenon.lab.common.entity.log.OperationLog;
 import xyz.jasenon.lab.service.service.IAlarmLogService;
-import xyz.jasenon.lab.service.service.IOperationLogService;
 import xyz.jasenon.lab.service.service.ILaboratoryService;
+import xyz.jasenon.lab.service.service.IOperationLogService;
 import xyz.jasenon.lab.service.service.IRS485GatewayService;
 
 import java.time.LocalDateTime;

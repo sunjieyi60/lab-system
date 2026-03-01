@@ -5,7 +5,6 @@ package xyz.jasenon.lab.core.listener;
 
 import xyz.jasenon.lab.core.ImConst;
 import xyz.jasenon.lab.core.config.ImConfig;
-import xyz.jasenon.lab.core.listener.ImStoreBindListener;
 import xyz.jasenon.lab.core.message.MessageHelper;
 
 /**

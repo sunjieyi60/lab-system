@@ -1,16 +1,12 @@
 package xyz.jasenon.lab.core.cache.redis;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Properties;
-
-import xyz.jasenon.lab.core.JimVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.jasenon.lab.core.JimVersion;
+
+import java.io.*;
+import java.net.URL;
+import java.util.Properties;
 /**
  * @author WChao
  * @date 2018年3月9日 上午1:06:33

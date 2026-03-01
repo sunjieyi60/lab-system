@@ -3,11 +3,11 @@
  */
 package xyz.jasenon.lab.core.packets;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import xyz.jasenon.lab.core.Status;
 import xyz.jasenon.lab.core.utils.JsonKit;
+
+import java.io.Serializable;
+import java.util.Objects;
 /**
  * 版本: [1.0]
  * 功能说明: 

@@ -8,7 +8,6 @@ import xyz.jasenon.lab.core.ImPacket;
 import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.packets.Command;
 import xyz.jasenon.lab.core.protocol.IProtocolConverter;
-import xyz.jasenon.lab.core.ws.WsSessionContext;
 
 /**
  * Ws协议消息转化包

@@ -5,17 +5,17 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.annotation.RequestPermission;
+import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.analysis.AirConditionRunningQueryDto;
 import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
 import xyz.jasenon.lab.service.dto.analysis.EnergyConsumptionQueryDto;
-import xyz.jasenon.lab.service.service.IEnergyConsumptionAnalysisService;
-import xyz.jasenon.lab.service.service.IAirConditionRunningAnalysisService;
 import xyz.jasenon.lab.service.service.IAcademicAnalysisService;
+import xyz.jasenon.lab.service.service.IAirConditionRunningAnalysisService;
+import xyz.jasenon.lab.service.service.IEnergyConsumptionAnalysisService;
 import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningResultVo;
 import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
 import xyz.jasenon.lab.service.vo.analysis.EnergyConsumptionResultVo;
-import xyz.jasenon.lab.service.annotation.RequestPermission;
-import xyz.jasenon.lab.service.constants.Permissions;
 
 /**
  * 数据分析：课程数、学时数、人学时数及分布，供前端画图。

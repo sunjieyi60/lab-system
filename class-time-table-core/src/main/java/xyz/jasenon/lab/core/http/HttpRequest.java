@@ -1,19 +1,17 @@
 package xyz.jasenon.lab.core.http;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tio.core.Node;
+import org.tio.utils.hutool.ArrayUtil;
+import xyz.jasenon.lab.core.http.session.HttpSession;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.apache.commons.lang3.StringUtils;
-import xyz.jasenon.lab.core.http.Cookie;
-import xyz.jasenon.lab.core.http.RequestLine;
-import xyz.jasenon.lab.core.http.session.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.tio.core.Node;
-import org.tio.utils.hutool.ArrayUtil;
 
 /**
  *

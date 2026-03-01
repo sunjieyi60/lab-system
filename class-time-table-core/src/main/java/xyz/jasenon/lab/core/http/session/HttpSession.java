@@ -1,12 +1,12 @@
 package xyz.jasenon.lab.core.http.session;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.http.HttpConfig;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *

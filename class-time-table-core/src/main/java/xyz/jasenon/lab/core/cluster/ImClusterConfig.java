@@ -1,7 +1,5 @@
 package xyz.jasenon.lab.core.cluster;
 
-import xyz.jasenon.lab.core.cluster.ImClusterVO;
-
 /**
  * @desc IM集群配置抽象类
  * @author WChao

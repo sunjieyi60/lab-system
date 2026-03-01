@@ -1,7 +1,5 @@
 package xyz.jasenon.lab.core.ws;
 
-import xyz.jasenon.lab.core.ws.WsPacket;
-
 /**
  *
  * @author wchao

@@ -1,14 +1,12 @@
 package xyz.jasenon.lab.core.http;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import xyz.jasenon.lab.core.http.Cookie;
-import xyz.jasenon.lab.core.http.HttpRequest;
-import xyz.jasenon.lab.core.http.RequestLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.utils.hutool.ZipUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

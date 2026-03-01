@@ -5,11 +5,11 @@ package xyz.jasenon.lab.server.util;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
-import xyz.jasenon.lab.core.ImChannelContext;
-import xyz.jasenon.lab.core.packets.User;
-import xyz.jasenon.lab.server.JimServerAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.jasenon.lab.core.ImChannelContext;
+import xyz.jasenon.lab.core.packets.ClassTimeTable;
+import xyz.jasenon.lab.server.JimServerAPI;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,30 +30,30 @@ public class ImServerKit {
 	 * @param groupId 群组ID
 	 * @return 群组用户集合列表
 	 */
-	public static List<User> getUsersByGroup(String groupId){
+	public static List<ClassTimeTable> getUsersByGroup(String groupId){
 		List<ImChannelContext> channelContexts = JimServerAPI.getByGroup(groupId);
-		List<User> users = Lists.newArrayList();
+		List<ClassTimeTable> classTimeTables = Lists.newArrayList();
 		if(CollectionUtils.isEmpty(channelContexts)){
-			return users;
+			return classTimeTables;
 		}
-		Map<String,User> userMap = new HashMap<>();
+		Map<String,ClassTimeTable> userMap = new HashMap<>();
 		channelContexts.forEach(imChannelContext -> {
-			User user = imChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
-			if(Objects.nonNull(user) && Objects.isNull(userMap.get(user.getUserId()))){
-				userMap.put(user.getUserId(), user);
-				users.add(user);
+			ClassTimeTable classTimeTable = imChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
+			if(Objects.nonNull(classTimeTable) && Objects.isNull(userMap.get(classTimeTable.getUuid()))){
+				userMap.put(classTimeTable.getUuid(), classTimeTable);
+				classTimeTables.add(classTimeTable);
 			}
 		});
-		return users;
+		return classTimeTables;
 	}
 
 	/**
-	 * 根据用户ID获取用户信息(一个用户ID会有多端通道,默认取第一个)
-	 * @param userId 用户ID
-	 * @return user信息
+	 * 根据班牌ID获取班牌信息(一个用户ID会有多端通道,默认取第一个)
+	 * @param uuid 用户ID
+	 * @return classTimeTable信息
 	 */
-	public static User getUser(String userId){
-		List<ImChannelContext> imChannelContexts = JimServerAPI.getByUserId(userId);
+	public static ClassTimeTable getClassTimeTable(String uuid){
+		List<ImChannelContext> imChannelContexts = JimServerAPI.getByUserId(uuid);
 		if(CollectionUtils.isEmpty(imChannelContexts)) {
 			return null;
 		}

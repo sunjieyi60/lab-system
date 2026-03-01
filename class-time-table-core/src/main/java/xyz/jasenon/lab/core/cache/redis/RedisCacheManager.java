@@ -1,12 +1,10 @@
 package xyz.jasenon.lab.core.cache.redis;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import xyz.jasenon.lab.core.cache.redis.RedisCache;
-import xyz.jasenon.lab.core.cache.redis.RedisExpireUpdateTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author WChao

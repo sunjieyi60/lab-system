@@ -2,7 +2,6 @@ package xyz.jasenon.lab.server.processor;
 
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.core.ImPacket;
 import xyz.jasenon.lab.core.packets.Message;
 
 /**

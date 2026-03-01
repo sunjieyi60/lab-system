@@ -17,10 +17,10 @@
 
     <modules>
         <module>common</module>
-        <module>class-time-table-core</module>
         <module>mqtt</module>
         <module>service</module>
         <module>class-time-table</module>
+        <module>class-time-table-core</module>
         <module>class-time-table-server</module>
     </modules>
 

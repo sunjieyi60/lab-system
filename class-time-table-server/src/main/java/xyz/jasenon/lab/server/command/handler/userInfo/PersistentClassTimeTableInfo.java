@@ -7,8 +7,6 @@ import xyz.jasenon.lab.core.packets.ClassTimeTable;
 import xyz.jasenon.lab.core.packets.ClassTimeTableReqBody;
 import xyz.jasenon.lab.server.config.ImServerConfig;
 
-import java.util.Objects;
-
 /**
  * 持久化获取用户信息处理
  */

@@ -1,10 +1,10 @@
 package xyz.jasenon.lab.server;
 
+import org.tio.core.ChannelContext;
+import org.tio.utils.thread.pool.AbstractQueueRunnable;
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.config.ImConfig;
 import xyz.jasenon.lab.server.protocol.AbstractProtocolHandler;
-import org.tio.core.ChannelContext;
-import org.tio.utils.thread.pool.AbstractQueueRunnable;
 
 /**
  * @ClassName ImServerChannelContext

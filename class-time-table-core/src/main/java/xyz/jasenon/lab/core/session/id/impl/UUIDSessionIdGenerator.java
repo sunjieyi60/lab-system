@@ -1,9 +1,9 @@
 package xyz.jasenon.lab.core.session.id.impl;
 
-import xyz.jasenon.lab.core.http.HttpConfig;
-import xyz.jasenon.lab.core.session.id.ISessionIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.jasenon.lab.core.http.HttpConfig;
+import xyz.jasenon.lab.core.session.id.ISessionIdGenerator;
 
 import java.util.UUID;
 

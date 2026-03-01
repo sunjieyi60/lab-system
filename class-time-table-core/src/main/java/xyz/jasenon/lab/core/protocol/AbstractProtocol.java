@@ -3,14 +3,14 @@
  */
 package xyz.jasenon.lab.core.protocol;
 
-import java.nio.ByteBuffer;
-import java.util.Objects;
-
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImConst;
 import xyz.jasenon.lab.core.ImPacket;
 import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.exception.ImException;
+
+import java.nio.ByteBuffer;
+import java.util.Objects;
 /**
  * 协议校验接口抽象类
  * @author WChao

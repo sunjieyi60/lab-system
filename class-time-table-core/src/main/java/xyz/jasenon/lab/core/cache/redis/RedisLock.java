@@ -1,9 +1,9 @@
 package xyz.jasenon.lab.core.cache.redis;
 
-import java.util.Random;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+
+import java.util.Random;
 
 @SuppressWarnings({"deprecation"})
 public class RedisLock {  

@@ -1,10 +1,10 @@
 package xyz.jasenon.lab.common.entity.base;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import xyz.jasenon.lab.common.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 @Getter
 @Setter

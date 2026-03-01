@@ -1,24 +1,20 @@
 package xyz.jasenon.lab.service.integration;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import xyz.jasenon.lab.common.entity.base.User;
-import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.ServiceApplication;
 import xyz.jasenon.lab.service.constants.Permissions;
-import xyz.jasenon.lab.service.dto.user.CreateUser;
 import xyz.jasenon.lab.service.entity.UserPermission;
 import xyz.jasenon.lab.service.mapper.UserMapper;
 import xyz.jasenon.lab.service.mapper.UserPermissionMapper;
-import xyz.jasenon.lab.service.ServiceApplication;
-import xyz.jasenon.lab.service.service.IUserService;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(classes = ServiceApplication.class)
 class UserInitIntegrationTest {

@@ -1,10 +1,10 @@
 package xyz.jasenon.lab.common.entity.class_time_table;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
-import xyz.jasenon.lab.common.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.experimental.Accessors;
+import xyz.jasenon.lab.common.entity.BaseEntity;
 
 import java.time.LocalDate;
 

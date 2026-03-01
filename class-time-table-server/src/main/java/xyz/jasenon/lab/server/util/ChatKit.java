@@ -4,18 +4,12 @@
 package xyz.jasenon.lab.server.util;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import xyz.jasenon.lab.core.ImChannelContext;
-import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.config.ImConfig;
-import xyz.jasenon.lab.core.packets.ChatBody;
-import xyz.jasenon.lab.core.packets.User;
-import xyz.jasenon.lab.core.session.id.impl.UUIDSessionIdGenerator;
-import xyz.jasenon.lab.core.utils.JsonKit;
 import xyz.jasenon.lab.server.JimServerAPI;
 import xyz.jasenon.lab.server.config.ImServerConfig;
+
 import java.util.List;
 
 /**
@@ -27,73 +21,6 @@ import java.util.List;
 public class ChatKit {
 	
 	private static Logger log = Logger.getLogger(ChatKit.class);
-
-	/**
-	 * 转换为聊天消息结构;
-	 * @param body
-	 * @param imChannelContext
-	 * @return
-	 */
-	public static ChatBody toChatBody(byte[] body,ImChannelContext imChannelContext){
-		ChatBody chatReqBody = parseChatBody(body);
-		if(chatReqBody != null){
-			if(StringUtils.isEmpty(chatReqBody.getFrom())){
-				ImSessionContext imSessionContext = imChannelContext.getSessionContext();
-				User user = imSessionContext.getImClientNode().getClassTimeTable();
-				if(user != null){
-					chatReqBody.setFrom(user.getNick());
-				}else{
-					chatReqBody.setFrom(imChannelContext.getId());
-				}
-			}
-		}
-		return chatReqBody;
-	}
-
-	/**
-	 * 判断是否属于指定格式聊天消息;
-	 * @param body
-	 * @return
-	 */
-	private static ChatBody parseChatBody(byte[] body){
-		if(body == null) {
-			return null;
-		}
-		ChatBody chatReqBody = null;
-		try{
-			String text = new String(body,ImConst.CHARSET);
-		    chatReqBody = JsonKit.toBean(text,ChatBody.class);
-			if(chatReqBody != null){
-				if(chatReqBody.getCreateTime() == null) {
-					chatReqBody.setCreateTime(System.currentTimeMillis());
-				}
-				if(StringUtils.isEmpty(chatReqBody.getId())){
-					chatReqBody.setId(UUIDSessionIdGenerator.instance.sessionId(null));
-				}
-				return chatReqBody;
-			}
-		}catch(Exception e){
-			log.error(e.toString());
-		}
-		return chatReqBody;
-	}
-
-	/**
-	 * 判断是否属于指定格式聊天消息;
-	 * @param bodyStr
-	 * @return
-	 */
-	public static ChatBody parseChatBody(String bodyStr){
-		if(bodyStr == null) {
-			return null;
-		}
-		try {
-			return parseChatBody(bodyStr.getBytes(ImConst.CHARSET));
-		} catch (Exception e) {
-			log.error(e);
-		}
-		return null;
-	}
 
      /**
       * 判断用户是否在线

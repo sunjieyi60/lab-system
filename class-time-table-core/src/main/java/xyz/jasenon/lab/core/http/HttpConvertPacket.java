@@ -7,8 +7,6 @@ import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImConst;
 import xyz.jasenon.lab.core.ImPacket;
 import xyz.jasenon.lab.core.ImSessionContext;
-import xyz.jasenon.lab.core.http.HttpRequest;
-import xyz.jasenon.lab.core.http.HttpResponse;
 import xyz.jasenon.lab.core.http.session.HttpSession;
 import xyz.jasenon.lab.core.packets.Command;
 import xyz.jasenon.lab.core.protocol.IProtocolConverter;

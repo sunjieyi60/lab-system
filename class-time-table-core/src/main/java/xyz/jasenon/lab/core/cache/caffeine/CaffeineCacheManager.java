@@ -3,18 +3,15 @@
  */
 package xyz.jasenon.lab.core.cache.caffeine;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import xyz.jasenon.lab.core.cache.caffeine.CaffeineCache;
-import xyz.jasenon.lab.core.cache.caffeine.CaffeineConfigurationFactory;
-import xyz.jasenon.lab.core.cache.caffeine.CaffeineUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalListener;
 /**
  * 
  * @author WChao

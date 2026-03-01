@@ -3,8 +3,6 @@
  */
 package xyz.jasenon.lab.core.packets;
 
-import xyz.jasenon.lab.core.packets.Message;
-
 /**
  * @author WChao
  *

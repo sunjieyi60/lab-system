@@ -1,9 +1,5 @@
 package xyz.jasenon.lab.core.cache.caffeineredis;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.jasenon.lab.core.cache.caffeine.CaffeineCache;
@@ -13,6 +9,10 @@ import xyz.jasenon.lab.core.cache.caffeine.CaffeineConfigurationFactory;
 import xyz.jasenon.lab.core.cache.redis.RedisCache;
 import xyz.jasenon.lab.core.cache.redis.RedisCacheManager;
 import xyz.jasenon.lab.core.cache.redis.SubRunnable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author WChao

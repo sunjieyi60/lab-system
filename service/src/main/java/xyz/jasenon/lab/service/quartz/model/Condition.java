@@ -1,7 +1,6 @@
 package xyz.jasenon.lab.service.quartz.model;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;

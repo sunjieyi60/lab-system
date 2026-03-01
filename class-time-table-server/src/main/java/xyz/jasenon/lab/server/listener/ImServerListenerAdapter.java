@@ -1,5 +1,8 @@
 package xyz.jasenon.lab.server.listener;
 
+import org.tio.core.ChannelContext;
+import org.tio.core.intf.Packet;
+import org.tio.server.intf.ServerAioListener;
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImConst;
 import xyz.jasenon.lab.core.ImPacket;
@@ -10,9 +13,6 @@ import xyz.jasenon.lab.core.packets.User;
 import xyz.jasenon.lab.server.ImServerChannelContext;
 import xyz.jasenon.lab.server.config.ImServerConfig;
 import xyz.jasenon.lab.server.queue.MsgQueueRunnable;
-import org.tio.core.ChannelContext;
-import org.tio.core.intf.Packet;
-import org.tio.server.intf.ServerAioListener;
 
 import java.util.Objects;
 

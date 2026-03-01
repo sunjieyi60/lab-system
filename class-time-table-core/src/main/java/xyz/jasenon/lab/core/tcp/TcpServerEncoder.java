@@ -3,14 +3,13 @@
  */
 package xyz.jasenon.lab.core.tcp;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImConst;
 import xyz.jasenon.lab.core.ImPacket;
 import xyz.jasenon.lab.core.config.ImConfig;
-import xyz.jasenon.lab.core.tcp.TcpPacket;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * 版本: [1.0]

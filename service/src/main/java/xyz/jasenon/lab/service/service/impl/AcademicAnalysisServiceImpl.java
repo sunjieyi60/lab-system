@@ -3,10 +3,10 @@ package xyz.jasenon.lab.service.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
@@ -17,7 +17,10 @@ import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
 import xyz.jasenon.lab.service.vo.analysis.DimensionPointVo;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

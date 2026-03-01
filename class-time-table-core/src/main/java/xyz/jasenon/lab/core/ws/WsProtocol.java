@@ -3,8 +3,6 @@
  */
 package xyz.jasenon.lab.core.ws;
 
-import java.nio.ByteBuffer;
-
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImPacket;
 import xyz.jasenon.lab.core.ImSessionContext;
@@ -14,7 +12,8 @@ import xyz.jasenon.lab.core.http.HttpRequestDecoder;
 import xyz.jasenon.lab.core.protocol.AbstractProtocol;
 import xyz.jasenon.lab.core.protocol.IProtocolConverter;
 import xyz.jasenon.lab.core.utils.ImKit;
-import xyz.jasenon.lab.core.ws.WsPacket;
+
+import java.nio.ByteBuffer;
 
 /**
  * WebSocket协议判断器

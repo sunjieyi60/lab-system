@@ -1,11 +1,6 @@
 package xyz.jasenon.lab.core.cache.caffeineredis;
 
-import java.io.Serializable;
-import java.util.Collection;
-
 import org.apache.commons.lang3.StringUtils;
-import xyz.jasenon.lab.core.cache.caffeineredis.CaffeineRedisCacheManager;
-import xyz.jasenon.lab.core.cache.caffeineredis.RedisL2Vo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.jasenon.lab.core.cache.CacheChangeType;
@@ -16,6 +11,9 @@ import xyz.jasenon.lab.core.cache.caffeine.CaffeineCache;
 import xyz.jasenon.lab.core.cache.redis.JedisTemplate;
 import xyz.jasenon.lab.core.cache.redis.RedisCache;
 import xyz.jasenon.lab.core.cache.redis.RedisExpireUpdateTask;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * @author WChao

@@ -1,5 +1,9 @@
 package xyz.jasenon.lab.core.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import xyz.jasenon.lab.core.ImConst;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -8,10 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import xyz.jasenon.lab.core.ImConst;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 部分代码参考了: https://github.com/helyho/Voovan

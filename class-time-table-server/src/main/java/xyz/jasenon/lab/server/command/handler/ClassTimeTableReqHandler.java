@@ -4,7 +4,9 @@
 package xyz.jasenon.lab.server.command.handler;
 
 import org.apache.commons.lang3.StringUtils;
-import xyz.jasenon.lab.core.*;
+import xyz.jasenon.lab.core.ImChannelContext;
+import xyz.jasenon.lab.core.ImPacket;
+import xyz.jasenon.lab.core.ImStatus;
 import xyz.jasenon.lab.core.config.ImConfig;
 import xyz.jasenon.lab.core.exception.ImException;
 import xyz.jasenon.lab.core.packets.*;
@@ -19,13 +21,13 @@ import java.util.Objects;
 
 /**
  * 版本: [1.0]
- * 功能说明: 获取用户信息消息命令
+ * 功能说明: 获取设备信息消息命令
  * @author : WChao 创建时间: 2017年9月18日 下午4:08:47
  */
 public class ClassTimeTableReqHandler extends AbstractCmdHandler {
 
 	/**
-	 * 持久化用户信息接口
+	 * 持久化设备信息接口
 	 */
 	private IClassTimeTableInfo persistentUserInfo;
 
@@ -49,7 +51,7 @@ public class ClassTimeTableReqHandler extends AbstractCmdHandler {
 		if(StringUtils.isEmpty(uuid)) {
 			return ProtocolManager.Converter.respPacket(ClassTimeTableRespBody.failed(ImStatus.C10004, "设备uuid为空"), imChannelContext);
 		}
-		//(0:所有在线用户,1:所有离线用户,2:所有用户[在线+离线]);
+		//(0:所有在线设备,1:所有离线设备,2:所有设备[在线+离线]);
 		Integer type = classTimeTableReqBody.getType() == null ? ClassTimeTableStatusType.ALL.getNumber() : classTimeTableReqBody.getType();
 		if(Objects.isNull(ClassTimeTableStatusType.valueOf(type))){
 			return ProtocolManager.Converter.respPacket(ClassTimeTableRespBody.failed(ImStatus.C10004, "未知的type"), imChannelContext);

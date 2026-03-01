@@ -1,10 +1,9 @@
 package xyz.jasenon.lab.core;
 
-import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.core.config.ImConfig;
 import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.utils.prop.MapWithLockPropSupport;
+import xyz.jasenon.lab.core.config.ImConfig;
 
 /**
  * @ClassName ImChannelContext

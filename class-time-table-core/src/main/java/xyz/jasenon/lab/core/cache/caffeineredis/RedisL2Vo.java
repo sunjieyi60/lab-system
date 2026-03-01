@@ -1,8 +1,8 @@
 package xyz.jasenon.lab.core.cache.caffeineredis;
 
-import java.io.Serializable;
-
 import xyz.jasenon.lab.core.cache.redis.RedisCache;
+
+import java.io.Serializable;
 
 /**
  * @author WChao

@@ -15,8 +15,6 @@
  */ 
 package xyz.jasenon.lab.core.utils;
 
-import xyz.jasenon.lab.core.utils.BASE64Util;
-
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

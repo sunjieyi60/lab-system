@@ -3,6 +3,7 @@ package xyz.jasenon.lab.core;
 import xyz.jasenon.lab.core.config.ImConfig;
 import xyz.jasenon.lab.core.exception.ImDecodeException;
 import xyz.jasenon.lab.core.exception.ImException;
+
 import java.nio.ByteBuffer;
 
 /**

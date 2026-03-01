@@ -1,15 +1,13 @@
 package xyz.jasenon.lab.core.cache.redis;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import xyz.jasenon.lab.core.cache.redis.JedisTemplate.PairEx;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import xyz.jasenon.lab.core.cache.redis.ExpireVo;
-import xyz.jasenon.lab.core.cache.redis.JedisTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import xyz.jasenon.lab.core.cache.redis.JedisTemplate.PairEx;
 
 /**
  * 定时更新redis的过期时间

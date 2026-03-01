@@ -1,12 +1,11 @@
 package xyz.jasenon.lab.core.ws;
 
-import java.util.List;
-
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.http.HttpRequest;
 import xyz.jasenon.lab.core.http.HttpResponse;
-import xyz.jasenon.lab.core.ws.WsRequestPacket;
+
+import java.util.List;
 
 /**
  *

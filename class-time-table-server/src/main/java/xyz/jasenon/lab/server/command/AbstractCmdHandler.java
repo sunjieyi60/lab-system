@@ -5,8 +5,8 @@ package xyz.jasenon.lab.server.command;
 
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.server.processor.SingleProtocolCmdProcessor;
 import xyz.jasenon.lab.server.processor.MultiProtocolCmdProcessor;
+import xyz.jasenon.lab.server.processor.SingleProtocolCmdProcessor;
 
 import java.util.ArrayList;
 import java.util.List;

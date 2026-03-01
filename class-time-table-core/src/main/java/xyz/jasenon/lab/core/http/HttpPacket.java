@@ -1,9 +1,9 @@
 package xyz.jasenon.lab.core.http;
 
+import xyz.jasenon.lab.core.ImPacket;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import xyz.jasenon.lab.core.ImPacket;
 
 /**
  *

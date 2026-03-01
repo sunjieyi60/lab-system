@@ -1,14 +1,5 @@
 package xyz.jasenon.lab.core.cache.caffeineredis;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import xyz.jasenon.lab.core.cache.caffeineredis.CaffeineRedisCacheManager;
-import xyz.jasenon.lab.core.cache.caffeineredis.RedisL2Vo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.jasenon.lab.core.cache.CacheChangeType;
@@ -16,6 +7,13 @@ import xyz.jasenon.lab.core.cache.CacheChangedVo;
 import xyz.jasenon.lab.core.cache.redis.JedisTemplate;
 import xyz.jasenon.lab.core.cache.redis.JedisTemplate.Pair;
 import xyz.jasenon.lab.core.cache.redis.RedisCacheManager;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 /**
  * @author WChao
  * @date 2018年3月13日 下午7:59:20

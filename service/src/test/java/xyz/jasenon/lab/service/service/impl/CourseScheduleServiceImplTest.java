@@ -8,7 +8,8 @@ import java.lang.reflect.Method;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 课程课表服务测试：重点验证冲突检测算法

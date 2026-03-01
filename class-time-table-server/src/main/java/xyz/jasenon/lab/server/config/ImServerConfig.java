@@ -1,5 +1,9 @@
 package xyz.jasenon.lab.server.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tio.core.ssl.SslConfig;
+import org.tio.server.ServerTioConfig;
 import xyz.jasenon.lab.core.ImHandler;
 import xyz.jasenon.lab.core.config.ImConfig;
 import xyz.jasenon.lab.core.http.HttpConfig;
@@ -12,10 +16,6 @@ import xyz.jasenon.lab.server.handler.ImServerHandlerAdapter;
 import xyz.jasenon.lab.server.listener.DefaultImServerListener;
 import xyz.jasenon.lab.server.listener.ImServerListener;
 import xyz.jasenon.lab.server.listener.ImServerListenerAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.tio.core.ssl.SslConfig;
-import org.tio.server.ServerTioConfig;
 
 import java.util.Objects;
 

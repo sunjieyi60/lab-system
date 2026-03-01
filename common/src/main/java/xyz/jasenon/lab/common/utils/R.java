@@ -1,6 +1,5 @@
 package xyz.jasenon.lab.common.utils;
 
-import cn.hutool.http.HttpStatus;
 import lombok.Getter;
 import lombok.Setter;
 

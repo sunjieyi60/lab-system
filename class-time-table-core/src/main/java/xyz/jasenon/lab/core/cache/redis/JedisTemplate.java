@@ -1,27 +1,13 @@
 package xyz.jasenon.lab.core.cache.redis;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
-import xyz.jasenon.lab.core.cache.redis.RedisConfigurationFactory;
-import xyz.jasenon.lab.core.cache.redis.RedisLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.*;
 
-import com.alibaba.fastjson.JSON;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisPubSub;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Response;
-import redis.clients.jedis.Transaction;
+import java.io.Serializable;
+import java.util.*;
 /**
  * @author wchao
  * @modify 2016-08-29 增加了set(final String key, final Object value)和<T> T get(final String key,final Class<T> clazz)

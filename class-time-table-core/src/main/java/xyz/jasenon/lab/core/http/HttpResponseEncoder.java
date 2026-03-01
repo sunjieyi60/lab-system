@@ -1,18 +1,15 @@
 package xyz.jasenon.lab.core.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import xyz.jasenon.lab.core.ImChannelContext;
+import xyz.jasenon.lab.core.ImConst;
+
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import xyz.jasenon.lab.core.ImChannelContext;
-import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.core.http.Cookie;
-import xyz.jasenon.lab.core.http.HttpResponse;
-import xyz.jasenon.lab.core.http.HttpResponseStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *

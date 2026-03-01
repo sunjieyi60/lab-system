@@ -3,11 +3,12 @@
  */
 package xyz.jasenon.lab.core.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.packets.ImClientNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import java.util.Objects;
 
 /**

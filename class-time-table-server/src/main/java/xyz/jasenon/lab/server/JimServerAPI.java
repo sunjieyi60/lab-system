@@ -3,17 +3,6 @@ package xyz.jasenon.lab.server;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import xyz.jasenon.lab.core.ImChannelContext;
-import xyz.jasenon.lab.core.ImConst;
-import xyz.jasenon.lab.core.ImPacket;
-import xyz.jasenon.lab.core.cluster.ImCluster;
-import xyz.jasenon.lab.core.config.ImConfig;
-import xyz.jasenon.lab.core.exception.ImException;
-import xyz.jasenon.lab.core.listener.ImUserListener;
-import xyz.jasenon.lab.core.packets.Group;
-import xyz.jasenon.lab.core.packets.User;
-import xyz.jasenon.lab.core.packets.UserStatusType;
-import xyz.jasenon.lab.server.protocol.ProtocolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -21,6 +10,17 @@ import org.tio.core.ChannelContextFilter;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
 import org.tio.utils.lock.SetWithLock;
+import xyz.jasenon.lab.core.ImChannelContext;
+import xyz.jasenon.lab.core.ImConst;
+import xyz.jasenon.lab.core.ImPacket;
+import xyz.jasenon.lab.core.cluster.ImCluster;
+import xyz.jasenon.lab.core.config.ImConfig;
+import xyz.jasenon.lab.core.exception.ImException;
+import xyz.jasenon.lab.core.listener.ImClassTimeTableListener;
+import xyz.jasenon.lab.core.packets.ClassTimeTable;
+import xyz.jasenon.lab.core.packets.ClassTimeTableStatusType;
+import xyz.jasenon.lab.core.packets.Group;
+import xyz.jasenon.lab.server.protocol.ProtocolManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -216,27 +216,28 @@ public class JimServerAPI implements ImConst{
 	/**
 	 * 绑定用户(如果配置了回调函数执行回调)
 	 * @param imChannelContext IM通道上下文
-	 * @param userId 用户ID
+	 * @param uuid 班牌uuid
 	 */
-	public static boolean bindUser(ImChannelContext imChannelContext, String userId){
-		User user = imChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
-		if(Objects.isNull(user)){
-			user = User.newBuilder().userId(userId).status(UserStatusType.ONLINE.getStatus()).build();
+	public static boolean bindUser(ImChannelContext imChannelContext, String uuid){
+		ClassTimeTable classTimeTable = imChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
+		if(Objects.isNull(classTimeTable)){
+			classTimeTable = ClassTimeTable.newBuilder().uuid(uuid).status(ClassTimeTableStatusType.ONLINE.getStatus()).build();
 		}
-		return bindUser(imChannelContext, user);
+		return bindClassTimeTable(imChannelContext, classTimeTable);
 	}
 
 	/**
 	 * 绑定用户(如果配置了回调函数执行回调)
+	 *
 	 * @param imChannelContext IM通道上下文
-	 * @param user 绑定用户信息
+	 * @param classTimeTable   绑定用户信息
 	 */
-	public static boolean bindUser(ImChannelContext imChannelContext, User user){
-		if(Objects.isNull(user)|| StringUtils.isEmpty(user.getUserId())){
+	public static boolean bindClassTimeTable(ImChannelContext imChannelContext, ClassTimeTable classTimeTable){
+		if(Objects.isNull(classTimeTable)|| StringUtils.isEmpty(classTimeTable.getUuid())){
 			log.error("user or userId is null");
 			return false;
 		}
-		String userId = user.getUserId();
+		String userId = classTimeTable.getUuid();
 		Tio.bindUser(imChannelContext.getTioChannelContext(), userId);
 		SetWithLock<ChannelContext> channelContextSetWithLock = Tio.getByUserid(imConfig.getTioConfig(), userId);
 		ReadLock lock = channelContextSetWithLock.getLock().readLock();
@@ -245,10 +246,10 @@ public class JimServerAPI implements ImConst{
 			if(CollectionUtils.isEmpty(channelContextSetWithLock.getObj())){
 				return false;
 			}
-			imChannelContext.getSessionContext().getImClientNode().setUser(user);
-			ImUserListener imUserListener = imConfig.getImUserListener();
+			imChannelContext.getSessionContext().getImClientNode().setUser(classTimeTable);
+			ImClassTimeTableListener imUserListener = imConfig.getImClassTimeTableListener();
 			if(Objects.nonNull(imUserListener)){
-				imUserListener.onAfterBind(imChannelContext, user);
+				imUserListener.onAfterBind(imChannelContext, classTimeTable);
 			}
 		}catch (ImException e) {
 			log.error(e.getMessage(), e);
@@ -261,26 +262,27 @@ public class JimServerAPI implements ImConst{
 
 	/**
 	 * 解除userId的绑定。一般用于多地登录，踢掉前面登录的场景
-	 * @param userId 解绑用户ID
+	 * @param uuid 解绑用户ID
 	 * @author: WChao
 	 */
-	public static boolean unbindUser(String userId){
-		return unbindUser(User.newBuilder().userId(userId).build());
+	public static boolean unbindClassTimeTable(String uuid){
+		return unbindClassTimeTable(ClassTimeTable.newBuilder().uuid(uuid).build());
 	}
 
 	/**
 	 * 解除userId的绑定。一般用于多地登录，踢掉前面登录的场景
-	 * @param user 解绑用户信息
+	 *
+	 * @param classTimeTable 解绑用户信息
 	 * @author: WChao
 	 */
-	public static boolean unbindUser(User user){
-		if(Objects.isNull(user)|| StringUtils.isEmpty(user.getUserId())){
+	public static boolean unbindClassTimeTable(ClassTimeTable classTimeTable){
+		if(Objects.isNull(classTimeTable)|| StringUtils.isEmpty(classTimeTable.getUuid())){
 			log.error("user or userId is null");
 			return false;
 		}
-		String userId = user.getUserId();
+		String uuid = classTimeTable.getUuid();
 		TioConfig tioConfig = imConfig.getTioConfig();
-		SetWithLock<ChannelContext> userChannels = Tio.getByUserid(tioConfig, userId);
+		SetWithLock<ChannelContext> userChannels = Tio.getByUserid(tioConfig, uuid);
 		Set<ChannelContext> channelContexts = userChannels.getObj();
 		if(channelContexts.isEmpty()){
 			return true;
@@ -290,12 +292,12 @@ public class JimServerAPI implements ImConst{
 			readLock.lock();
 			for (ChannelContext channelContext :  channelContexts){
 				ImChannelContext imChannelContext = (ImChannelContext)channelContext.get(Key.IM_CHANNEL_CONTEXT_KEY);
-				ImUserListener imUserListener = imConfig.getImUserListener();
+				ImClassTimeTableListener imUserListener = imConfig.getImClassTimeTableListener();
 				if(Objects.isNull(imUserListener))continue;
-				User existUser = imChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
-				imUserListener.onAfterUnbind(imChannelContext, existUser);
+				ClassTimeTable exist = imChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
+				imUserListener.onAfterUnbind(imChannelContext, exist);
 			}
-			Tio.unbindUser(tioConfig, userId);
+			Tio.unbindUser(tioConfig, uuid);
 		} catch (ImException e) {
 			log.error("unbind user failed", e);
 			return false;

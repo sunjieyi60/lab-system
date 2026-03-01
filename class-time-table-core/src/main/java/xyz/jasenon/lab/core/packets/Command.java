@@ -49,6 +49,21 @@ public enum Command{
    * </pre>
    */
   COMMAND_GET_CLASS_TIME_TABLE_RESP(6),
+
+  /**
+   * <pre>
+   *     加入群组请求
+   * </pre>
+   */
+  COMMAND_JOIN_GROUP_REQ(7),
+
+  /**
+   * <pre>
+   *     加入群组响应
+   * </pre>
+   */
+  COMMAND_JOIN_GROUP_RESP(8),
+
   /**
    * <pre>
    *心跳请求

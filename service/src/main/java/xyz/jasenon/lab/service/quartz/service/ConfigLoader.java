@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import xyz.jasenon.lab.common.entity.base.User;
 import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.entity.record.BaseRecord;
 import xyz.jasenon.lab.service.quartz.check.Result;
 import xyz.jasenon.lab.service.quartz.mapper.*;
 import xyz.jasenon.lab.service.quartz.model.*;
@@ -17,7 +18,6 @@ import xyz.jasenon.lab.service.service.IUserService;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.record.DeviceRecordFactory;
 import xyz.jasenon.lab.service.vo.device.DeviceRecordVo;
-import xyz.jasenon.lab.common.entity.record.BaseRecord;
 
 import java.text.MessageFormat;
 import java.util.*;
