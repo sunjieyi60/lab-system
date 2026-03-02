@@ -28,4 +28,14 @@ public interface IDeviceService extends IService<Device> {
     R<Map<Long, List<SocketGatewayVo>>> getSocketGatewayTree();
 
     R<Map<Long,List<DeviceVo>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType);
+
+    /**
+     * 开启指定设备的轮询
+     */
+    R enablePolling(Long deviceId);
+
+    /**
+     * 关闭指定设备的轮询
+     */
+    R disablePolling(Long deviceId);
 }

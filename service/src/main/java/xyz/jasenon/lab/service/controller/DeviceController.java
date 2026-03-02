@@ -86,4 +86,16 @@ public class DeviceController {
         return deviceService.getSocketGatewayTree();
     }
 
+    @PostMapping("/polling/start")
+    @ApiOperation("开启设备轮询")
+    public R enablePolling(@RequestParam("deviceId") Long deviceId) {
+        return deviceService.enablePolling(deviceId);
+    }
+
+    @PostMapping("/polling/stop")
+    @ApiOperation("关闭设备轮询")
+    public R disablePolling(@RequestParam("deviceId") Long deviceId) {
+        return deviceService.disablePolling(deviceId);
+    }
+
 }

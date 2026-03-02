@@ -168,4 +168,41 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         return R.success(map,"获取成功");
     }
 
+    @Override
+    public R enablePolling(Long deviceId) {
+        Device device = baseMapper.selectById(deviceId);
+        if (device == null) {
+            return R.fail("设备不存在");
+        }
+        Boolean pollingEnabled = device.getPollingEnabled();
+        if (Boolean.TRUE.equals(pollingEnabled)) {
+            return R.success("轮询已开启");
+        }
+        device.setPollingEnabled(Boolean.TRUE);
+        baseMapper.updateById(device);
+        DeviceFactory.getDeviceQMethod(device.getDeviceType()).startPollingById(deviceId);
+        return R.success("开启轮询成功");
+    }
+
+    @Override
+    public R disablePolling(Long deviceId) {
+        Device device = baseMapper.selectById(deviceId);
+        if (device == null) {
+            return R.fail("设备不存在");
+        }
+        Boolean pollingEnabled = device.getPollingEnabled();
+        if (pollingEnabled == null) {
+            pollingEnabled = Boolean.TRUE;
+        }
+        if (Boolean.FALSE.equals(pollingEnabled)) {
+            // 已经是关闭状态，确保调度中没有残留任务
+            pollingScheduleExecutorPool.cancelPolling(deviceId);
+            return R.success("轮询已关闭");
+        }
+        device.setPollingEnabled(Boolean.FALSE);
+        baseMapper.updateById(device);
+        pollingScheduleExecutorPool.cancelPolling(deviceId);
+        return R.success("关闭轮询成功");
+    }
+
 }
