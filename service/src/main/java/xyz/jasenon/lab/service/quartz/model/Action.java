@@ -18,7 +18,7 @@ import xyz.jasenon.lab.common.entity.device.DeviceType;
  */
 @Getter
 @Setter
-@TableName("action")
+@TableName(value = "action", autoResultMap = true)
 public class Action {
 
     private String id;

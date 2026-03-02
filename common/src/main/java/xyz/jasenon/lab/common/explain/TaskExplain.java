@@ -42,7 +42,8 @@ TaskExplain<T> {
     protected final byte[] generatePayload(Task task,Device device){
         CommandLine commandLine = task.getCommandLine();
         Command command = commandLine.getCommand();
-        Object[] toHexString = Arrays.stream(task.getArgs()).map(arg->{
+        Integer[] args = task.getArgs();
+        Object[] toHexString = Arrays.stream(args).map(arg->{
             return Integer.toHexString(arg);
         }).toArray(Object[]::new);
         String[] $ = MessageFormat.format(command.getCommandLine(), toHexString).split(" ");
