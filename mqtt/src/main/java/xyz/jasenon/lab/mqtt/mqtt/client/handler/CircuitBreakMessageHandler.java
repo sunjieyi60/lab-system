@@ -55,9 +55,9 @@ public class CircuitBreakMessageHandler
         log.info("电流值:{}", current);
         log.info("功率值:{}", power);
         log.info("电能值:{}", energy);
-        log.info("合闸:{}", isFix);
+        log.info("修复:{}", isFix);
         log.info("门锁:{}", isLock);
-        log.info("分闸:{}", isOpen);
+        log.info("闸体状态:{}", isOpen);
 
         CircuitBreakRecord circuitBreakRecord = (CircuitBreakRecord) new CircuitBreakRecord()
                 .setAddress(address)
