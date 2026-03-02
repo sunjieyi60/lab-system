@@ -1,9 +1,13 @@
 package xyz.jasenon.lab.service.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import xyz.jasenon.lab.common.command.CommandLine;
+import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.log.LogPoint;
 import xyz.jasenon.lab.service.quartz.check.Result;
@@ -11,6 +15,7 @@ import xyz.jasenon.lab.service.quartz.config.QuartzRegister;
 import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
 import xyz.jasenon.lab.service.quartz.model.ScheduleTask;
 import xyz.jasenon.lab.service.quartz.service.ConfigLoader;
+import xyz.jasenon.lab.service.quartz.service.TaskQueryService;
 import xyz.jasenon.lab.service.quartz.service.TaskRuntimeService;
 
 import java.util.List;
@@ -29,6 +34,7 @@ public class QuartzController {
     private final ConfigLoader configLoader;
     private final QuartzRegister quartzRegister;
     private final TaskRuntimeService taskRuntimeService;
+    private final TaskQueryService taskQueryService;
 
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
@@ -88,4 +94,32 @@ public class QuartzController {
         }
         return R.success(tasks);
     }
+
+    /**
+     * 高性能实验室任务查询（支持设备/指令筛选）
+     */
+    @GetMapping("/list-by-lab")
+    @ApiOperation(value = "查询实验室定时任务配置",
+                  notes = "支持按设备类型、设备ID、指令筛选,分页查询")
+    public R<Page<ScheduleConfigRoot>> getConfigsByLaboratory(
+            @RequestParam("laboratoryId") @Parameter(description = "实验室ID") Long laboratoryId,
+            @RequestParam(required = false) @Parameter(description = "启用状态筛选") Boolean enable,
+            @RequestParam(required = false) @Parameter(description = "设备类型筛选") DeviceType deviceType,
+            @RequestParam(required = false) @Parameter(description = "设备ID筛选") Long deviceId,
+            @RequestParam(required = false) @Parameter(description = "指令筛选") CommandLine commandLine,
+            @RequestParam(defaultValue = "1") @Parameter(description = "页码") int pageNum,
+            @RequestParam(defaultValue = "20") @Parameter(description = "每页大小") int pageSize) {
+
+        // 参数校验
+        if (pageSize > 100) {
+            pageSize = 100;
+        }
+
+        Page<ScheduleConfigRoot> result = taskQueryService.queryByLaboratory(
+            laboratoryId, enable, deviceType, deviceId, commandLine, pageNum, pageSize
+        );
+
+        return R.success(result);
+    }
+
 }
