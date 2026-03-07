@@ -164,7 +164,7 @@ public class ImServerConfig extends ImConfig {
             imServerConfig.setWsConfig(this.wsConfig);
             imServerConfig.setHeartbeatTimeout(this.heartbeatTimeout);
             imServerConfig.setImGroupListener(this.imGroupListener);
-            imServerConfig.setImUserListener(this.imUserListener);
+            imServerConfig.setImUserListener(this.imClassTimeTableListener);
             return imServerConfig;
         }
     }

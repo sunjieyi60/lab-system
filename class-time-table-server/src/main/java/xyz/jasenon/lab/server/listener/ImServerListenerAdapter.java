@@ -9,7 +9,7 @@ import xyz.jasenon.lab.core.ImPacket;
 import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.config.ImConfig;
 import xyz.jasenon.lab.core.message.MessageHelper;
-import xyz.jasenon.lab.core.packets.User;
+import xyz.jasenon.lab.core.packets.ClassTimeTable;
 import xyz.jasenon.lab.server.ImServerChannelContext;
 import xyz.jasenon.lab.server.config.ImServerConfig;
 import xyz.jasenon.lab.server.queue.MsgQueueRunnable;
@@ -83,10 +83,10 @@ public class ImServerListenerAdapter implements ServerAioListener, ImConst{
 		if(Objects.nonNull(imSessionContext)){
 			ImServerConfig imServerConfig = ImConfig.Global.get();
 			MessageHelper messageHelper = imServerConfig.getMessageHelper();
-			User user = imServerChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
-			boolean isStore = ImServerConfig.ON.equals(imServerConfig.getIsStore()) && Objects.nonNull(messageHelper) && Objects.nonNull(user);
+			ClassTimeTable classTimeTable = imServerChannelContext.getSessionContext().getImClientNode().getClassTimeTable();
+			boolean isStore = ImServerConfig.ON.equals(imServerConfig.getIsStore()) && Objects.nonNull(messageHelper) && Objects.nonNull(classTimeTable);
 			if(isStore){
-				imServerConfig.getImUserListener().onAfterUnbind(imServerChannelContext, user);
+				imServerConfig.getImClassTimeTableListener().onAfterUnbind(imServerChannelContext, classTimeTable);
 			}
 		}
 		imServerListener.onBeforeClose(imServerChannelContext, throwable, remark, isRemove);
