@@ -5,6 +5,7 @@ import xyz.jasenon.lab.common.entity.class_time_table.Teacher;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateTeacher;
 import xyz.jasenon.lab.service.dto.course.DeleteTeacher;
+import xyz.jasenon.lab.service.dto.course.EditTeacher;
 
 /**
  * @author Jasenon_ce
@@ -15,4 +16,8 @@ public interface ITeacherService extends IService<Teacher> {
     R createTeacher(CreateTeacher createTeacher);
 
     R deleteTeacher(DeleteTeacher deleteTeacher);
+
+    R editTeacher(EditTeacher editTeacher);
+
+    R getAllTeacher();
 }

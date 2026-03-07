@@ -12,6 +12,7 @@ import xyz.jasenon.lab.service.dto.course.*;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
 import xyz.jasenon.lab.service.service.ICourseService;
 import xyz.jasenon.lab.service.service.ISemesterService;
+import xyz.jasenon.lab.service.service.ITeacherService;
 
 import java.util.List;
 
@@ -31,6 +32,8 @@ public class CourseController {
     private ICourseService courseService;
     @Autowired
     private ICourseScheduleService courseScheduleService;
+    @Autowired
+    private ITeacherService teacherService;
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PostMapping("/create/course")
@@ -51,6 +54,13 @@ public class CourseController {
     @ApiOperation("创建学期")
     public R createSemester(@Validated @RequestBody CreateSemester createSemester){
         return semesterService.createSemester(createSemester);
+    }
+
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
+    @PostMapping("/create/teacher")
+    @ApiOperation("创建任课教师")
+    public R createTeacher(@RequestBody CreateTeacher createTeacher){
+        return teacherService.createTeacher(createTeacher);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
@@ -75,6 +85,14 @@ public class CourseController {
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
+    @DeleteMapping("/delete/teacher")
+    @ApiOperation("删除教师")
+    public R deleteTeacher(@Validated @RequestBody DeleteTeacher deleteTeacher){
+        return teacherService.deleteTeacher(deleteTeacher);
+    }
+
+
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PutMapping("/edit/course")
     @ApiOperation("编辑课程")
     public R editCourse(@Validated @RequestBody EditCourse editCourse){
@@ -86,6 +104,13 @@ public class CourseController {
     @ApiOperation("编辑学期")
     public R editSemester(@Validated @RequestBody EditSemester editSemester){
         return semesterService.editSemester(editSemester);
+    }
+
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
+    @PutMapping("/edit/teacher")
+    @ApiOperation("编辑教师")
+    public R editTeacher(@Validated @RequestBody EditTeacher editTeacher){
+        return teacherService.editTeacher(editTeacher);
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
@@ -115,4 +140,18 @@ public class CourseController {
     public R listSemester(){
         return semesterService.listSemester();
     }
+
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
+    @GetMapping("/list/teacher")
+    @ApiOperation("获取教师列表")
+    public R listTeacher(){
+        return teacherService.getAllTeacher();
+    }
+
+
+
+
+
+
+
 }
