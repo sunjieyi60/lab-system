@@ -86,11 +86,11 @@ public class Group extends Message{
 		this.online = online;
 	}
 
-	public List<ClassTimeTable> getUsers() {
+	public List<ClassTimeTable> getClassTimeTables() {
 		return classTimeTables;
 	}
 
-	public void setUsers(List<ClassTimeTable> classTimeTables) {
+	public void setClassTimeTables(List<ClassTimeTable> classTimeTables) {
 		this.classTimeTables = classTimeTables;
 	}
 
@@ -134,7 +134,7 @@ public class Group extends Message{
 			this.online = online;
 			return this;
 		}
-		public Builder addUser(ClassTimeTable classTimeTable) {
+		public Builder addClassTimeTable(ClassTimeTable classTimeTable) {
 			if(CollectionUtils.isEmpty(classTimeTables)){
 				classTimeTables = Lists.newArrayList();
 			}

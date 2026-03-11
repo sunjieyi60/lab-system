@@ -291,4 +291,10 @@ public interface ImConst
 	
 	String JIM = "J-IM";
 
+	Integer ONLINE = 0;
+
+	Integer OFFLINE = 1;
+
+	Integer ANYLINE = 2;
+
 }

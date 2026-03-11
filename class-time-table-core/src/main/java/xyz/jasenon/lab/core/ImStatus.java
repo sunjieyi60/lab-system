@@ -33,7 +33,9 @@ public enum ImStatus implements Status {
 	C10020(10020,"Invalid verification!","不合法校验"),
 	C10021(10021,"close ok!","关闭成功"),
 	C10022(10022,"ok", "好友申请已发送"),
-	C10023(10023,"ok", "好友申请已处理");
+	C10023(10023,"ok", "好友申请已处理"),
+	C10024(10024,"ok","握手成功"),
+	C10025(10025,"failed","握手失败");
 	
 	private int status;
 	

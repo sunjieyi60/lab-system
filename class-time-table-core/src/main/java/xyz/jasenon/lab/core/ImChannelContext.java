@@ -5,6 +5,8 @@ import org.tio.core.Node;
 import org.tio.utils.prop.MapWithLockPropSupport;
 import xyz.jasenon.lab.core.config.ImConfig;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @ClassName ImChannelContext
  * @Description TODO
@@ -17,6 +19,8 @@ public abstract class ImChannelContext extends MapWithLockPropSupport implements
     protected ImConfig imConfig;
 
     protected ChannelContext tioChannelContext;
+
+    private final AtomicInteger synSeqGenerator = new AtomicInteger();
 
     public ImChannelContext(ImConfig imConfig, ChannelContext tioChannelContext) {
         this.imConfig = imConfig;
@@ -57,6 +61,15 @@ public abstract class ImChannelContext extends MapWithLockPropSupport implements
 
     public void setUserId(String userId){
         tioChannelContext.setUserid(userId);
+    }
+
+    /**
+     * 通道生成唯一 synSeq 用于Tio.synSend()
+     * {@link org.tio.core.Tio}
+     * @return
+     */
+    public Integer synSeq(){
+        return synSeqGenerator.incrementAndGet();
     }
 
     public ChannelContext getTioChannelContext() {

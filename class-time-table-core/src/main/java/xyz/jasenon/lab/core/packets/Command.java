@@ -72,15 +72,51 @@ public enum Command{
    * <code>COMMAND_HEARTBEAT_REQ = 13;</code>
    */
   COMMAND_HEARTBEAT_REQ(13),
+
+  /**
+   * <pre>
+   * 心跳响应
+   * </pre>
+   *
+   * <code>COMMAND_HEARTBEAT_RESP = 14</code>
+   */
+  COMMAND_HEARTBEAT_RESP(14),
+
   /**
    * <pre>
    *关闭请求
    * </pre>
    *
-   * <code>COMMAND_CLOSE_REQ = 14;</code>
+   * <code>COMMAND_CLOSE_REQ = 15;</code>
    */
-  COMMAND_CLOSE_REQ(14),
+  COMMAND_CLOSE_REQ(15),
 
+  /**
+   * <pre>
+   * 班牌设备配置信息下发
+   * </pre>
+   *
+   * <code>COMMAND_CONFIG_PUSH_RESP = 16</code>
+   */
+  COMMAND_CONFIG_PUSH_RESP(16),
+
+  /**
+   * <pre>
+   * 人脸信息下发
+   * </pre>
+   *
+   * <code>COMMAND_BITMAP_PUSH_REQ = 17</code>
+   */
+  COMMAND_BITMAP_PUSH_REQ(17),
+
+  /**
+   * <pre>
+   * 人脸录入客户端响应
+   * </pre>
+   *
+   * <code>COMMAND_BITMAP_PUSH_RESP = 18</code>
+   */
+  COMMAND_BITMAP_PUSH_RESP(18),
   ;
 
   public final int getNumber() {

@@ -9,6 +9,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.ChannelContextFilter;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
+import org.tio.core.intf.Packet;
 import org.tio.utils.lock.SetWithLock;
 import xyz.jasenon.lab.core.ImChannelContext;
 import xyz.jasenon.lab.core.ImConst;
@@ -141,6 +142,24 @@ public class JimServerAPI implements ImConst{
 			return false;
 		}
 		return Tio.bSend(imChannelContext.getTioChannelContext(), convertPacket);
+	}
+
+	/**
+	 * rpc机制实现响应接收  需要请求响应同步的机制时使用这个
+	 * @param imChannelContext 通讯上下文
+	 * @param imPacket 消息包
+	 * @return 响应包
+	 */
+	public static Packet synSend(ImChannelContext imChannelContext, ImPacket imPacket){
+		if (imChannelContext == null){
+			return null;
+		}
+		ImPacket convertPacket = convertPacket(imChannelContext, imPacket);
+		if (convertPacket == null){
+			return null;
+		}
+		convertPacket.setSynSeq(imChannelContext.synSeq());
+		return Tio.synSend(imChannelContext.getTioChannelContext(), convertPacket, 10L);
 	}
 
 	/**

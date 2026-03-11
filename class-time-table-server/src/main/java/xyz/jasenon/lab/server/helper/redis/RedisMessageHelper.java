@@ -109,7 +109,7 @@ public class RedisMessageHelper extends AbstractMessageHelper {
 				return;
 			validateStatusByType(type, classTimeTables, classTimeTable);
 		});
-		group.setUsers(classTimeTables);
+		group.setClassTimeTables(classTimeTables);
 		return group;
 	}
 
@@ -165,7 +165,7 @@ public class RedisMessageHelper extends AbstractMessageHelper {
 		for (Group group : relatedGroups) {
 			if (!relatedGroupId.equals(group.getGroupId()))
 				continue;
-			List<ClassTimeTable> classTimeTables = group.getUsers();
+			List<ClassTimeTable> classTimeTables = group.getClassTimeTables();
 			if (CollectionUtils.isEmpty(classTimeTables)) {
 				return group;
 			}
@@ -174,7 +174,7 @@ public class RedisMessageHelper extends AbstractMessageHelper {
 				initClassTimeTableStatus(classTimeTable);
 				validateStatusByType(type, results, classTimeTable);
 			}
-			group.setUsers(results);
+			group.setClassTimeTables(results);
 			return group;
 		}
 		return null;
@@ -216,7 +216,7 @@ public class RedisMessageHelper extends AbstractMessageHelper {
 		List<Group> relatedGroups = new ArrayList<Group>();
 		relatedJsonArray.forEach(groupJson -> {
 			Group group = JSONObject.toJavaObject(groupJson, Group.class);
-			List<ClassTimeTable> classTimeTables = group.getUsers();
+			List<ClassTimeTable> classTimeTables = group.getClassTimeTables();
 			if (CollectionUtils.isEmpty(classTimeTables)) {
 				return;
 			}
@@ -225,7 +225,7 @@ public class RedisMessageHelper extends AbstractMessageHelper {
 				initClassTimeTableStatus(classTimeTable);
 				validateStatusByType(type, results, classTimeTable);
 			}
-			group.setUsers(results);
+			group.setClassTimeTables(results);
 			relatedGroups.add(group);
 		});
 		return relatedGroups;

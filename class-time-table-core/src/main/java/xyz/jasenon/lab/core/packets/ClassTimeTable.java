@@ -54,6 +54,11 @@ public class ClassTimeTable extends Message implements Serializable, Cloneable {
     private List<Group> groups;
 
     /**
+     * 设备配置信息
+     */
+    private Config config;
+
+    /**
      * 获取班牌所属群组列表
      * @return List<Group> 群组列表
      */

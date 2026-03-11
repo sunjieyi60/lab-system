@@ -14,7 +14,7 @@ import xyz.jasenon.lab.common.entity.BaseEntity;
 public class Course extends BaseEntity {
 
     /**
-     * 课程名称
+     * 课程名称s
      */
     private String courseName;
 
