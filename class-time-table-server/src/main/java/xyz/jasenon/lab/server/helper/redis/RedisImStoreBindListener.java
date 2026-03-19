@@ -1,11 +1,9 @@
 package xyz.jasenon.lab.server.helper.redis;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.jasenon.lab.core.ImChannelContext;
-import xyz.jasenon.lab.core.ImSessionContext;
 import xyz.jasenon.lab.core.cache.redis.RedisCache;
 import xyz.jasenon.lab.core.cache.redis.RedisCacheManager;
 import xyz.jasenon.lab.core.config.ImConfig;
@@ -17,7 +15,6 @@ import xyz.jasenon.lab.core.packets.ClassTimeTableStatusType;
 import xyz.jasenon.lab.core.packets.Group;
 import xyz.jasenon.lab.server.config.ImServerConfig;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -102,20 +99,8 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 			groupCache.listPushTail(groupClassTimeTableKey, uuid);
 		}
 		initClassTimeTableGroups(uuid, groupId);
-		ImSessionContext imSessionContext = imChannelContext.getSessionContext();
-		ClassTimeTable onlineClassTimeTable = imSessionContext.getImClientNode().getClassTimeTable();
-		if(onlineClassTimeTable == null) {
-			return;
-		}
-		List<Group> groups = onlineClassTimeTable.getGroups();
-		if(groups == null) {
-			return;
-		}
-		for(Group storeGroup : groups){
-			if(!groupId.equals(storeGroup.getGroupId())) continue;
-			groupCache.put(groupId + SUFFIX + INFO, storeGroup);
-			break;
-		}
+		// 缓存群组信息
+		groupCache.put(groupId + SUFFIX + INFO, group);
 	}
 
 	/**
@@ -149,9 +134,7 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 		}
 		RedisCache userCache = RedisCacheManager.getCache(USER);
 		userCache.put(uuid + SUFFIX + INFO, classTimeTable.clone());
-		List<Group> friends = classTimeTable.getGroups(); // 使用groups作为关联分组
-		if(CollectionUtils.isEmpty(friends)) return;
-		userCache.put(uuid + SUFFIX + FRIENDS, (Serializable) friends);
+		// 班牌实体不再存储groups列表，群组关系通过Redis维护
 	}
 
 	/**
@@ -168,7 +151,6 @@ public class RedisImStoreBindListener extends AbstractImStoreBindListener {
 		RedisCacheManager.register(GROUP, Integer.MAX_VALUE, Integer.MAX_VALUE);
 		RedisCacheManager.register(STORE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 		RedisCacheManager.register(PUSH, Integer.MAX_VALUE, Integer.MAX_VALUE);
-		RedisCacheManager.register(FRIEND_REQUEST, Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 
 }

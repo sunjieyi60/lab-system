@@ -1,7 +1,7 @@
 server:
   port: 8083
 
-# t-io TCP 服务器配置
+# t-io ws 服务器配置
 t-io:
   server:
     name: smart-board-server

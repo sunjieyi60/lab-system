@@ -22,6 +22,7 @@
         <module>class-time-table</module>
         <module>class-time-table-core</module>
         <module>class-time-table-server</module>
+        <module>class-time-table-rsocket</module>
     </modules>
 
     <properties>

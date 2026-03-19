@@ -150,7 +150,7 @@ public class JimServerAPI implements ImConst{
 	 * @param imPacket 消息包
 	 * @return 响应包
 	 */
-	public static Packet synSend(ImChannelContext imChannelContext, ImPacket imPacket){
+	public static ImPacket synSend(ImChannelContext imChannelContext, ImPacket imPacket){
 		if (imChannelContext == null){
 			return null;
 		}
@@ -159,7 +159,7 @@ public class JimServerAPI implements ImConst{
 			return null;
 		}
 		convertPacket.setSynSeq(imChannelContext.synSeq());
-		return Tio.synSend(imChannelContext.getTioChannelContext(), convertPacket, 10L);
+		return (ImPacket) Tio.synSend(imChannelContext.getTioChannelContext(), convertPacket, 10L);
 	}
 
 	/**

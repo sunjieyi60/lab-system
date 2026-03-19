@@ -35,7 +35,9 @@ public enum ImStatus implements Status {
 	C10022(10022,"ok", "好友申请已发送"),
 	C10023(10023,"ok", "好友申请已处理"),
 	C10024(10024,"ok","握手成功"),
-	C10025(10025,"failed","握手失败");
+	C10025(10025,"failed","握手失败"),
+	C10026(10026, "ok", "人脸注册成功"),
+	C10027(10027,"failed","人脸注册失败");
 	
 	private int status;
 	

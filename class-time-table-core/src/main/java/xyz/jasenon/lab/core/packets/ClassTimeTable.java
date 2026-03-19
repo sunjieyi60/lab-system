@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 电子班牌设备实体类
@@ -49,30 +48,9 @@ public class ClassTimeTable extends Message implements Serializable, Cloneable {
     private String ip;
 
     /**
-     * 设备所在群组列表（班牌支持多分组）
-     */
-    private List<Group> groups;
-
-    /**
      * 设备配置信息
      */
     private Config config;
-
-    /**
-     * 获取班牌所属群组列表
-     * @return List<Group> 群组列表
-     */
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    /**
-     * 设置班牌所属群组列表
-     * @param groups 群组列表
-     */
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
-    }
 
     /**
      * 浅拷贝克隆
