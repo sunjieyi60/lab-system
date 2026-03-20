@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
 import xyz.jasenon.lab.common.entity.class_time_table.*;
 import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.dto.course.EditCourseSchedule;
 import xyz.jasenon.lab.service.dto.course.CreateCourseSchedule;
 import xyz.jasenon.lab.service.dto.course.DeleteCourseSchedule;
 import xyz.jasenon.lab.service.mapper.CourseScheduleMapper;
@@ -83,6 +84,59 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         this.removeById(deleteCourseSchedule.getCourseScheduleId());
         analysisService.invalidateChartCache();
         return R.success("课程表删除成功");
+    }
+
+    @Override
+    public R editCourseScheduleWeekdays(EditCourseSchedule editCourseSchedule) {
+        CourseSchedule courseSchedule = this.getById(editCourseSchedule.getCourseScheduleId());
+        if (courseSchedule == null) {
+            return R.fail("课程表不存在");
+        }
+
+        courseSchedule.setWeekdays(editCourseSchedule.getWeekdays());
+        CourseSchedule updated = courseSchedule;
+
+        List<CourseSchedule> schedules = this.lambdaQuery()
+                .eq(CourseSchedule::getSemesterId, updated.getSemesterId())
+                .list();
+
+        for (CourseSchedule ex : schedules) {
+            if (ex.getId() != null && ex.getId().equals(updated.getId())) {
+                continue; // 跳过自身记录，避免把“旧数据”当作冲突对比对象
+            }
+            if (hasConflict(updated, ex)) {
+                return R.fail("课程安排冲突");
+            }
+        }
+
+        this.updateById(updated);
+        analysisService.invalidateChartCache();
+        return R.success("课程表编辑成功");
+    }
+
+    @Override
+    public R deleteCourseScheduleByLaboratoryId(Long laboratoryId) {
+        if (laboratoryId == null) {
+            return R.fail("实验室ID不能为空");
+        }
+
+        List<CourseSchedule> schedules = this.lambdaQuery()
+                .eq(CourseSchedule::getLaboratoryId, laboratoryId)
+                .list();
+        if (schedules.isEmpty()) {
+            return R.fail("该实验室下无课程表");
+        }
+
+        List<Long> ids = schedules.stream()
+                .map(CourseSchedule::getId)
+                .filter(id -> id != null)
+                .toList();
+
+        if (!ids.isEmpty()) {
+            this.removeByIds(ids);
+            analysisService.invalidateChartCache();
+        }
+        return R.success("实验室课程删除成功");
     }
 
     @Override
