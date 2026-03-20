@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: class-time-table-rsocket-server
