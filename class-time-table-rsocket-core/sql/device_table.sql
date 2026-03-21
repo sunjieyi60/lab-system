@@ -31,15 +31,4 @@ ALTER TABLE `class_time_table_device`
         FOREIGN KEY (`laboratory_id`) REFERENCES `laboratory`(`id`)
             ON DELETE SET NULL ON UPDATE CASCADE;
 
--- 初始化数据
-INSERT IGNORE INTO `class_time_table_device` (
-    `id`, `uuid`, `config`, `laboratory_id`, `status`
-) VALUES (
-    1, 
-    'CTT001',
-    '{"password":"123456","facePrecision":0.85,"timeout":30,"unit":"SECONDS"}',
-    200,
-    'offline'
-);
-
 SET FOREIGN_KEY_CHECKS = 1;

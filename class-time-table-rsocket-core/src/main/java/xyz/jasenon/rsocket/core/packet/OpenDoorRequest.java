@@ -1,5 +1,9 @@
 package xyz.jasenon.rsocket.core.packet;
 
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
+import xyz.jasenon.rsocket.core.protocol.Message;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,10 +14,11 @@ import java.time.Instant;
  * 开门请求
  * 
  * 服务器向设备发送开门指令
+ * 实现 MessageAdaptor<OpenDoorRequest, OpenDoorResponse> 实现类型安全
  */
 @Getter
 @Setter
-public class OpenDoorRequest implements Serializable {
+public class OpenDoorRequest implements MessageAdaptor<OpenDoorRequest, OpenDoorResponse>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,5 +55,26 @@ public class OpenDoorRequest implements Serializable {
          * 远程开门
          */
         REMOTE
+    }
+
+    /**
+     * 将请求转换为 Message 对象
+     */
+    @Override
+    public Message<OpenDoorRequest> adaptor() {
+        return Message.<OpenDoorRequest>builder()
+                .route(Const.Route.DEVICE_DOOR_OPEN)
+                .type(Message.Type.REQUEST_RESPONSE)
+                .data(this)
+                .timestamp(Instant.now())
+                .build();
+    }
+
+    /**
+     * 定义响应类型，用于类型安全
+     */
+    @Override
+    public Class<OpenDoorResponse> getResponseType() {
+        return OpenDoorResponse.class;
     }
 }

@@ -1,4 +1,6 @@
 package xyz.jasenon.rsocket.core.packet;
+import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,16 +25,6 @@ public class UpdateScheduleResponse implements Serializable {
     private boolean success;
 
     /**
-     * 结果码
-     */
-    private Integer code;
-
-    /**
-     * 设备当前课表版本
-     */
-    private Long currentVersion;
-
-    /**
      * 更新时间
      */
     private Instant updateTime;
@@ -40,8 +32,6 @@ public class UpdateScheduleResponse implements Serializable {
     public static UpdateScheduleResponse success(Long version) {
         UpdateScheduleResponse response = new UpdateScheduleResponse();
         response.setSuccess(true);
-        response.setCode(0);
-        response.setCurrentVersion(version);
         response.setUpdateTime(Instant.now());
         return response;
     }
@@ -49,7 +39,7 @@ public class UpdateScheduleResponse implements Serializable {
     public static UpdateScheduleResponse fail(Integer code, String message) {
         UpdateScheduleResponse response = new UpdateScheduleResponse();
         response.setSuccess(false);
-        response.setCode(code);
         return response;
     }
+
 }

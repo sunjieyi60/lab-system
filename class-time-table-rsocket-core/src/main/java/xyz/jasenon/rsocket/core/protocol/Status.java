@@ -2,7 +2,8 @@ package xyz.jasenon.rsocket.core.protocol;
 
 public enum Status implements IStatus{
 
-    C10000(10000,"ok","发送成功");
+    C10000(10000,"ok","发送成功"),
+    C10001(10001,"fail","发送失败");
 
     private final Integer code;
     private final String desc;

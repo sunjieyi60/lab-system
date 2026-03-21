@@ -1,6 +1,7 @@
 package xyz.jasenon.rsocket.core.cache;
 
 import com.alibaba.fastjson2.JSON;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,13 +33,12 @@ import java.util.function.Function;
  * @author Jasenon_ce
  */
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class JedisTemplate implements Serializable {
 
     private static final long serialVersionUID = 9135301078135982677L;
 
-    @Autowired
-    private JedisPool jedisPool;
+    private final JedisPool jedisPool;
 
     /**
      * 执行器抽象类

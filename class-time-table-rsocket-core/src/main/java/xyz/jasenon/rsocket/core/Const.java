@@ -11,13 +11,17 @@ public interface Const {
         String INFO = "info";
         
         // 缓存键
-        String CACHE_DEVICE_PREFIX = "class-time-table:device:";
-        String CACHE_DEVICE_ID_PREFIX = "class-time-table:device:id:";
+        String CACHE_DEVICE_UUID_PREFIX = "class-time-table:uuid:";
+        String CACHE_DEVICE_ID_PREFIX = "class-time-table:id:";
     }
 
     interface Status {
         String ONLINE = "online";
         String OFFLINE = "offline";
+    }
+
+    interface Role {
+        String SERVER = "server";
     }
 
     /**
@@ -38,6 +42,14 @@ public interface Const {
         String DEVICE_COMMAND = "device.command";
         // 服务器下发命令并等待响应
         String DEVICE_COMMAND_WAIT = "device.command.wait";
+        // 服务器推送设备配置信息更新
+        String DEVICE_CONFIG_UPDATE = "device.config.update";
+        // 服务器推送人脸信息更新
+        String DEVICE_FACE_UPDATE = "device.face.update";
+        // 服务端推送课表信息更新
+        String DEVICE_SCHEDULE_UPDATE = "device.schedule.update";
+        // 服务端下发开门指令
+        String DEVICE_DOOR_OPEN = "device.door.open";
     }
 
     /**

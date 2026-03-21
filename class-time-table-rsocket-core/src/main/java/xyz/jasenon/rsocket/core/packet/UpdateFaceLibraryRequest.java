@@ -1,4 +1,7 @@
 package xyz.jasenon.rsocket.core.packet;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +17,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class UpdateFaceLibraryRequest implements Serializable {
+public class UpdateFaceLibraryRequest implements MessageAdaptor<UpdateFaceLibraryRequest,UpdateFaceLibraryResponse>,  Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,6 +67,22 @@ public class UpdateFaceLibraryRequest implements Serializable {
 
         private String faceId;
         private String name;
-        private String faceData;
+        private byte[] faceData;
     }
+
+    @Override
+    public Message adaptor() {
+        return Message.builder()
+                .route(Const.Route.DEVICE_FACE_UPDATE)
+                .type(Message.Type.REQUEST_RESPONSE)
+                .data(this)
+                .timestamp(Instant.now())
+                .build();
+    }
+
+    @Override
+    public Class<UpdateFaceLibraryResponse> getResponseType() {
+        return UpdateFaceLibraryResponse.class;
+    }
+
 }

@@ -1,4 +1,6 @@
 package xyz.jasenon.rsocket.core.packet;
+import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -46,4 +48,5 @@ public class RebootResponse implements Serializable {
         response.setMessage("重启被拒绝: " + reason);
         return response;
     }
+
 }

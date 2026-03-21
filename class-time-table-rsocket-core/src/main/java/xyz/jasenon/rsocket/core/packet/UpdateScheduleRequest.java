@@ -1,4 +1,7 @@
 package xyz.jasenon.rsocket.core.packet;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,17 +18,12 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class UpdateScheduleRequest implements Serializable {
+public class UpdateScheduleRequest implements MessageAdaptor<UpdateScheduleRequest, UpdateScheduleResponse>,  Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 课表版本号
-     */
-    private Long scheduleVersion;
-
-    /**
-     * 课表数据（简化表示，实际应为课程列表）
+     * 课表数据
      */
     private List<CourseSchedule> schedules;
 
@@ -39,18 +37,19 @@ public class UpdateScheduleRequest implements Serializable {
      */
     private Instant requestTime;
 
-    /**
-     * 课表项
-     */
-    @Getter
-    @Setter
-    public static class ScheduleItem implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        private String courseName;
-        private String teacherName;
-        private String startTime;
-        private String endTime;
-        private List<Integer> weekdays;
+    @Override
+    public Message<UpdateScheduleRequest> adaptor() {
+        return Message.<UpdateScheduleRequest>builder()
+                .route(Const.Route.DEVICE_SCHEDULE_UPDATE)
+                .type(Message.Type.REQUEST_RESPONSE)
+                .data(this)
+                .timestamp(Instant.now())
+                .build();
     }
+
+    @Override
+    public Class<UpdateScheduleResponse> getResponseType() {
+        return UpdateScheduleResponse.class;
+    }
+
 }

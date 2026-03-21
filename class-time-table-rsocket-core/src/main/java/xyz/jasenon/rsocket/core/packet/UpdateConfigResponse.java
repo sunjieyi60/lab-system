@@ -1,8 +1,12 @@
 package xyz.jasenon.rsocket.core.packet;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -15,27 +19,13 @@ import java.time.Instant;
 @Setter
 public class UpdateConfigResponse implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
      * 是否成功
      */
     private boolean success;
-
-    /**
-     * 结果码
-     */
-    private Integer code;
-
-    /**
-     * 结果消息
-     */
-    private String message;
-
-    /**
-     * 设备当前配置版本
-     */
-    private Long currentVersion;
 
     /**
      * 更新时间
@@ -45,9 +35,6 @@ public class UpdateConfigResponse implements Serializable {
     public static UpdateConfigResponse success(Long version) {
         UpdateConfigResponse response = new UpdateConfigResponse();
         response.setSuccess(true);
-        response.setCode(0);
-        response.setMessage("配置更新成功");
-        response.setCurrentVersion(version);
         response.setUpdateTime(Instant.now());
         return response;
     }
@@ -55,8 +42,7 @@ public class UpdateConfigResponse implements Serializable {
     public static UpdateConfigResponse fail(Integer code, String message) {
         UpdateConfigResponse response = new UpdateConfigResponse();
         response.setSuccess(false);
-        response.setCode(code);
-        response.setMessage(message);
         return response;
     }
+
 }

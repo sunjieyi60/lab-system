@@ -1,4 +1,7 @@
 package xyz.jasenon.rsocket.core.packet;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +17,7 @@ import java.time.Instant;
  */
 @Getter
 @Setter
-public class UpdateConfigRequest implements Serializable {
+public class UpdateConfigRequest implements MessageAdaptor<UpdateConfigRequest, UpdateConfigResponse>,  Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,4 +40,20 @@ public class UpdateConfigRequest implements Serializable {
      * 请求时间
      */
     private Instant requestTime;
+
+    @Override
+    public Message<UpdateConfigRequest> adaptor() {
+        return Message.<UpdateConfigRequest>builder()
+                .route(Const.Route.DEVICE_CONFIG_UPDATE)
+                .type(Message.Type.REQUEST_RESPONSE)
+                .data(this)
+                .timestamp(Instant.now())
+                .build();
+    }
+
+    @Override
+    public Class<UpdateConfigResponse> getResponseType() {
+        return UpdateConfigResponse.class;
+    }
+
 }

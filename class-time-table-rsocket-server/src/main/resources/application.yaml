@@ -1,3 +1,65 @@
 spring:
   application:
-    name: class-time-table-rsocket-server
+    name: class-time-table-rsocket
+
+  # RSocket 配置
+  rsocket:
+    server:
+      port: 7001                    # RSocket 服务端口（TCP）
+      transport: tcp               # 传输协议：tcp / websocket
+      mapping-path: /rsocket       # WebSocket 路径（仅 websocket 传输有效）
+
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/lab_sys4?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: sbx159357!?.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+
+  # Redis 配置（使用 Jedis）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 2000
+
+rsocket:
+  core:
+    enabled: true  # 启用自动配置（默认true）
+    redis:
+      max-total: 20
+      max-idle: 10
+      min-idle: 5
+    connection:
+      enabled: true
+      heartbeat-interval: 30
+
+# MyBatis Plus 配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志配置
+logging:
+  level:
+    xyz.jasenon.rsocket.classtimetablersocket: DEBUG
+    io.rsocket: INFO
+    org.springframework.messaging.rsocket: INFO
+
+# 服务端口（HTTP 管理接口）
+server:
+  port: 8084

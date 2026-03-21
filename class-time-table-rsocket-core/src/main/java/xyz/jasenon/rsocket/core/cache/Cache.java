@@ -2,6 +2,7 @@ package xyz.jasenon.rsocket.core.cache;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -26,14 +27,12 @@ import java.util.function.Supplier;
  * @date 2026/3/17
  */
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class Cache {
 
-    @Autowired
-    private JedisTemplate jedisTemplate;
+    private final JedisTemplate jedisTemplate;
 
-    @Autowired
-    private RedissonClient redissonClient;
+    private final RedissonClient redissonClient;
 
     /**
      * 缓存空值的过期时间（分钟）- 防止缓存穿透

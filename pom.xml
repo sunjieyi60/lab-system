@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>3.5.6</version>
         <relativePath />
     </parent>
     <groupId>xyz.jasenon.lab</groupId>
@@ -20,14 +20,13 @@
         <module>mqtt</module>
         <module>service</module>
         <module>class-time-table-rsocket-core</module>
-        <module>class-time-table-rsocket-demo</module>
         <module>class-time-table-rsocket-server</module>
     </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spring.version>3.5.7</spring.version>
+        <spring.version>3.5.6</spring.version>
         <mybatis.plus.version>3.5.12</mybatis.plus.version>
         <jackson.version>2.20.0</jackson.version>
     </properties>
