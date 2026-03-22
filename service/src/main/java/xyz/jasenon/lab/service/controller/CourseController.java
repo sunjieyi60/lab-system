@@ -72,7 +72,7 @@ public class CourseController {
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @DeleteMapping("/delete/courseSchedule")
-    @ApiOperation("删除课程表")
+    @ApiOperation("删除特定时间的课程")
     public R deleteCourseSchedule(@Validated @RequestBody DeleteCourseSchedule deleteCourseSchedule){
         return courseScheduleService.deleteCourseSchedule(deleteCourseSchedule);
     }
@@ -113,9 +113,23 @@ public class CourseController {
         return teacherService.editTeacher(editTeacher);
     }
 
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
+    @PutMapping("/edit/courseSchedule")
+    @ApiOperation("编辑课程表")
+    public R editCourseSchedule(@Validated @RequestBody EditCourseSchedule editCourseSchedule){
+        return courseScheduleService.editCourseScheduleWeekdays(editCourseSchedule);
+    }
+
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
+    @DeleteMapping("/delete/courseScheduleByLaboratory")
+    @ApiOperation("删除实验室全部课程表")
+    public R deleteCourseScheduleByLaboratory(@RequestParam Long laboratoryId) {
+        return courseScheduleService.deleteCourseScheduleByLaboratoryId(laboratoryId);
+    }
+
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES,Permissions.SCHEDULE_CLASSES_VIEW})
     @PostMapping("/list/courseSchedule")
-    @ApiOperation("获取课程表列表")
+    @ApiOperation("获取教室课程表列表")
     public R listCourseSchedule(@RequestParam List<Long> laboratoryIds){
         return courseScheduleService.listCourseSchedule(laboratoryIds);
     }
