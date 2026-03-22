@@ -1,12 +1,14 @@
 package xyz.jasenon.rsocket.core.packet;
 
-import xyz.jasenon.rsocket.core.Const;
-import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
-import xyz.jasenon.rsocket.core.protocol.Message;
-
 import lombok.Getter;
 import lombok.Setter;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.Command;
+import xyz.jasenon.rsocket.core.protocol.Message;
+import xyz.jasenon.rsocket.core.protocol.ServerSend;
+import xyz.jasenon.rsocket.core.protocol.Status;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -14,12 +16,13 @@ import java.time.Instant;
  * 开门请求
  * 
  * 服务器向设备发送开门指令
- * 实现 MessageAdaptor<OpenDoorRequest, OpenDoorResponse> 实现类型安全
+ * 继承 Message，简化设计
  */
 @Getter
 @Setter
-public class OpenDoorRequest implements MessageAdaptor<OpenDoorRequest, OpenDoorResponse>, Serializable {
+public class OpenDoorRequest extends Message implements ServerSend, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -42,6 +45,11 @@ public class OpenDoorRequest implements MessageAdaptor<OpenDoorRequest, OpenDoor
      */
     private Instant requestTime;
 
+    @Override
+    public Command command() {
+        return super.getCommand();
+    }
+
     public enum OpenType {
         /**
          * 人脸识别
@@ -58,23 +66,27 @@ public class OpenDoorRequest implements MessageAdaptor<OpenDoorRequest, OpenDoor
     }
 
     /**
-     * 将请求转换为 Message 对象
+     * 创建开门请求 Message
      */
-    @Override
-    public Message<OpenDoorRequest> adaptor() {
-        return Message.<OpenDoorRequest>builder()
-                .route(Const.Route.DEVICE_DOOR_OPEN)
-                .type(Message.Type.REQUEST_RESPONSE)
-                .data(this)
-                .timestamp(Instant.now())
-                .build();
+    public static OpenDoorRequest create(OpenType type, String verifyInfo, Integer duration) {
+        OpenDoorRequest request = new OpenDoorRequest();
+        // client -> server 使用 route
+        request.setRoute(Const.Route.DEVICE_DOOR_OPEN);
+        request.setStatus(Status.C10000);
+        request.setType_(type);
+        request.setVerifyInfo(verifyInfo);
+        request.setDuration(duration);
+        request.setRequestTime(Instant.now());
+        request.setTimestamp(Instant.now());
+        return request;
     }
 
-    /**
-     * 定义响应类型，用于类型安全
-     */
-    @Override
-    public Class<OpenDoorResponse> getResponseType() {
-        return OpenDoorResponse.class;
+    // 兼容旧代码的 getter/setter
+    public OpenType getType_() {
+        return type;
+    }
+
+    public void setType_(OpenType type) {
+        this.type = type;
     }
 }

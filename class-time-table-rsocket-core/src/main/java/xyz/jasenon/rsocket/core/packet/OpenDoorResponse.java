@@ -1,10 +1,12 @@
 package xyz.jasenon.rsocket.core.packet;
-import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
-import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.ClientSend;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -12,11 +14,13 @@ import java.time.Instant;
  * 开门响应
  * 
  * 设备返回开门执行结果
+ * 继承 Message，简化设计
  */
 @Getter
 @Setter
-public class OpenDoorResponse implements Serializable {
+public class OpenDoorResponse extends Message implements ClientSend, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -32,7 +36,7 @@ public class OpenDoorResponse implements Serializable {
     /**
      * 结果消息
      */
-    private String message;
+    private String messageText;
 
     /**
      * 实际开门时间
@@ -43,8 +47,9 @@ public class OpenDoorResponse implements Serializable {
         OpenDoorResponse response = new OpenDoorResponse();
         response.setSuccess(true);
         response.setCode(0);
-        response.setMessage("开门成功");
+        response.setMessageText("开门成功");
         response.setOpenTime(Instant.now());
+        response.setTimestamp(Instant.now());
         return response;
     }
 
@@ -52,8 +57,13 @@ public class OpenDoorResponse implements Serializable {
         OpenDoorResponse response = new OpenDoorResponse();
         response.setSuccess(false);
         response.setCode(code);
-        response.setMessage(message);
+        response.setMessageText(message);
+        response.setTimestamp(Instant.now());
         return response;
     }
 
+    @Override
+    public String route() {
+        return Const.Route.DEVICE_DOOR_OPEN;
+    }
 }

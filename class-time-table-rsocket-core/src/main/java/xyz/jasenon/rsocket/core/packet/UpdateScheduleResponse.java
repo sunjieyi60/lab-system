@@ -1,21 +1,22 @@
 package xyz.jasenon.rsocket.core.packet;
-import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
-import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.ClientSend;
+import xyz.jasenon.rsocket.core.protocol.Message;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 /**
  * 更新课表响应
  * 
  * 设备返回课表更新结果
+ * 继承 Message，简化设计
  */
 @Getter
 @Setter
-public class UpdateScheduleResponse implements Serializable {
+public class UpdateScheduleResponse extends Message implements ClientSend {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,13 +34,19 @@ public class UpdateScheduleResponse implements Serializable {
         UpdateScheduleResponse response = new UpdateScheduleResponse();
         response.setSuccess(true);
         response.setUpdateTime(Instant.now());
+        response.setTimestamp(Instant.now());
         return response;
     }
 
     public static UpdateScheduleResponse fail(Integer code, String message) {
         UpdateScheduleResponse response = new UpdateScheduleResponse();
         response.setSuccess(false);
+        response.setTimestamp(Instant.now());
         return response;
     }
 
+    @Override
+    public String route() {
+        return Const.Route.DEVICE_SCHEDULE_UPDATE;
+    }
 }

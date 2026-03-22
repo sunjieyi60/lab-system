@@ -6,27 +6,79 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * RSocket 命令类型枚举
+ * 
+ * 对应各种业务操作命令
+ */
 @Getter
 public enum Command {
 
-    REGISTER(1,"设备注册");
+    /**
+     * 设备注册
+     */
+    REGISTER(1, "设备注册"),
+
+    /**
+     * 心跳
+     */
+    HEARTBEAT(2, "心跳"),
+
+    /**
+     * 开门
+     */
+    OPEN_DOOR(3, "开门"),
+
+    /**
+     * 更新配置
+     */
+    UPDATE_CONFIG(4, "更新配置"),
+
+    /**
+     * 更新人脸库
+     */
+    UPDATE_FACE_LIBRARY(5, "更新人脸库"),
+
+    /**
+     * 更新课表
+     */
+    UPDATE_SCHEDULE(6, "更新课表"),
+
+    /**
+     * 设备重启
+     */
+    REBOOT(7, "设备重启"),
+
+    /**
+     * 远程截图
+     */
+    SCREENSHOT(8, "远程截图"),
+
+    /**
+     * 设备状态上报
+     */
+    STATUS_REPORT(9, "设备状态上报"),
+
+    /**
+     * 通用响应
+     */
+    RESPONSE(100, "通用响应");
 
     private final Integer code;
-
     private final String desc;
 
-    Command(Integer code, String desc){
+    Command(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    private static Map<Integer, Command> CACHE = Arrays.stream(values())
+    private static final Map<Integer, Command> CACHE = Arrays.stream(values())
             .collect(Collectors.toMap(Command::getCode, cmd -> cmd));
 
-    public static Command valueOf(Integer code){
-        if (code == null){
+    public static Command valueOf(Integer code) {
+        if (code == null) {
             return null;
         }
-        return CACHE.getOrDefault(code,null);
+        return CACHE.getOrDefault(code, null);
     }
 }

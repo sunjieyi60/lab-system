@@ -1,13 +1,14 @@
 package xyz.jasenon.rsocket.core.packet;
-import xyz.jasenon.rsocket.core.Const;
-import xyz.jasenon.rsocket.core.protocol.MessageAdaptor;
-import xyz.jasenon.rsocket.core.protocol.Message;
 
 import lombok.Getter;
 import lombok.Setter;
+import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.protocol.Command;
+import xyz.jasenon.rsocket.core.protocol.Message;
+import xyz.jasenon.rsocket.core.protocol.ServerSend;
+import xyz.jasenon.rsocket.core.protocol.Status;
 import xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 
@@ -15,10 +16,11 @@ import java.util.List;
  * 更新课表请求
  * 
  * 服务器推送新课表数据
+ * 继承 Message，简化设计
  */
 @Getter
 @Setter
-public class UpdateScheduleRequest implements MessageAdaptor<UpdateScheduleRequest, UpdateScheduleResponse>,  Serializable {
+public class UpdateScheduleRequest extends Message implements ServerSend {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,19 +39,23 @@ public class UpdateScheduleRequest implements MessageAdaptor<UpdateScheduleReque
      */
     private Instant requestTime;
 
-    @Override
-    public Message<UpdateScheduleRequest> adaptor() {
-        return Message.<UpdateScheduleRequest>builder()
-                .route(Const.Route.DEVICE_SCHEDULE_UPDATE)
-                .type(Message.Type.REQUEST_RESPONSE)
-                .data(this)
-                .timestamp(Instant.now())
-                .build();
+    /**
+     * 创建课表更新请求 Message
+     */
+    public static UpdateScheduleRequest create(List<CourseSchedule> schedules, Instant effectiveTime) {
+        UpdateScheduleRequest request = new UpdateScheduleRequest();
+        // client -> server 使用 route
+        request.setRoute(Const.Route.DEVICE_SCHEDULE_UPDATE);
+        request.setStatus(Status.C10000);
+        request.setSchedules(schedules);
+        request.setEffectiveTime(effectiveTime);
+        request.setRequestTime(Instant.now());
+        request.setTimestamp(Instant.now());
+        return request;
     }
 
     @Override
-    public Class<UpdateScheduleResponse> getResponseType() {
-        return UpdateScheduleResponse.class;
+    public Command command() {
+        return Command.UPDATE_SCHEDULE;
     }
-
 }

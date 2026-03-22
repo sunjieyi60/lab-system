@@ -20,7 +20,6 @@ import xyz.jasenon.rsocket.core.cache.JedisTemplate;
 import xyz.jasenon.rsocket.core.rsocket.*;
 import xyz.jasenon.rsocket.core.rsocket.client.Client;
 import xyz.jasenon.rsocket.core.rsocket.client.ClientImpl;
-import xyz.jasenon.rsocket.core.rsocket.strategy.*;
 
 /**
  * RSocket Core 自动配置类
@@ -30,7 +29,8 @@ import xyz.jasenon.rsocket.core.rsocket.strategy.*;
  * - ConnectionManager
  * - Server / ServerImpl
  * - Client / ClientImpl
- * - SendStrategyManager 及所有策略
+ * 
+ * 注意：SendStrategy 已被移除，直接使用 RSocketRequester 发送消息
  */
 @AutoConfiguration(before = JmxAutoConfiguration.class)
 @EnableConfigurationProperties(RSocketCoreProperties.class)
@@ -38,8 +38,8 @@ import xyz.jasenon.rsocket.core.rsocket.strategy.*;
 @ConditionalOnProperty(prefix = "rsocket.core", name = "enabled", havingValue = "true", matchIfMissing = true)
 @Import({
     RSocketCoreAutoConfiguration.RedisConfiguration.class,
-    RSocketCoreAutoConfiguration.StrategyConfiguration.class,
-    RSocketCoreAutoConfiguration.RSocketConfiguration.class
+    RSocketCoreAutoConfiguration.RSocketConfiguration.class,
+    xyz.jasenon.rsocket.core.rsocket.client.handler.HandlerConfiguration.class
 })
 public class RSocketCoreAutoConfiguration {
 
@@ -86,36 +86,6 @@ public class RSocketCoreAutoConfiguration {
         @ConditionalOnClass(RedissonClient.class)
         public Cache cache(JedisTemplate jedisTemplate, RedissonClient redissonClient) {
             return new Cache(jedisTemplate, redissonClient);
-        }
-    }
-
-    // ==================== 策略配置 ====================
-
-    @Configuration
-    static class StrategyConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public SendStrategyManager sendStrategyManager(java.util.List<SendStrategy> strategies) {
-            return new SendStrategyManager(strategies);
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public RequestResponseStrategy requestResponseStrategy() {
-            return new RequestResponseStrategy();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public FireAndForgetStrategy fireAndForgetStrategy() {
-            return new FireAndForgetStrategy();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public RequestStreamStrategy requestStreamStrategy() {
-            return new RequestStreamStrategy();
         }
     }
 

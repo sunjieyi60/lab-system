@@ -50,6 +50,8 @@ public interface Const {
         String DEVICE_SCHEDULE_UPDATE = "device.schedule.update";
         // 服务端下发开门指令
         String DEVICE_DOOR_OPEN = "device.door.open";
+        // 服务端下发重启指令
+        String DEVICE_REBOOT = "device.reboot";
     }
 
     /**

@@ -1,22 +1,27 @@
 package xyz.jasenon.rsocket.core.rsocket;
 
+import com.alibaba.fastjson2.JSON;
+import io.rsocket.util.ByteBufPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Message;
-import xyz.jasenon.rsocket.core.rsocket.strategy.SendStrategyManager;
+import xyz.jasenon.rsocket.core.protocol.ServerSend;
+import xyz.jasenon.rsocket.core.protocol.Status;
 
+import java.nio.ByteBuffer;
 import java.time.Instant;
 
 /**
  * 服务端实现
  * 
  * 负责服务端向客户端发送消息
- * 使用策略模式处理不同类型的消息发送
- * 支持类型安全的 MessageAdaptor 调用
+ * 使用 command 标识消息类型（server -> client）
+ * 直接通过底层 RSocket 发送，绕过 Spring 的 @MessageMapping 路由
  */
 @Slf4j
 @Component
@@ -24,71 +29,68 @@ public class ServerImpl implements Server {
 
     @Autowired
     private ConnectionManager connectionManager;
-    
-    @Autowired
-    private SendStrategyManager strategyManager;
 
-    // ==================== 基础发送方法 ====================
+    // ==================== 请求-响应 ====================
 
-    /**
-     * 向指定设备发送消息
-     * 
-     * @param message 消息（包含 route、payload 等）
-     * @param requester RSocket 连接
-     * @return 响应消息
-     */
     @Override
-    public Mono<Message<?>> send(Message<?> message, RSocketRequester requester) {
+    public Mono<Message> send(ServerSend message, RSocketRequester requester) {
         if (requester == null) {
             return Mono.error(new IllegalStateException("RSocket 连接为空"));
         }
 
-        String route = message.getRoute();
-        if (route == null || route.isEmpty()) {
-            return Mono.error(new IllegalArgumentException("消息 route 不能为空"));
+        Command command = message.command();
+        if (command == null) {
+            return Mono.error(new IllegalArgumentException("消息 command 不能为空"));
         }
 
-        // 设置时间戳
-        message.setTimestamp(Instant.now());
+        // 设置时间戳和 command
+        if (message instanceof Message) {
+            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setCommand(command);
+        }
 
-        log.debug("向设备发送消息: route={}", route);
+        log.debug("向设备发送请求-响应消息: command={}", command);
         
-        // 使用策略管理器执行发送
-        return strategyManager.send(message, requester, route)
-                .doOnSuccess(resp -> log.debug("收到设备响应: route={}, status={}", route, resp.getStatus()))
+        // 直接通过底层 RSocket 发送 JSON 数据
+        return requester.rsocket()
+                .requestResponse(ByteBufPayload.create(JSON.toJSONBytes(message)))
+                .map(payload -> {
+                    try {
+                        ByteBuffer buffer = payload.getData();
+                        byte[] bytes = byteBufferToBytes(buffer);
+                        payload.release();
+                        return JSON.parseObject(bytes, Message.class);
+                    } catch (Exception e) {
+                        payload.release();
+                        throw new RuntimeException("解析响应失败", e);
+                    }
+                })
+                .doOnSuccess(resp -> log.debug("收到设备响应: command={}, status={}", 
+                        command, resp.getStatus()))
                 .onErrorResume(e -> {
-                    log.error("向设备发送消息失败: route={}", route, e);
-                    return Mono.error(e);
+                    log.error("向设备发送消息失败: command={}", command, e);
+                    return Mono.just(createErrorResponse(command, e.getMessage()));
                 });
     }
 
-    /**
-     * 向指定设备发送消息（通过设备ID）
-     * 
-     * @param deviceId 设备ID
-     * @param message 消息
-     * @return 响应消息
-     */
     @Override
-    public Mono<Message<?>> sendTo(String deviceId, Message<?> message) {
+    public Mono<Message> sendTo(String deviceId, ServerSend message) {
         RSocketRequester requester = connectionManager.getRequester(deviceId);
         if (requester == null) {
             log.warn("设备 {} 不在线，无法发送消息", deviceId);
             return Mono.error(new IllegalStateException("设备 " + deviceId + " 不在线"));
         }
-        message.setTo(deviceId);
+        if (message instanceof Message) {
+            ((Message) message).setTo(deviceId);
+        }
         return send(message, requester);
     }
 
-    /**
-     * 广播消息给所有在线设备
-     * 
-     * @param message 消息
-     * @return 发送成功的设备数量
-     */
     @Override
-    public Mono<Integer> broadcast(Message<?> message) {
-        message.setTimestamp(Instant.now());
+    public Mono<Integer> broadcast(ServerSend message) {
+        if (message instanceof Message) {
+            ((Message) message).setTimestamp(Instant.now());
+        }
         
         var connections = connectionManager.getAllConnections();
         if (connections.isEmpty()) {
@@ -109,56 +111,54 @@ public class ServerImpl implements Server {
                 .doOnSuccess(count -> log.info("广播消息成功发送给 {} 个设备", count));
     }
 
-    // ==================== Fire-and-Forget 方法 ====================
+    // ==================== Fire-and-Forget ====================
 
-    /**
-     * Fire-and-Forget 发送（不等待响应）
-     */
     @Override
-    public Mono<Void> sendAndForget(Message<?> message, RSocketRequester requester) {
+    public Mono<Void> sendAndForget(ServerSend message, RSocketRequester requester) {
         if (requester == null) {
             return Mono.error(new IllegalStateException("RSocket 连接为空"));
         }
 
-        String route = message.getRoute();
-        if (route == null || route.isEmpty()) {
-            return Mono.error(new IllegalArgumentException("消息 route 不能为空"));
+        Command command = message.command();
+        if (command == null) {
+            return Mono.error(new IllegalArgumentException("消息 command 不能为空"));
         }
 
-        message.setTimestamp(Instant.now());
-        message.setType(Message.Type.FIRE_AND_FORGET);
+        if (message instanceof Message) {
+            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setCommand(command);
+        }
 
-        log.debug("FireAndForget 发送消息: route={}", route);
+        log.debug("FireAndForget 发送消息: command={}", command);
         
-        return strategyManager.sendAndForget(message, requester, route)
-                .doOnSuccess(v -> log.debug("FireAndForget 消息发送成功: route={}", route))
+        // 直接通过底层 RSocket 发送
+        return requester.rsocket()
+                .fireAndForget(ByteBufPayload.create(JSON.toJSONBytes(message)))
+                .doOnSuccess(v -> log.debug("FireAndForget 消息发送成功: command={}", command))
                 .onErrorResume(e -> {
-                    log.error("FireAndForget 消息发送失败: route={}", route, e);
-                    return Mono.empty(); // FireAndForget 不传播错误
+                    log.error("FireAndForget 消息发送失败: command={}", command, e);
+                    return Mono.empty();
                 });
     }
 
-    /**
-     * Fire-and-Forget 发送到指定设备
-     */
     @Override
-    public Mono<Void> sendAndForgetTo(String deviceId, Message<?> message) {
+    public Mono<Void> sendAndForgetTo(String deviceId, ServerSend message) {
         RSocketRequester requester = connectionManager.getRequester(deviceId);
         if (requester == null) {
             log.warn("设备 {} 不在线，FireAndForget 消息丢弃", deviceId);
-            return Mono.empty(); // FireAndForget 不报错
+            return Mono.empty();
         }
-        message.setTo(deviceId);
+        if (message instanceof Message) {
+            ((Message) message).setTo(deviceId);
+        }
         return sendAndForget(message, requester);
     }
 
-    /**
-     * Fire-and-Forget 广播
-     */
     @Override
-    public Mono<Integer> broadcastAndForget(Message<?> message) {
-        message.setTimestamp(Instant.now());
-        message.setType(Message.Type.FIRE_AND_FORGET);
+    public Mono<Integer> broadcastAndForget(ServerSend message) {
+        if (message instanceof Message) {
+            ((Message) message).setTimestamp(Instant.now());
+        }
         
         var connections = connectionManager.getAllConnections();
         if (connections.isEmpty()) {
@@ -171,5 +171,32 @@ public class ServerImpl implements Server {
                         .onErrorResume(e -> Mono.just(0)))
                 .reduce(Integer::sum)
                 .doOnSuccess(count -> log.info("FireAndForget 广播成功发送给 {} 个设备", count));
+    }
+
+    // ==================== 工具方法 ====================
+
+    /**
+     * 将 ByteBuffer 转换为 byte[]（支持 Direct ByteBuffer）
+     */
+    private byte[] byteBufferToBytes(ByteBuffer buffer) {
+        if (buffer.hasArray()) {
+            return buffer.array();
+        } else {
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+            return bytes;
+        }
+    }
+
+    /**
+     * 创建错误响应
+     */
+    private Message createErrorResponse(Command command, String errorMessage) {
+        Message response = new Message();
+        response.setCommand(command);
+        response.setStatus(Status.C10001);
+        response.setError(errorMessage);
+        response.setTimestamp(Instant.now());
+        return response;
     }
 }
