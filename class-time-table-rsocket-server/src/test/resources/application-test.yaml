@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: class-time-table-rsocket-test
+
+  # RSocket 配置（测试使用随机端口）
+  rsocket:
+    server:
+      port: 7001                      # 随机端口
+      transport: tcp
+
+  # 数据源配置 - H2 内存数据库（替代 MySQL）
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;INIT=RUNSCRIPT FROM 'classpath:db/schema-h2.sql'
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+
+  # H2 Console（测试调试用，可选）
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # Redis 配置（测试环境使用嵌入式或本地）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 1                    # 使用不同的数据库避免冲突
+      timeout: 2000
+
+rsocket:
+  core:
+    enabled: true
+    redis:
+      max-total: 5
+      max-idle: 3
+      min-idle: 1
+    connection:
+      enabled: true
+      heartbeat-interval: 30
+
+# MyBatis Plus 配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志配置
+logging:
+  level:
+    io.rsocket: INFO
+    org.springframework.messaging.rsocket: WARN
+
+# 服务端口（HTTP 管理接口，随机）
+server:
+  port: 7000

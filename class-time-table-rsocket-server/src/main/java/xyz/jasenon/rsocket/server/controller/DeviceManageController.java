@@ -2,17 +2,14 @@ package xyz.jasenon.rsocket.server.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import xyz.jasenon.rsocket.core.Const;
-import xyz.jasenon.rsocket.core.packet.OpenDoorRequest;
 import xyz.jasenon.rsocket.core.packet.UpdateConfigRequest;
 import xyz.jasenon.rsocket.core.packet.UpdateConfigResponse;
 import xyz.jasenon.rsocket.core.rsocket.ConnectionManager;
 import xyz.jasenon.rsocket.core.model.ClassTimeTable;
 import xyz.jasenon.rsocket.core.model.Config;
-import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.rsocket.Server;
 import xyz.jasenon.rsocket.server.service.ClassTimeTableService;
 
@@ -114,12 +111,17 @@ public class DeviceManageController {
                         request.setRequestTime(Instant.now());
 
                         return server.sendTo(uuid, request)
-                                .map(response -> Map.<String, Object>of(
+                                .map(response -> {
+                                    // response 是 UpdateConfigResponse（继承自 Message）
+                                    boolean pushed = response instanceof UpdateConfigResponse 
+                                            && ((UpdateConfigResponse) response).isSuccess();
+                                    return Map.<String, Object>of(
                                            "success", true,
                                            "uuid", uuid,
                                            "configUpdated", true,
-                                           "configPushed", response.getData().isSuccess()
-                                ));
+                                           "configPushed", pushed
+                                    );
+                                });
 //                        return server.requestResponse(uuid, wrapMessage(request), "device.config.update")
 //                                .map(response -> {
 //                                    Object payload = response.getPayload();
