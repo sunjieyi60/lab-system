@@ -13,6 +13,7 @@ import xyz.jasenon.lab.service.dto.course.EditCourse;
 import xyz.jasenon.lab.service.mapper.CourseMapper;
 import xyz.jasenon.lab.service.service.IAcademicAnalysisService;
 import xyz.jasenon.lab.service.service.ICourseService;
+import xyz.jasenon.lab.service.vo.base.CourseCreatedVo;
 
 import java.util.List;
 
@@ -27,14 +28,14 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private IAcademicAnalysisService analysisService;
 
     @Override
-    public R createCourse(CreateCourse createCourse) {
+    public R<CourseCreatedVo> createCourse(CreateCourse createCourse) {
         // 创建课程：参考项目风格，使用流式DTO取值进行字段注入
         Course course = new Course();
         course.setCourseName(createCourse.getCourseName());
         course.setVolumn(createCourse.getVolume());
         course.setGrade(createCourse.getGrade());
         this.save(course);
-        return R.success("课程创建成功");
+        return R.success(new CourseCreatedVo().setCourseId(course.getId()), "课程创建成功");
     }
 
     @Override

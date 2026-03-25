@@ -10,6 +10,7 @@ import xyz.jasenon.lab.service.annotation.RequestPermission;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.course.*;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
+import xyz.jasenon.lab.service.vo.base.CourseCreatedVo;
 import xyz.jasenon.lab.service.service.ICourseService;
 import xyz.jasenon.lab.service.service.ISemesterService;
 import xyz.jasenon.lab.service.service.ITeacherService;
@@ -38,7 +39,7 @@ public class CourseController {
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PostMapping("/create/course")
     @ApiOperation("创建课程")
-    public R createCourse(@Validated @RequestBody CreateCourse createCourse){
+    public R<CourseCreatedVo> createCourse(@Validated @RequestBody CreateCourse createCourse){
         return courseService.createCourse(createCourse);
     }
 
