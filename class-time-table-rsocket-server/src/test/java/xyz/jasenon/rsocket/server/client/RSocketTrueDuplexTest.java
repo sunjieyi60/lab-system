@@ -16,11 +16,12 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import xyz.jasenon.rsocket.core.Api;
 import xyz.jasenon.rsocket.core.Const;
+import xyz.jasenon.rsocket.core.model.Config;
 import xyz.jasenon.rsocket.core.packet.*;
 import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
-import xyz.jasenon.rsocket.core.rsocket.ConnectionManager;
+import xyz.jasenon.rsocket.core.rsocket.AbstractConnectionManager;
 import xyz.jasenon.rsocket.core.rsocket.client.ClientResponder;
 import xyz.jasenon.rsocket.core.rsocket.client.handler.Handler;
 import xyz.jasenon.rsocket.core.rsocket.client.handler.HandlerManager;
@@ -57,7 +58,7 @@ public class RSocketTrueDuplexTest {
     private RSocketStrategies rSocketStrategies;
 
     @Autowired
-    private ConnectionManager connectionManager;
+    private AbstractConnectionManager connectionManager;
 
     @Autowired
     private Api api;
@@ -135,7 +136,7 @@ public class RSocketTrueDuplexTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("【RegisterHandler】收到服务器命令: command={}, from={}", 
                     message.getCommand(), message.getFrom());
             
@@ -164,7 +165,7 @@ public class RSocketTrueDuplexTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("【UpdateConfigHandler】收到服务器命令: command={}, data={}", 
                     message.getCommand(), message);
             
@@ -198,7 +199,7 @@ public class RSocketTrueDuplexTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("【HeartbeatHandler】收到心跳检查");
             
             Heartbeat response = new Heartbeat();
@@ -316,15 +317,17 @@ public class RSocketTrueDuplexTest {
         // 步骤5: 服务器发送配置更新命令给客户端
         // Server -> Client 使用 ServerSend 接口（command）
         UpdateConfigRequest serverCommand = new UpdateConfigRequest();
+        serverCommand.setCommand(Command.UPDATE_CONFIG);
         serverCommand.setVersion(100L);
         serverCommand.setImmediate(true);
         serverCommand.setStatus(Status.C10000, "服务器要求更新配置");
+        serverCommand.setConfig(Config.Default());
         
         log.info("【步骤5】服务器发送配置更新命令给客户端...");
         
         // 使用 Api 发送命令（ServerSend 接口，使用 command）
         Mono<Message> responseMono = api.sendToClient(serverCommand, serverRequester);
-        
+        responseMono.subscribe();
         // 等待 Handler 被调用（可能需要一些时间）
         await().atMost(Duration.ofSeconds(5))
                 .until(() -> updateConfigHandlerCalled.get());

@@ -16,7 +16,7 @@ import xyz.jasenon.rsocket.core.Const;
 import xyz.jasenon.rsocket.core.packet.*;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
-import xyz.jasenon.rsocket.core.rsocket.ConnectionManager;
+import xyz.jasenon.rsocket.core.rsocket.AbstractConnectionManager;
 
 import java.time.Duration;
 
@@ -45,7 +45,7 @@ public class RSocketDuplexCommunicationTest {
     private RSocketStrategies rSocketStrategies;
 
     @Autowired
-    private ConnectionManager connectionManager;
+    private AbstractConnectionManager connectionManager;
 
     private RSocketRequester clientRequester;
     private static final String TEST_UUID = "test-device-001";

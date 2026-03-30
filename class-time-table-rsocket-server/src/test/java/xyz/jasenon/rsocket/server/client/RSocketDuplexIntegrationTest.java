@@ -21,7 +21,7 @@ import xyz.jasenon.rsocket.core.packet.*;
 import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
-import xyz.jasenon.rsocket.core.rsocket.ConnectionManager;
+import xyz.jasenon.rsocket.core.rsocket.AbstractConnectionManager;
 import xyz.jasenon.rsocket.core.rsocket.client.ClientResponder;
 import xyz.jasenon.rsocket.core.rsocket.client.handler.*;
 
@@ -53,7 +53,7 @@ public class RSocketDuplexIntegrationTest {
     private RSocketStrategies rSocketStrategies;
 
     @Autowired
-    private ConnectionManager connectionManager;
+    private AbstractConnectionManager connectionManager;
 
     @Value("${spring.rsocket.server.port}")
     private int serverPort;
@@ -121,7 +121,7 @@ public class RSocketDuplexIntegrationTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("TestRegisterHandler 收到命令: command={}, code={}", 
                     message.getCommand(), message.getCode());
             lastReceivedCommand.set(message);
@@ -147,7 +147,7 @@ public class RSocketDuplexIntegrationTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("TestUpdateConfigHandler 收到命令: command={}, version={}", 
                     message.getCommand(),
                     message instanceof UpdateConfigRequest ? ((UpdateConfigRequest) message).getVersion() : "unknown");
@@ -174,7 +174,7 @@ public class RSocketDuplexIntegrationTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("TestOpenDoorHandler 收到命令: command={}", message.getCommand());
             lastReceivedCommand.set(message);
             

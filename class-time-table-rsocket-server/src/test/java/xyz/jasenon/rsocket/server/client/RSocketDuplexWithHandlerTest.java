@@ -21,7 +21,7 @@ import xyz.jasenon.rsocket.core.packet.*;
 import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
-import xyz.jasenon.rsocket.core.rsocket.ConnectionManager;
+import xyz.jasenon.rsocket.core.rsocket.AbstractConnectionManager;
 import xyz.jasenon.rsocket.core.rsocket.client.ClientResponder;
 import xyz.jasenon.rsocket.core.rsocket.client.handler.*;
 
@@ -51,7 +51,7 @@ public class RSocketDuplexWithHandlerTest {
     private RSocketStrategies rSocketStrategies;
 
     @Autowired
-    private ConnectionManager connectionManager;
+    private AbstractConnectionManager connectionManager;
 
     @Value("${spring.rsocket.server.port}")
     private int serverPort;
@@ -129,7 +129,7 @@ public class RSocketDuplexWithHandlerTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("【Handler】收到注册命令: command={}, from={}", 
                     message.getCommand(), message.getFrom());
             
@@ -159,7 +159,7 @@ public class RSocketDuplexWithHandlerTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("【Handler】收到配置更新命令: command={}", message.getCommand());
             
             updateConfigHandlerCalled.set(true);
@@ -192,7 +192,7 @@ public class RSocketDuplexWithHandlerTest {
         }
 
         @Override
-        public Mono<Message> handler(Message message) {
+        public Mono<Message> handle(Message message) {
             log.info("【Handler】收到心跳检查: command={}", message.getCommand());
             
             Heartbeat response = new Heartbeat();
@@ -212,7 +212,7 @@ public class RSocketDuplexWithHandlerTest {
      * 测试 1: 验证 Handler 注册
      */
     @Test
-    void testHandlerRegistration() {
+    void testHandleRegistration() {
         // 验证 Handler 已注册
         assertThat(HandlerManager.get(Command.REGISTER)).isNotNull();
         assertThat(HandlerManager.get(Command.UPDATE_CONFIG)).isNotNull();
@@ -299,7 +299,7 @@ public class RSocketDuplexWithHandlerTest {
      * 测试 4: 验证 Client 的 ClientResponder 能正确路由到 Handler
      */
     @Test
-    void testClientResponderRoutesToHandler() {
+    void testClientResponderRoutesToHandle() {
         // 创建带 ClientResponder 的 Client
         createClientWithResponder();
         

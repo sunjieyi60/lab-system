@@ -1,6 +1,6 @@
 package xyz.jasenon.rsocket.server.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.yulichang.base.MPJBaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -14,7 +14,7 @@ import java.util.List;
  * 班牌设备 Mapper
  */
 @Mapper
-public interface ClassTimeTableMapper extends BaseMapper<ClassTimeTable> {
+public interface ClassTimeTableMapper extends MPJBaseMapper<ClassTimeTable> {
 
     /**
      * 根据 uuid 查询
