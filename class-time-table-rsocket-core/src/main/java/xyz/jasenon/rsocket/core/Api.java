@@ -5,10 +5,9 @@ import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import xyz.jasenon.rsocket.core.model.ClassTimeTable;
-import xyz.jasenon.rsocket.core.protocol.ClientSend;
 import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.ServerSend;
-import xyz.jasenon.rsocket.core.rsocket.ConnectionManager;
+import xyz.jasenon.rsocket.core.rsocket.AbstractConnectionManager;
 import xyz.jasenon.rsocket.core.rsocket.Server;
 
 /**
@@ -22,7 +21,7 @@ import xyz.jasenon.rsocket.core.rsocket.Server;
 @RequiredArgsConstructor
 public class Api {
 
-    private final ConnectionManager connectionManager;
+    private final AbstractConnectionManager connectionManager;
     private final Server server;
 
     /**

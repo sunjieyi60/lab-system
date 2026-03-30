@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import lombok.*;
 
 import java.time.Instant;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public class Message {
     
     /** 时间戳 */
     @Builder.Default
-    private Instant timestamp = Instant.now();
+    private Long timestamp = System.currentTimeMillis();
 
     /**
      * 序列化为字节数组
@@ -154,7 +155,7 @@ public class Message {
                 .code(Status.C10000.getCode())
                 .desc(Status.C10000.getDesc())
                 .msg(Status.C10000.getMsg())
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -167,7 +168,7 @@ public class Message {
                 .code(Status.C10000.getCode())
                 .desc(Status.C10000.getDesc())
                 .msg(customMsg)
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -180,7 +181,7 @@ public class Message {
                 .code(status.getCode())
                 .desc(status.getDesc())
                 .msg(status.getMsg())
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -193,7 +194,7 @@ public class Message {
                 .code(status.getCode())
                 .desc(status.getDesc())
                 .msg(customMsg)
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -207,7 +208,7 @@ public class Message {
                 .desc(status.getDesc())
                 .msg(customMsg)
                 .error(errorDetail)
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -222,7 +223,7 @@ public class Message {
                 .code(Status.C10000.getCode())
                 .desc(Status.C10000.getDesc())
                 .msg(Status.C10000.getMsg())
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -235,7 +236,7 @@ public class Message {
                 .code(Status.C10000.getCode())
                 .desc(Status.C10000.getDesc())
                 .msg(customMsg)
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -248,7 +249,7 @@ public class Message {
                 .code(status.getCode())
                 .desc(status.getDesc())
                 .msg(status.getMsg())
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -261,7 +262,7 @@ public class Message {
                 .code(status.getCode())
                 .desc(status.getDesc())
                 .msg(customMsg)
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -275,7 +276,7 @@ public class Message {
                 .desc(status.getDesc())
                 .msg(customMsg)
                 .error(errorDetail)
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -291,7 +292,7 @@ public class Message {
                 .desc(Status.C10001.getDesc())
                 .msg(throwable.getMessage())
                 .error(getStackTrace(throwable))
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -305,7 +306,7 @@ public class Message {
                 .desc(Status.C10001.getDesc())
                 .msg(throwable.getMessage())
                 .error(getStackTrace(throwable))
-                .timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -357,7 +358,7 @@ public class Message {
         this.code = status.getCode();
         this.desc = status.getDesc();
         this.msg = status.getMsg();
-        this.timestamp = Instant.now();
+        this.timestamp = System.currentTimeMillis();
     }
 
     /**
@@ -368,6 +369,6 @@ public class Message {
         this.code = status.getCode();
         this.desc = status.getDesc();
         this.msg = msg;
-        this.timestamp = Instant.now();
+        this.timestamp = System.currentTimeMillis();
     }
 }

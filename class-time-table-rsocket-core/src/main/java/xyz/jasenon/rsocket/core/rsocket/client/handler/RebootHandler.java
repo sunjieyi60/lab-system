@@ -8,7 +8,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
+
 
 /**
  * 设备重启处理器
@@ -26,7 +26,7 @@ public class RebootHandler implements Handler {
     }
 
     @Override
-    public Mono<Message> handler(Message message) {
+    public Mono<Message> handle(Message message) {
         // 类型检查
         if (!(message instanceof RebootRequest)) {
             log.error("RebootHandler 收到错误的消息类型: {}", message.getClass().getName());
@@ -42,14 +42,14 @@ public class RebootHandler implements Handler {
 
         try {
             // 构造响应（server -> client，使用 command）
-            Instant rebootTime = Instant.now().plusSeconds(delaySeconds != null ? delaySeconds : 0);
+            long rebootTime = System.currentTimeMillis() + (delaySeconds != null ? delaySeconds : 0) * 1000L;
             RebootResponse response = new RebootResponse();
             response.setCommand(Command.REBOOT);
             response.setAccepted(true);
             response.setRebootTime(rebootTime);
             response.setMessageText("设备将在指定时间重启");
             response.setStatus(Status.C10000, "重启请求已接受");
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
 
             log.info("设备重启请求已接受，预计重启时间: {}", rebootTime);
             return Mono.just(response);
@@ -61,7 +61,7 @@ public class RebootHandler implements Handler {
             response.setAccepted(false);
             response.setMessageText("重启请求被拒绝: " + e.getMessage());
             response.setStatus(Status.C10001, "重启失败", e.getMessage());
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
             return Mono.just(response);
         }
     }

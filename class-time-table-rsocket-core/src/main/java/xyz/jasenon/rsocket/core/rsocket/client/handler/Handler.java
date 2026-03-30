@@ -60,6 +60,6 @@ public interface Handler {
      * @param message 接收到的消息（实际是业务实体的父类）
      * @return 处理结果的 Mono（返回的业务实体也继承自 Message）
      */
-    Mono<Message> handler(Message message);
+    Mono<Message> handle(Message message);
 
 }

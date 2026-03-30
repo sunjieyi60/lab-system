@@ -7,7 +7,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
+
 
 /**
  * 心跳处理器
@@ -25,7 +25,7 @@ public class HeartbeatHandler implements Handler {
     }
 
     @Override
-    public Mono<Message> handler(Message message) {
+    public Mono<Message> handle(Message message) {
         // 类型检查
         if (!(message instanceof Heartbeat)) {
             log.error("HeartbeatHandler 收到错误的消息类型: {}", message.getClass().getName());
@@ -44,9 +44,8 @@ public class HeartbeatHandler implements Handler {
         response.setCommand(Command.HEARTBEAT);
         response.setUuid(uuid);
         response.setInterval(interval);
-        response.setConfigUpdated(false);
         response.setStatus(Status.C10000, "心跳成功");
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
 
         return Mono.just(response);
     }

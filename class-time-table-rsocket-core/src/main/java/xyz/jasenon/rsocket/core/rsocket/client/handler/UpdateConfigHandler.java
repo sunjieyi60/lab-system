@@ -8,7 +8,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
+
 
 /**
  * 更新配置处理器
@@ -26,7 +26,7 @@ public class UpdateConfigHandler implements Handler {
     }
 
     @Override
-    public Mono<Message> handler(Message message) {
+    public Mono<Message> handle(Message message) {
         // 类型检查
         if (!(message instanceof UpdateConfigRequest)) {
             log.error("UpdateConfigHandler 收到错误的消息类型: {}", message.getClass().getName());
@@ -50,9 +50,9 @@ public class UpdateConfigHandler implements Handler {
             UpdateConfigResponse response = new UpdateConfigResponse();
             response.setCommand(Command.UPDATE_CONFIG);
             response.setSuccess(true);
-            response.setUpdateTime(Instant.now());
+            response.setUpdateTime(System.currentTimeMillis());
             response.setStatus(Status.C10000, "配置更新成功");
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
 
             log.info("配置更新处理完成: version={}", version);
             return Mono.just(response);
@@ -63,7 +63,7 @@ public class UpdateConfigHandler implements Handler {
             response.setCommand(Command.UPDATE_CONFIG);
             response.setSuccess(false);
             response.setStatus(Status.C10001, "配置更新失败", e.getMessage());
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
             return Mono.just(response);
         }
     }

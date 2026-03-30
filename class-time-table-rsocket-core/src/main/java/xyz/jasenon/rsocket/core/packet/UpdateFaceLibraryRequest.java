@@ -10,7 +10,7 @@ import xyz.jasenon.rsocket.core.protocol.Status;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+
 import java.util.List;
 
 /**
@@ -48,7 +48,7 @@ public class UpdateFaceLibraryRequest extends Message implements ServerSend {
     /**
      * 请求时间
      */
-    private Instant requestTime;
+    private Long requestTime;
 
     public enum UpdateType {
         /**
@@ -88,8 +88,8 @@ public class UpdateFaceLibraryRequest extends Message implements ServerSend {
         request.setLibraryVersion(libraryVersion);
         request.setFaces(faces);
         request.setDeletedFaceIds(deletedFaceIds);
-        request.setRequestTime(Instant.now());
-        request.setTimestamp(Instant.now());
+        request.setRequestTime(System.currentTimeMillis());
+        request.setTimestamp(System.currentTimeMillis());
         return request;
     }
 

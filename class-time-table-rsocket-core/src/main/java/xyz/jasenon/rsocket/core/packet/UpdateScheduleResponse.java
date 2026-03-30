@@ -6,7 +6,7 @@ import xyz.jasenon.rsocket.core.Const;
 import xyz.jasenon.rsocket.core.protocol.ClientSend;
 import xyz.jasenon.rsocket.core.protocol.Message;
 
-import java.time.Instant;
+
 
 /**
  * 更新课表响应
@@ -28,20 +28,20 @@ public class UpdateScheduleResponse extends Message implements ClientSend {
     /**
      * 更新时间
      */
-    private Instant updateTime;
+    private Long updateTime;
 
     public static UpdateScheduleResponse success(Long version) {
         UpdateScheduleResponse response = new UpdateScheduleResponse();
         response.setSuccess(true);
-        response.setUpdateTime(Instant.now());
-        response.setTimestamp(Instant.now());
+        response.setUpdateTime(System.currentTimeMillis());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 
     public static UpdateScheduleResponse fail(Integer code, String message) {
         UpdateScheduleResponse response = new UpdateScheduleResponse();
         response.setSuccess(false);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 

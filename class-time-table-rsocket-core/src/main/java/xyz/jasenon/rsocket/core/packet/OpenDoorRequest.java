@@ -10,7 +10,7 @@ import xyz.jasenon.rsocket.core.protocol.Status;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+
 
 /**
  * 开门请求
@@ -43,7 +43,7 @@ public class OpenDoorRequest extends Message implements ServerSend, Serializable
     /**
      * 请求时间
      */
-    private Instant requestTime;
+    private Long requestTime;
 
     @Override
     public Command command() {
@@ -76,8 +76,8 @@ public class OpenDoorRequest extends Message implements ServerSend, Serializable
         request.setType_(type);
         request.setVerifyInfo(verifyInfo);
         request.setDuration(duration);
-        request.setRequestTime(Instant.now());
-        request.setTimestamp(Instant.now());
+        request.setRequestTime(System.currentTimeMillis());
+        request.setTimestamp(System.currentTimeMillis());
         return request;
     }
 

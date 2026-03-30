@@ -8,7 +8,6 @@ import xyz.jasenon.rsocket.core.protocol.ClientSend;
 import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
 
 /**
  * 客户端实现
@@ -79,7 +78,7 @@ public class ClientImpl implements Client {
 
         // 设置时间戳
         if (message instanceof Message) {
-            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setTimestamp(System.currentTimeMillis());
         }
 
         log.debug("客户端发送请求: route={}", route);
@@ -116,7 +115,7 @@ public class ClientImpl implements Client {
 
         // 设置时间戳
         if (message instanceof Message) {
-            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setTimestamp(System.currentTimeMillis());
         }
 
         log.debug("客户端 FireAndForget 发送: route={}", route);
@@ -137,7 +136,7 @@ public class ClientImpl implements Client {
     private Message createErrorResponse(String errorMessage) {
         Message response = new Message();
         response.setStatus(Status.C10001);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 }

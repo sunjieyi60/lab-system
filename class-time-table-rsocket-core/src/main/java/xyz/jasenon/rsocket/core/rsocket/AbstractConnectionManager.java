@@ -1,5 +1,6 @@
 package xyz.jasenon.rsocket.core.rsocket;
 
+import io.rsocket.RSocket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -19,8 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 发送逻辑由 Server/Client 处理
  */
 @Slf4j
-@Component
-public class ConnectionManager {
+public abstract class AbstractConnectionManager {
 
     /**
      * 设备ID到RSocketRequester的映射
@@ -29,7 +29,7 @@ public class ConnectionManager {
 
     /**
      * 注册设备连接
-     *
+     * todo 修改设备信息为在线
      * @param deviceId  设备数据库ID
      * @param requester RSocket 连接
      */
@@ -61,15 +61,14 @@ public class ConnectionManager {
                                 remove(deviceId);
                             });
                 })
-                .subscribe(
-                        null,
-                        error -> log.warn("监听设备 {} 连接关闭事件失败: {}", deviceId, error.getMessage())
-                );
+                .subscribe();
 
         log.info("设备 {} 已注册，当前在线设备数: {}", deviceId, deviceConnections.size());
+        onAfterRegister(deviceId);
     }
 
     /**
+     * todo 修改设备状态为下线
      * 移除设备连接
      *
      * @param deviceId 设备数据库ID
@@ -83,10 +82,11 @@ public class ConnectionManager {
         if (removed != null) {
             // 尝试关闭连接
             try {
-                io.rsocket.RSocket rsocket = removed.rsocket();
+                RSocket rsocket = removed.rsocket();
                 if (rsocket != null && !rsocket.isDisposed()) {
                     rsocket.dispose();
                 }
+                onAfterClose(deviceId);
             } catch (Exception e) {
                 log.warn("关闭设备 {} 连接时出错: {}", deviceId, e.getMessage());
             }
@@ -164,4 +164,15 @@ public class ConnectionManager {
         deviceConnections.clear();
         log.info("所有连接已关闭");
     }
+
+    /**
+     * 注册完成时的回调函数
+     * @param deviceUUID 设备唯一id
+     */
+    public abstract void onAfterRegister(String deviceUUID);
+
+    /**
+     * 设备离线时的回调函数
+     */
+    public abstract void onAfterClose(String deviceUUID);
 }

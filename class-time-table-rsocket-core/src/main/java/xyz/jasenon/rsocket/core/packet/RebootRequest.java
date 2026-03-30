@@ -8,7 +8,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.ServerSend;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
+
 
 /**
  * 重启请求
@@ -35,7 +35,7 @@ public class RebootRequest extends Message implements ServerSend {
     /**
      * 请求时间
      */
-    private Instant requestTime;
+    private Long requestTime;
 
     /**
      * 创建重启请求 Message
@@ -47,8 +47,8 @@ public class RebootRequest extends Message implements ServerSend {
         request.setStatus(Status.C10000);
         request.setDelaySeconds(delaySeconds);
         request.setReason(reason);
-        request.setRequestTime(Instant.now());
-        request.setTimestamp(Instant.now());
+        request.setRequestTime(System.currentTimeMillis());
+        request.setTimestamp(System.currentTimeMillis());
         return request;
     }
 

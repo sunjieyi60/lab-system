@@ -7,7 +7,6 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.ServerSend;
 import xyz.jasenon.rsocket.core.model.Config;
 
-import java.time.Instant;
 
 /**
  * 设备注册响应 - 继承 Message
@@ -16,7 +15,7 @@ import java.time.Instant;
  */
 @Getter
 @Setter
-public class RegisterResponse extends Message implements ServerSend {
+public class RegisterResponse extends Message implements ServerSend<RegisterResponse> {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,7 +36,7 @@ public class RegisterResponse extends Message implements ServerSend {
         RegisterResponse response = new RegisterResponse();
         response.setUuid(uuid);
         response.setConfig(config);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 
@@ -47,7 +46,7 @@ public class RegisterResponse extends Message implements ServerSend {
     public static RegisterResponse fail(String uuid, String errorMessage) {
         RegisterResponse response = new RegisterResponse();
         response.setUuid(uuid);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         // 错误信息可以通过 data 字段或其他方式传递
         return response;
     }
@@ -55,5 +54,9 @@ public class RegisterResponse extends Message implements ServerSend {
     @Override
     public Command command() {
         return Command.REGISTER;
+    }
+
+    public RegisterResponse(){
+         init(this);
     }
 }

@@ -6,7 +6,7 @@ import xyz.jasenon.rsocket.core.Const;
 import xyz.jasenon.rsocket.core.protocol.ClientSend;
 import xyz.jasenon.rsocket.core.protocol.Message;
 
-import java.time.Instant;
+
 
 /**
  * 更新配置响应
@@ -28,20 +28,20 @@ public class UpdateConfigResponse extends Message implements ClientSend {
     /**
      * 更新时间
      */
-    private Instant updateTime;
+    private Long updateTime;
 
     public static UpdateConfigResponse success(Long version) {
         UpdateConfigResponse response = new UpdateConfigResponse();
         response.setSuccess(true);
-        response.setUpdateTime(Instant.now());
-        response.setTimestamp(Instant.now());
+        response.setUpdateTime(System.currentTimeMillis());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 
     public static UpdateConfigResponse fail(Integer code, String message) {
         UpdateConfigResponse response = new UpdateConfigResponse();
         response.setSuccess(false);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         // 错误信息可以通过其他字段传递
         return response;
     }

@@ -8,7 +8,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
+
 
 /**
  * 设备注册处理器
@@ -26,7 +26,7 @@ public class RegisterHandler implements Handler {
     }
 
     @Override
-    public Mono<Message> handler(Message message) {
+    public Mono<Message> handle(Message message) {
         // 类型检查
         if (!(message instanceof RegisterRequest)) {
             log.error("RegisterHandler 收到错误的消息类型: {}", message.getClass().getName());
@@ -53,7 +53,7 @@ public class RegisterHandler implements Handler {
             response.setCommand(Command.REGISTER);
             response.setUuid(uuid);
             response.setStatus(Status.C10000, "注册成功");
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
 
             log.info("设备 {} 注册处理完成", uuid);
             return Mono.just(response);

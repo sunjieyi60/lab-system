@@ -8,7 +8,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
+
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ public class UpdateFaceLibraryHandler implements Handler {
     }
 
     @Override
-    public Mono<Message> handler(Message message) {
+    public Mono<Message> handle(Message message) {
         // 类型检查
         if (!(message instanceof UpdateFaceLibraryRequest)) {
             log.error("UpdateFaceLibraryHandler 收到错误的消息类型: {}", message.getClass().getName());
@@ -61,9 +61,9 @@ public class UpdateFaceLibraryHandler implements Handler {
             response.setCode(0);
             response.setProcessedCount(processedCount);
             response.setCurrentVersion(libraryVersion);
-            response.setUpdateTime(Instant.now());
+            response.setUpdateTime(System.currentTimeMillis());
             response.setStatus(Status.C10000, "人脸库更新成功");
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
 
             log.info("人脸库更新处理完成: processedCount={}", processedCount);
             return Mono.just(response);
@@ -75,7 +75,7 @@ public class UpdateFaceLibraryHandler implements Handler {
             response.setSuccess(false);
             response.setCode(500);
             response.setStatus(Status.C10001, "人脸库更新失败", e.getMessage());
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
             return Mono.just(response);
         }
     }

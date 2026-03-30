@@ -14,7 +14,7 @@ import xyz.jasenon.rsocket.core.protocol.ServerSend;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
 import java.nio.ByteBuffer;
-import java.time.Instant;
+
 
 /**
  * 服务端实现
@@ -28,7 +28,7 @@ import java.time.Instant;
 public class ServerImpl implements Server {
 
     @Autowired
-    private ConnectionManager connectionManager;
+    private AbstractConnectionManager connectionManager;
 
     // ==================== 请求-响应 ====================
 
@@ -45,7 +45,7 @@ public class ServerImpl implements Server {
 
         // 设置时间戳和 command
         if (message instanceof Message) {
-            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setTimestamp(System.currentTimeMillis());
             ((Message) message).setCommand(command);
         }
 
@@ -89,7 +89,7 @@ public class ServerImpl implements Server {
     @Override
     public Mono<Integer> broadcast(ServerSend message) {
         if (message instanceof Message) {
-            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setTimestamp(System.currentTimeMillis());
         }
         
         var connections = connectionManager.getAllConnections();
@@ -125,7 +125,7 @@ public class ServerImpl implements Server {
         }
 
         if (message instanceof Message) {
-            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setTimestamp(System.currentTimeMillis());
             ((Message) message).setCommand(command);
         }
 
@@ -157,7 +157,7 @@ public class ServerImpl implements Server {
     @Override
     public Mono<Integer> broadcastAndForget(ServerSend message) {
         if (message instanceof Message) {
-            ((Message) message).setTimestamp(Instant.now());
+            ((Message) message).setTimestamp(System.currentTimeMillis());
         }
         
         var connections = connectionManager.getAllConnections();
@@ -196,7 +196,7 @@ public class ServerImpl implements Server {
         response.setCommand(command);
         response.setStatus(Status.C10001);
         response.setError(errorMessage);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 }

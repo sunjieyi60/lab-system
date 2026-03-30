@@ -97,8 +97,19 @@ public class RSocketCoreAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean
         @ConditionalOnProperty(prefix = "rsocket.core.connection", name = "enabled", havingValue = "true", matchIfMissing = true)
-        public ConnectionManager connectionManager() {
-            return new ConnectionManager();
+        public AbstractConnectionManager connectionManager() {
+            return new AbstractConnectionManager(){
+
+                @Override
+                public void onAfterRegister(String deviceUUID) {
+
+                }
+
+                @Override
+                public void onAfterClose(String deviceUUID) {
+
+                }
+            };
         }
 
         @Bean
@@ -115,7 +126,7 @@ public class RSocketCoreAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean(Api.class)
-        public Api api(ConnectionManager manager, Server server){
+        public Api api(AbstractConnectionManager manager, Server server){
             return new Api(manager, server);
         }
     }

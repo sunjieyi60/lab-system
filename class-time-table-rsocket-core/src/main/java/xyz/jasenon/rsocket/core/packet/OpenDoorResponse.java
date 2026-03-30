@@ -8,7 +8,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+
 
 /**
  * 开门响应
@@ -41,15 +41,15 @@ public class OpenDoorResponse extends Message implements ClientSend, Serializabl
     /**
      * 实际开门时间
      */
-    private Instant openTime;
+    private Long openTime;
 
     public static OpenDoorResponse success() {
         OpenDoorResponse response = new OpenDoorResponse();
         response.setSuccess(true);
         response.setCode(0);
         response.setMessageText("开门成功");
-        response.setOpenTime(Instant.now());
-        response.setTimestamp(Instant.now());
+        response.setOpenTime(System.currentTimeMillis());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 
@@ -58,7 +58,7 @@ public class OpenDoorResponse extends Message implements ClientSend, Serializabl
         response.setSuccess(false);
         response.setCode(code);
         response.setMessageText(message);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 

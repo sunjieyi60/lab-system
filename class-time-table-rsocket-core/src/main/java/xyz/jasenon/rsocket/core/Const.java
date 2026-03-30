@@ -9,10 +9,17 @@ public interface Const {
         String SUFFIX = ":";
         String CLASS_TIME_TABLE = "class-time-table";
         String INFO = "info";
+        String UUID = "uuid";
+        String ID = "id";
         
         // 缓存键
-        String CACHE_DEVICE_UUID_PREFIX = "class-time-table:uuid:";
+        String CACHE_DEVICE_UUID_PREFIX = "class-time-table:uuid";
         String CACHE_DEVICE_ID_PREFIX = "class-time-table:id:";
+    }
+
+    interface Log {
+        String TRACE_ID_KEY = "trace-id-key";
+        String SUFFIX = ":";
     }
 
     interface Status {
@@ -32,16 +39,12 @@ public interface Const {
         String DEVICE_REGISTER = "device.register";
         // 设备心跳
         String DEVICE_HEARTBEAT = "device.heartbeat";
-        // 命令结果上报
-        String DEVICE_COMMAND_RESULT = "device.command.result";
         // 设备数据流
         String DEVICE_STREAM = "device.stream";
         // 双向通道
         String DEVICE_CHANNEL = "device.channel";
         // 服务器下发命令
         String DEVICE_COMMAND = "device.command";
-        // 服务器下发命令并等待响应
-        String DEVICE_COMMAND_WAIT = "device.command.wait";
         // 服务器推送设备配置信息更新
         String DEVICE_CONFIG_UPDATE = "device.config.update";
         // 服务器推送人脸信息更新

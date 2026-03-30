@@ -8,7 +8,7 @@ import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
+
 
 /**
  * 开门处理器
@@ -26,7 +26,7 @@ public class OpenDoorHandler implements Handler {
     }
 
     @Override
-    public Mono<Message> handler(Message message) {
+    public Mono<Message> handle(Message message) {
         // 类型检查
         if (!(message instanceof OpenDoorRequest)) {
             log.error("OpenDoorHandler 收到错误的消息类型: {}", message.getClass().getName());
@@ -53,9 +53,9 @@ public class OpenDoorHandler implements Handler {
             response.setSuccess(true);
             response.setCode(0);
             response.setMessageText("开门成功");
-            response.setOpenTime(Instant.now());
+            response.setOpenTime(System.currentTimeMillis());
             response.setStatus(Status.C10000, "开门成功");
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
 
             log.info("开门请求处理完成: type={}, success=true", type);
             return Mono.just(response);
@@ -68,7 +68,7 @@ public class OpenDoorHandler implements Handler {
             response.setCode(500);
             response.setMessageText("开门失败: " + e.getMessage());
             response.setStatus(Status.C10001, "开门失败", e.getMessage());
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
             return Mono.just(response);
         }
     }

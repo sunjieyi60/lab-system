@@ -9,7 +9,7 @@ import xyz.jasenon.rsocket.core.protocol.ServerSend;
 import xyz.jasenon.rsocket.core.protocol.Status;
 import xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule;
 
-import java.time.Instant;
+
 import java.util.List;
 
 /**
@@ -32,25 +32,25 @@ public class UpdateScheduleRequest extends Message implements ServerSend {
     /**
      * 生效时间
      */
-    private Instant effectiveTime;
+    private Long effectiveTime;
 
     /**
      * 请求时间
      */
-    private Instant requestTime;
+    private Long requestTime;
 
     /**
      * 创建课表更新请求 Message
      */
-    public static UpdateScheduleRequest create(List<CourseSchedule> schedules, Instant effectiveTime) {
+    public static UpdateScheduleRequest create(List<CourseSchedule> schedules, Long effectiveTime) {
         UpdateScheduleRequest request = new UpdateScheduleRequest();
         // client -> server 使用 route
         request.setRoute(Const.Route.DEVICE_SCHEDULE_UPDATE);
         request.setStatus(Status.C10000);
         request.setSchedules(schedules);
         request.setEffectiveTime(effectiveTime);
-        request.setRequestTime(Instant.now());
-        request.setTimestamp(Instant.now());
+        request.setRequestTime(System.currentTimeMillis());
+        request.setTimestamp(System.currentTimeMillis());
         return request;
     }
 

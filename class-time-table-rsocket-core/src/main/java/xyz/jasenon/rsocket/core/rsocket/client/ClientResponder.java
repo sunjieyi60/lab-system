@@ -79,7 +79,7 @@ public class ClientResponder implements RSocket {
             return Mono.empty();
         }
 
-        return handler.handler(message)
+        return handler.handle(message)
                 .doOnSuccess(resp -> log.debug("FireAndForget 消息处理完成: command={}, code={}", 
                         command, resp.getCode()))
                 .doOnError(e -> log.error("FireAndForget 消息处理失败: command={}", command, e))
@@ -109,7 +109,7 @@ public class ClientResponder implements RSocket {
                     "不支持的 Command: " + command, null));
         }
 
-        return handler.handler(message)
+        return handler.handle(message)
                 .doOnSuccess(resp -> log.debug("RequestResponse 消息处理完成: command={}, code={}, msg={}", 
                         command, resp.getCode(), resp.getMsg()))
                 .doOnError(e -> log.error("RequestResponse 消息处理失败: command={}", command, e))

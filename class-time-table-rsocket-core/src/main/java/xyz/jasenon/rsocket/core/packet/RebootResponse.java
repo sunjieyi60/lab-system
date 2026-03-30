@@ -6,7 +6,7 @@ import xyz.jasenon.rsocket.core.Const;
 import xyz.jasenon.rsocket.core.protocol.ClientSend;
 import xyz.jasenon.rsocket.core.protocol.Message;
 
-import java.time.Instant;
+
 
 /**
  * 重启响应
@@ -28,19 +28,19 @@ public class RebootResponse extends Message implements ClientSend {
     /**
      * 预计重启时间
      */
-    private Instant rebootTime;
+    private Long rebootTime;
 
     /**
      * 结果消息
      */
     private String messageText;
 
-    public static RebootResponse accepted(Instant rebootTime) {
+    public static RebootResponse accepted(Long rebootTime) {
         RebootResponse response = new RebootResponse();
         response.setAccepted(true);
         response.setRebootTime(rebootTime);
         response.setMessageText("设备将在指定时间重启");
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 
@@ -48,7 +48,7 @@ public class RebootResponse extends Message implements ClientSend {
         RebootResponse response = new RebootResponse();
         response.setAccepted(false);
         response.setMessageText("重启被拒绝: " + reason);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 

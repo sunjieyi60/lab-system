@@ -6,7 +6,7 @@ import xyz.jasenon.rsocket.core.Const;
 import xyz.jasenon.rsocket.core.protocol.ClientSend;
 import xyz.jasenon.rsocket.core.protocol.Message;
 
-import java.time.Instant;
+
 
 /**
  * 更新人脸库响应
@@ -43,7 +43,7 @@ public class UpdateFaceLibraryResponse extends Message implements ClientSend {
     /**
      * 更新时间
      */
-    private Instant updateTime;
+    private Long updateTime;
 
     public static UpdateFaceLibraryResponse success(int count, Long version) {
         UpdateFaceLibraryResponse response = new UpdateFaceLibraryResponse();
@@ -51,8 +51,8 @@ public class UpdateFaceLibraryResponse extends Message implements ClientSend {
         response.setCode(0);
         response.setProcessedCount(count);
         response.setCurrentVersion(version);
-        response.setUpdateTime(Instant.now());
-        response.setTimestamp(Instant.now());
+        response.setUpdateTime(System.currentTimeMillis());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 
@@ -60,7 +60,7 @@ public class UpdateFaceLibraryResponse extends Message implements ClientSend {
         UpdateFaceLibraryResponse response = new UpdateFaceLibraryResponse();
         response.setSuccess(false);
         response.setCode(code);
-        response.setTimestamp(Instant.now());
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 

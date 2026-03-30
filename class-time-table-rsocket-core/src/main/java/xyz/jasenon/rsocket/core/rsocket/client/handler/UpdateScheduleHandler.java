@@ -9,7 +9,7 @@ import xyz.jasenon.rsocket.core.protocol.Command;
 import xyz.jasenon.rsocket.core.protocol.Status;
 import xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule;
 
-import java.time.Instant;
+
 import java.util.List;
 
 /**
@@ -28,7 +28,7 @@ public class UpdateScheduleHandler implements Handler {
     }
 
     @Override
-    public Mono<Message> handler(Message message) {
+    public Mono<Message> handle(Message message) {
         // 类型检查
         if (!(message instanceof UpdateScheduleRequest)) {
             log.error("UpdateScheduleHandler 收到错误的消息类型: {}", message.getClass().getName());
@@ -46,9 +46,9 @@ public class UpdateScheduleHandler implements Handler {
             UpdateScheduleResponse response = new UpdateScheduleResponse();
             response.setCommand(Command.UPDATE_SCHEDULE);
             response.setSuccess(true);
-            response.setUpdateTime(Instant.now());
+            response.setUpdateTime(System.currentTimeMillis());
             response.setStatus(Status.C10000, "课表更新成功");
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
 
             log.info("课表更新处理完成");
             return Mono.just(response);
@@ -59,7 +59,7 @@ public class UpdateScheduleHandler implements Handler {
             response.setCommand(Command.UPDATE_SCHEDULE);
             response.setSuccess(false);
             response.setStatus(Status.C10001, "课表更新失败", e.getMessage());
-            response.setTimestamp(Instant.now());
+            response.setTimestamp(System.currentTimeMillis());
             return Mono.just(response);
         }
     }

@@ -9,7 +9,7 @@ import xyz.jasenon.rsocket.core.protocol.ServerSend;
 import xyz.jasenon.rsocket.core.protocol.Status;
 import xyz.jasenon.rsocket.core.model.Config;
 
-import java.time.Instant;
+
 
 /**
  * 更新配置请求
@@ -41,7 +41,7 @@ public class UpdateConfigRequest extends Message implements ServerSend {
     /**
      * 请求时间
      */
-    private Instant requestTime;
+    private Long requestTime;
 
     /**
      * 创建配置更新请求 Message
@@ -54,8 +54,8 @@ public class UpdateConfigRequest extends Message implements ServerSend {
         request.setConfig(config);
         request.setImmediate(immediate);
         request.setVersion(version);
-        request.setRequestTime(Instant.now());
-        request.setTimestamp(Instant.now());
+        request.setRequestTime(System.currentTimeMillis());
+        request.setTimestamp(System.currentTimeMillis());
         return request;
     }
 

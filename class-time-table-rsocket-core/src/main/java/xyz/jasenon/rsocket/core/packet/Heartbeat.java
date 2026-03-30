@@ -8,8 +8,6 @@ import xyz.jasenon.rsocket.core.model.Config;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
-
 /**
  * 心跳请求/响应 - 继承 Message
  * 
@@ -18,7 +16,7 @@ import java.time.Instant;
  */
 @Getter
 @Setter
-public class Heartbeat extends Message implements ServerSend, ClientSend, Serializable {
+public class Heartbeat extends Message implements ServerSend<Heartbeat>, ClientSend, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -34,16 +32,6 @@ public class Heartbeat extends Message implements ServerSend, ClientSend, Serial
     private Integer interval;
 
     /**
-     * 是否有配置更新
-     */
-    private Boolean configUpdated;
-
-    /**
-     * 新配置（如果有更新）
-     */
-    private Config newConfig;
-
-    /**
      * 创建心跳请求
      */
     public static Heartbeat request(String uuid, Integer interval) {
@@ -53,19 +41,17 @@ public class Heartbeat extends Message implements ServerSend, ClientSend, Serial
         heartbeat.setUuid(uuid);
         heartbeat.setInterval(interval);
         heartbeat.setStatus(Status.C10000);
-        heartbeat.setTimestamp(Instant.now());
+        heartbeat.setTimestamp(System.currentTimeMillis());
         return heartbeat;
     }
 
     /**
      * 创建带配置更新的心跳响应
      */
-    public static Heartbeat responseWithConfig(String uuid, Config newConfig) {
+    public static Heartbeat responseWithConfig(String uuid) {
         Heartbeat heartbeat = new Heartbeat();
         heartbeat.setUuid(uuid);
-        heartbeat.setConfigUpdated(true);
-        heartbeat.setNewConfig(newConfig);
-        heartbeat.setTimestamp(Instant.now());
+        heartbeat.setTimestamp(System.currentTimeMillis());
         return heartbeat;
     }
 
@@ -77,5 +63,9 @@ public class Heartbeat extends Message implements ServerSend, ClientSend, Serial
     @Override
     public Command command() {
         return super.getCommand();
+    }
+
+    public Heartbeat(){
+        init(this);
     }
 }

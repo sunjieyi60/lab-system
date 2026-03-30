@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FaceFuture {
+public class FaceFeature {
 
     /**
      * 人脸位图

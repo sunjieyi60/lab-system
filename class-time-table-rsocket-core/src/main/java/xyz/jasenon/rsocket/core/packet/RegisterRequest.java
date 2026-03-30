@@ -7,8 +7,6 @@ import xyz.jasenon.rsocket.core.protocol.ClientSend;
 import xyz.jasenon.rsocket.core.protocol.Message;
 import xyz.jasenon.rsocket.core.protocol.Status;
 
-import java.time.Instant;
-
 /**
  * 设备注册请求 - 继承 Message
  * 
@@ -40,7 +38,7 @@ public class RegisterRequest extends Message implements ClientSend {
         request.setStatus(Status.C10000);
         request.setUuid(uuid);
         request.setLaboratoryId(laboratoryId);
-        request.setTimestamp(Instant.now());
+        request.setTimestamp(System.currentTimeMillis());
         return request;
     }
 

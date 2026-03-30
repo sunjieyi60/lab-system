@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
+import xyz.jasenon.rsocket.core.Const;
 import xyz.jasenon.rsocket.core.Unique;
 
 import java.io.Serializable;
@@ -37,7 +38,7 @@ public class ClassTimeTable implements Serializable, Unique {
      */
     private Long laboratoryId;
 
-    private String status;
+    private String status = Const.Status.OFFLINE;
 
     @Override
     public String unique() {
