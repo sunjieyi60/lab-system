@@ -1,0 +1,34 @@
+{
+  "backend_server": {
+    "host": "10.0.2.2",
+    "port": 9000,
+    "timeout": 5000,
+    "heart_peroid": 5000
+  },
+  "weather_config": {
+    "location": {
+      "longitude": 114.39297,
+      "latitude": 30.48748
+    },
+    "update_interval": 120
+  },
+  "hezi_config": {
+    "poll_interval": 120,
+    "open_id": "10009395",
+    "app_key": "7ebc0bc70c240ed63d9ddfcaf156db45"
+  },
+  "door_open_config": {
+    "pwd_open_config": {
+      "password": "123456",
+      "keep_time": {
+        "keep_time": 30
+      }
+    },
+    "face_open_config": {
+      "precision": 0.85,
+      "keep_time": {
+        "keep_time": 30
+      }
+    }
+  }
+}
