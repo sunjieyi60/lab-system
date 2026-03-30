@@ -8,9 +8,11 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.CircuitBreak;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.entity.record.CircuitBreakRecord;
 import xyz.jasenon.lab.service.dto.device.CreateCircuitBreak;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.record.CircuitBreakMapper;
+import xyz.jasenon.lab.service.mapper.record.CircuitBreakRecordMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
@@ -25,8 +27,13 @@ import java.util.List;
 @Component
 @Slf4j
 public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
-    public CircuitBreakQ(CircuitBreakMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    private final CircuitBreakRecordMapper circuitBreakRecordMapper;
+
+    public CircuitBreakQ(CircuitBreakMapper deviceMapper,
+                         PollingScheduleExecutorPool pollingScheduleExecutorPool,
+                         CircuitBreakRecordMapper circuitBreakRecordMapper) {
         super(deviceMapper, pollingScheduleExecutorPool);
+        this.circuitBreakRecordMapper = circuitBreakRecordMapper;
     }
 
     @Override
@@ -76,5 +83,22 @@ public class CircuitBreakQ extends DeviceQ<CircuitBreakMapper, CircuitBreak> {
         task.setDevice(circuitBreak);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(circuitBreak.getId(), pollingTask);
+    }
+
+    @Override
+    protected void initDefaultRecord(CircuitBreak device) {
+        CircuitBreakRecord record = new CircuitBreakRecord();
+        record.setDeviceId(device.getId());
+        record.setAddress(device.getAddress());
+        record.setIsOpen(false);
+        record.setIsFix(false);
+        record.setIsLock(false);
+        record.setVoltage(0.0F);
+        record.setCurrent(0.0F);
+        record.setPower(0.0F);
+        record.setEnergy(0.0F);
+        record.setLeakage(0.0F);
+        record.setTemperature(0.0F);
+        circuitBreakRecordMapper.insert(record);
     }
 }

@@ -41,7 +41,9 @@ public abstract class DeviceRecordQ<RM extends BaseMapper<R>, R extends BaseReco
         if (isOnline){
             DeviceRecordVo deviceRecordVo = new DeviceRecordVo();
             var object = rBucket.get();
-            object.setOrigin(Origin.Redis);
+            if (object != null) {
+                object.setOrigin(Origin.Redis);
+            }
             deviceRecordVo.setData(object);
             deviceRecordVo.setDeviceType(deviceType);
             return deviceRecordVo;
@@ -50,7 +52,9 @@ public abstract class DeviceRecordQ<RM extends BaseMapper<R>, R extends BaseReco
         var object = recordMapper.selectOne(
                 buildQueryWrapper(deviceId)
         );
-        object.setOrigin(Origin.MySql);
+        if (object != null) {
+            object.setOrigin(Origin.MySql);
+        }
         deviceRecordVo.setData(object);
         deviceRecordVo.setDeviceType(deviceType);
         return deviceRecordVo;

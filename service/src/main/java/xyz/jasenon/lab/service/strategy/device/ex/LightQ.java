@@ -8,9 +8,11 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Light;
+import xyz.jasenon.lab.common.entity.record.LightRecord;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateLight;
 import xyz.jasenon.lab.service.mapper.record.LightMapper;
+import xyz.jasenon.lab.service.mapper.record.LightRecordMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
@@ -25,8 +27,13 @@ import java.util.List;
 @Component
 @Slf4j
 public class LightQ extends DeviceQ<LightMapper, Light> {
-    public LightQ(LightMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    private final LightRecordMapper lightRecordMapper;
+
+    public LightQ(LightMapper deviceMapper,
+                  PollingScheduleExecutorPool pollingScheduleExecutorPool,
+                  LightRecordMapper lightRecordMapper) {
         super(deviceMapper, pollingScheduleExecutorPool);
+        this.lightRecordMapper = lightRecordMapper;
     }
 
     @Override
@@ -77,5 +84,16 @@ public class LightQ extends DeviceQ<LightMapper, Light> {
         task.setDevice(light);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(light.getId(), pollingTask);
+    }
+
+    @Override
+    protected void initDefaultRecord(Light device) {
+        LightRecord record = new LightRecord();
+        record.setDeviceId(device.getId());
+        record.setAddress(device.getAddress());
+        record.setSelfId(device.getSelfId());
+        record.setIsOpen(false);
+        record.setIsLock(Boolean.TRUE.equals(device.getIsLock()));
+        lightRecordMapper.insert(record);
     }
 }

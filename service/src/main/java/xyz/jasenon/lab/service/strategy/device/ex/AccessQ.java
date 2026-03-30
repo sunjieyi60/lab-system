@@ -8,9 +8,11 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.Access;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.entity.record.AccessRecord;
 import xyz.jasenon.lab.service.dto.device.CreateAccess;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.record.AccessMapper;
+import xyz.jasenon.lab.service.mapper.record.AccessRecordMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
@@ -25,9 +27,13 @@ import java.util.List;
 @Component
 @Slf4j
 public class AccessQ extends DeviceQ<AccessMapper, Access> {
+    private final AccessRecordMapper accessRecordMapper;
 
-    public AccessQ(AccessMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public AccessQ(AccessMapper deviceMapper,
+                   PollingScheduleExecutorPool pollingScheduleExecutorPool,
+                   AccessRecordMapper accessRecordMapper) {
         super(deviceMapper, pollingScheduleExecutorPool);
+        this.accessRecordMapper = accessRecordMapper;
     }
 
     @Override
@@ -79,5 +85,18 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
         task.setDevice(access);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(access.getId(), pollingTask);
+    }
+
+    @Override
+    protected void initDefaultRecord(Access device) {
+        AccessRecord record = new AccessRecord();
+        record.setDeviceId(device.getId());
+        record.setAddress(device.getAddress());
+        record.setSelfId(device.getSelfId());
+        record.setIsOpen(false);
+        record.setIsLock(Boolean.TRUE.equals(device.getIsLock()));
+        record.setLockStatus(0);
+        record.setDelayTime(0);
+        accessRecordMapper.insert(record);
     }
 }

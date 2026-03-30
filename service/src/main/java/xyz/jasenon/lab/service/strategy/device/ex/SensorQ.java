@@ -8,9 +8,11 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.entity.device.Sensor;
+import xyz.jasenon.lab.common.entity.record.SensorRecord;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.dto.device.CreateSensor;
 import xyz.jasenon.lab.service.mapper.record.SensorMapper;
+import xyz.jasenon.lab.service.mapper.record.SensorRecordMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
@@ -25,9 +27,13 @@ import java.util.List;
 @Component
 @Slf4j
 public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
+    private final SensorRecordMapper sensorRecordMapper;
 
-    public SensorQ(SensorMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public SensorQ(SensorMapper deviceMapper,
+                   PollingScheduleExecutorPool pollingScheduleExecutorPool,
+                   SensorRecordMapper sensorRecordMapper) {
         super(deviceMapper, pollingScheduleExecutorPool);
+        this.sensorRecordMapper = sensorRecordMapper;
     }
 
     @Override
@@ -78,5 +84,18 @@ public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
         task.setDevice(sensor);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(sensor.getId(), pollingTask);
+    }
+
+    @Override
+    protected void initDefaultRecord(Sensor device) {
+        SensorRecord record = new SensorRecord();
+        record.setDeviceId(device.getId());
+        record.setAddress(device.getAddress());
+        record.setSelfId(device.getSelfId());
+        record.setTemperature(0.0);
+        record.setHumidity(0.0);
+        record.setLight(0.0);
+        record.setSmoke(0);
+        sensorRecordMapper.insert(record);
     }
 }

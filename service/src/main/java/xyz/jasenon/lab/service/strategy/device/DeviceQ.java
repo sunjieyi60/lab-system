@@ -33,9 +33,17 @@ public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
 
     protected abstract T createDevice(CreateDevice createDevice);
 
+    /**
+     * 创建设备后初始化一条默认记录。
+     * 子类可按设备类型覆盖该方法；默认不处理。
+     */
+    protected void initDefaultRecord(T device) {
+    }
+
     public final R insertDevice(CreateDevice createDevice){
         T device = createDevice(createDevice);
         deviceMapper.insert(device);
+        initDefaultRecord(device);
         if (Boolean.TRUE.equals(device.getPollingEnabled())) {
             startPolling(device);
         }

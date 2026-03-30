@@ -6,6 +6,7 @@ import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateCourse;
 import xyz.jasenon.lab.service.dto.course.DeleteCourse;
 import xyz.jasenon.lab.service.dto.course.EditCourse;
+import xyz.jasenon.lab.service.vo.base.CourseCreatedVo;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface ICourseService extends IService<Course> {
 
-    R createCourse(CreateCourse createCourse);
+    R<CourseCreatedVo> createCourse(CreateCourse createCourse);
 
     R deleteCourse(DeleteCourse deleteCourse);
 

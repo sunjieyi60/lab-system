@@ -8,9 +8,11 @@ import xyz.jasenon.lab.common.dto.task.Task;
 import xyz.jasenon.lab.common.dto.task.TaskPriority;
 import xyz.jasenon.lab.common.entity.device.AirCondition;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.entity.record.AirConditionRecord;
 import xyz.jasenon.lab.service.dto.device.CreateAirCondition;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.mapper.record.AirConditionMapper;
+import xyz.jasenon.lab.service.mapper.record.AirConditionRecordMapper;
 import xyz.jasenon.lab.service.strategy.device.DeviceFactory;
 import xyz.jasenon.lab.service.strategy.device.DeviceQ;
 import xyz.jasenon.lab.service.strategy.device.PollingScheduleExecutorPool;
@@ -25,9 +27,13 @@ import java.util.List;
 @Component
 @Slf4j
 public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
+    private final AirConditionRecordMapper airConditionRecordMapper;
 
-    public AirConditionQ(AirConditionMapper deviceMapper, PollingScheduleExecutorPool pollingScheduleExecutorPool) {
+    public AirConditionQ(AirConditionMapper deviceMapper,
+                         PollingScheduleExecutorPool pollingScheduleExecutorPool,
+                         AirConditionRecordMapper airConditionRecordMapper) {
         super(deviceMapper, pollingScheduleExecutorPool);
+        this.airConditionRecordMapper = airConditionRecordMapper;
     }
 
     @Override
@@ -89,5 +95,20 @@ public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
         task.setArgs(new Integer[]{airCondition.getAddress(), airCondition.getSelfId()});
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(airCondition.getId(), pollingTask);
+    }
+
+    @Override
+    protected void initDefaultRecord(AirCondition device) {
+        AirConditionRecord record = new AirConditionRecord();
+        record.setDeviceId(device.getId());
+        record.setAddress(device.getAddress());
+        record.setSelfId(device.getSelfId());
+        record.setIsOpen(false);
+        record.setMode("AUTO");
+        record.setTemperature(26);
+        record.setSpeed("LOW");
+        record.setRoomTemperature(26);
+        record.setErrorCode(0);
+        airConditionRecordMapper.insert(record);
     }
 }
