@@ -296,7 +296,7 @@ public Mono<RegisterResponse> register(RegisterRequest request) {
 
 ## 📄 许可证
 
-MIT License © 2024 Jasenon
+MIT License © 2026 Jasenon(sunjieyi60) & XiaoQ
 
 ---
 
