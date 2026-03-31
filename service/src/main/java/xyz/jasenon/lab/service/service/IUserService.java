@@ -30,6 +30,8 @@ public interface IUserService extends IService<User> {
 
     R visibleTreeVo();
 
+    R permissionTree();
+
     List<User> visible();
 
 }

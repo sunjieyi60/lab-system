@@ -75,4 +75,10 @@ public class UserController {
     public R getVisibleTree(){
         return R.success(userService.visible());
     }
+
+    @GetMapping("/permission_tree")
+    @ApiOperation("获取权限树")
+    public R permissionTree() {
+        return userService.permissionTree();
+    }
 }

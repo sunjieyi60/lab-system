@@ -304,6 +304,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return R.success(userBizVos,"获取可见用户树成功");
     }
 
+    @Override
+    public R permissionTree() {
+        return R.success(Permissions.tree, "获取权限树成功");
+    }
+
     private UserBizVo userToUserBizVo(User user){
         UserBizVo userBizVo = BeanUtil.copyProperties(user, UserBizVo.class);
         List<Dept> depts = deptUserMapper.selectJoinList(Dept.class,
