@@ -49,6 +49,14 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
     @Override
     protected Access createDevice(CreateDevice createDevice) {
         CreateAccess createAccess = (CreateAccess) createDevice;
+        Long duplicated = deviceMapper.selectCount(new LambdaQueryWrapper<Access>()
+                .eq(Access::getDeviceType, DeviceType.Access)
+                .eq(Access::getRs485GatewayId, createAccess.getRs485GatewayId())
+                .eq(Access::getAddress, createAccess.getAddress())
+                .eq(Access::getSelfId, createAccess.getSelfId()));
+        if (duplicated != null && duplicated > 0) {
+            throw new IllegalArgumentException("同一RS485网关下该地址的selfId已存在");
+        }
         Access access = (Access) new Access()
                 .setAddress(createAccess.getAddress())
                 .setSelfId(createAccess.getSelfId())

@@ -41,13 +41,17 @@ public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
     }
 
     public final R insertDevice(CreateDevice createDevice){
-        T device = createDevice(createDevice);
-        deviceMapper.insert(device);
-        initDefaultRecord(device);
-        if (Boolean.TRUE.equals(device.getPollingEnabled())) {
-            startPolling(device);
+        try {
+            T device = createDevice(createDevice);
+            deviceMapper.insert(device);
+            initDefaultRecord(device);
+            if (Boolean.TRUE.equals(device.getPollingEnabled())) {
+                startPolling(device);
+            }
+            return R.success("创建设备成功");
+        } catch (IllegalArgumentException e) {
+            return R.fail(e.getMessage());
         }
-        return R.success("创建设备成功");
     }
 
     public T getDeviceById(Long id){

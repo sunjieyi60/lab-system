@@ -49,6 +49,14 @@ public class SensorQ extends DeviceQ<SensorMapper, Sensor> {
     @Override
     protected Sensor createDevice(CreateDevice createDevice) {
         CreateSensor createSensor = (CreateSensor) createDevice;
+        Long duplicated = deviceMapper.selectCount(new LambdaQueryWrapper<Sensor>()
+                .eq(Sensor::getDeviceType, DeviceType.Sensor)
+                .eq(Sensor::getRs485GatewayId, createSensor.getRs485GatewayId())
+                .eq(Sensor::getAddress, createSensor.getAddress())
+                .eq(Sensor::getSelfId, createSensor.getSelfId()));
+        if (duplicated != null && duplicated > 0) {
+            throw new IllegalArgumentException("同一RS485网关下该地址的selfId已存在");
+        }
         Sensor sensor = (Sensor) new Sensor()
                 .setAddress(createSensor.getAddress())
                 .setSelfId(createSensor.getSelfId())

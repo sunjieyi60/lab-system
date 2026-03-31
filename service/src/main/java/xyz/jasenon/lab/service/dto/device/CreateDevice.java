@@ -30,4 +30,9 @@ public class CreateDevice {
     @NotNull(message = "所属实验室不能为空")
     private Long belongToLaboratoryId;
 
+    /**
+     * 机组ID（可选，当前主要用于空调设备）
+     */
+    private String groupId;
+
 }

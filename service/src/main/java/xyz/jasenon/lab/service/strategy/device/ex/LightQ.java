@@ -49,8 +49,17 @@ public class LightQ extends DeviceQ<LightMapper, Light> {
     @Override
     protected Light createDevice(CreateDevice createDevice) {
         CreateLight createLight = (CreateLight) createDevice;
+        Long duplicated = deviceMapper.selectCount(new LambdaQueryWrapper<Light>()
+                .eq(Light::getDeviceType, DeviceType.Light)
+                .eq(Light::getRs485GatewayId, createLight.getRs485GatewayId())
+                .eq(Light::getAddress, createLight.getAddress())
+                .eq(Light::getSelfId, createLight.getSelfId()));
+        if (duplicated != null && duplicated > 0) {
+            throw new IllegalArgumentException("同一RS485网关下该地址的selfId已存在");
+        }
         Light light = (Light) new Light()
                 .setAddress(createLight.getAddress())
+                .setSelfId(createLight.getSelfId())
                 .setRs485GatewayId(createLight.getRs485GatewayId())
                 .setIsLock(false)
                 .setDeviceName(createLight.getDeviceName())

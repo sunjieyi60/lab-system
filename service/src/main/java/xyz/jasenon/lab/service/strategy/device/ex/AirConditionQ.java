@@ -53,6 +53,28 @@ public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
         if (!mustHaveOneGateway) {
             throw new IllegalArgumentException("rs485GatewayId or socketGatewayId must be set");
         }
+        Integer address = createAirCondition.getAddress();
+        Integer selfId = createAirCondition.getSelfId();
+        if (createAirCondition.getRs485GatewayId() != null) {
+            Long duplicated = deviceMapper.selectCount(new LambdaQueryWrapper<AirCondition>()
+                    .eq(AirCondition::getDeviceType, DeviceType.AirCondition)
+                    .eq(AirCondition::getRs485GatewayId, createAirCondition.getRs485GatewayId())
+                    .eq(AirCondition::getAddress, address)
+                    .eq(AirCondition::getSelfId, selfId));
+            if (duplicated != null && duplicated > 0) {
+                throw new IllegalArgumentException("同一RS485网关下该地址的selfId已存在");
+            }
+        }
+        if (createAirCondition.getSocketGatewayId() != null) {
+            Long duplicated = deviceMapper.selectCount(new LambdaQueryWrapper<AirCondition>()
+                    .eq(AirCondition::getDeviceType, DeviceType.AirCondition)
+                    .eq(AirCondition::getSocketGatewayId, createAirCondition.getSocketGatewayId())
+                    .eq(AirCondition::getAddress, address)
+                    .eq(AirCondition::getSelfId, selfId));
+            if (duplicated != null && duplicated > 0) {
+                throw new IllegalArgumentException("同一Socket网关下该地址的selfId已存在");
+            }
+        }
         AirCondition airCondition = (AirCondition) new AirCondition()
                 .setAddress(createAirCondition.getAddress())
                 .setSelfId(createAirCondition.getSelfId())
@@ -62,6 +84,9 @@ public class AirConditionQ extends DeviceQ<AirConditionMapper, AirCondition> {
                 .setDeviceName(createAirCondition.getDeviceName())
                 .setDeviceType(createAirCondition.getDeviceType())
                 .setBelongToLaboratoryId(createAirCondition.getBelongToLaboratoryId());
+        if (createAirCondition.getGroupId() != null && !createAirCondition.getGroupId().isBlank()) {
+            airCondition.setGroupId(createAirCondition.getGroupId());
+        }
         return airCondition;
     }
 

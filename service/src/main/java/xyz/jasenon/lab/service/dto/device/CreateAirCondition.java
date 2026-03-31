@@ -32,9 +32,4 @@ public class CreateAirCondition extends CreateDevice {
      */
     private Long socketGatewayId;
 
-    /**
-     * 机组id 机组id不填则随机生成
-     */
-    private String groupId;
-
 }
