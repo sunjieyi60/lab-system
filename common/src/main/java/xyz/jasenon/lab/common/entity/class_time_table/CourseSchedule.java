@@ -27,6 +27,11 @@ public class CourseSchedule extends Schedule {
     private Long deptId;
 
     /**
+     * 专业班级
+     */
+    private String majorClass;
+
+    /**
      * 课程开始节
      */
     private Integer startSection;

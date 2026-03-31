@@ -32,6 +32,11 @@ public class CreateCourseSchedule extends CreateSchedule {
     private Long belongToDeptId;
 
     /**
+     * 专业班级
+     */
+    private String majorClass;
+
+    /**
      * 起始节数
      */
     @NotNull

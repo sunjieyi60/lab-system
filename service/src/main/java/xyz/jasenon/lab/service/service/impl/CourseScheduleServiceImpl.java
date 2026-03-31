@@ -54,6 +54,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         courseSchedule.setCourseId(createCourseSchedule.getCourseId());
         courseSchedule.setTeacherId(createCourseSchedule.getTeacherId());
         courseSchedule.setDeptId(createCourseSchedule.getBelongToDeptId());
+        courseSchedule.setMajorClass(createCourseSchedule.getMajorClass());
         courseSchedule.setStartSection(createCourseSchedule.getStartSection());
         courseSchedule.setEndSection(createCourseSchedule.getEndSection());
         courseSchedule.setMark(createCourseSchedule.getMark());
@@ -154,6 +155,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
                             .selectAs(Semester::getName, CourseScheduleVo::getSemesterName)
                             .selectAs(Laboratory::getId, CourseScheduleVo::getLaboratoryId)
                             .selectAs(Laboratory::getLaboratoryName, CourseScheduleVo::getLaboratoryName)
+                            .selectAs(CourseSchedule::getMajorClass, CourseScheduleVo::getMajorClass)
                             .leftJoin(Course.class, Course::getId, CourseSchedule::getCourseId)
                             .leftJoin(Teacher.class, Teacher::getId, CourseSchedule::getTeacherId)
                             .leftJoin(Semester.class, Semester::getId, CourseSchedule::getSemesterId)

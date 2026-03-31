@@ -53,6 +53,11 @@ public class CourseScheduleVo {
     private String deptName;
 
     /**
+     * 专业班级
+     */
+    private String majorClass;
+
+    /**
      * 学期ID
      */
     private Long semesterId;
