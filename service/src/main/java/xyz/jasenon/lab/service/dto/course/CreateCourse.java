@@ -19,7 +19,6 @@ public class CreateCourse {
     @NotBlank(message = "课程名称不能为空")
     private String courseName;
 
-    @NotNull(message = "课程容量不为空")
     private Integer volume;
 
     @Pattern(regexp = "^[0-9]{4}级", message = "年级格式不正确")

@@ -29,7 +29,6 @@ public class CreateCourseSchedule extends CreateSchedule {
     /**
      * 所属部门id
      */
-    @NotNull
     private Long belongToDeptId;
 
     /**
@@ -47,7 +46,6 @@ public class CreateCourseSchedule extends CreateSchedule {
     /**
      * 备注信息
      */
-    @NotNull
     private String mark;
 
 }
