@@ -32,13 +32,10 @@ public class CreateLaboratory {
     @NotNull(message = "楼栋ID不能为空")
     private Long belongToBuilding;
 
-    @NotBlank(message = "安全等级不能为空")
     private String securityLevel;
 
-    @NotNull(message = "容纳人数不能为空")
     private Integer classCapacity;
 
-    @NotNull(message = "面积不能为空")
     private Integer area;
 
     private String intro;
