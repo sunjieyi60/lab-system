@@ -62,7 +62,22 @@ public enum Command {
     /**
      * 通用响应
      */
-    RESPONSE(100, "通用响应");
+    RESPONSE(100, "通用响应"),
+
+    /**
+     * 初始化上传任务
+     */
+    INIT_UPLOAD_TASK(10, "初始化上传任务"),
+
+    /**
+     * 上传人脸图片分片
+     */
+    UPLOAD_FACE_IMAGE(11, "上传人脸图片"),
+
+    /**
+     * 完成上传任务
+     */
+    COMPLETE_UPLOAD_TASK(12, "完成上传任务");
 
     private final Integer code;
     private final String desc;

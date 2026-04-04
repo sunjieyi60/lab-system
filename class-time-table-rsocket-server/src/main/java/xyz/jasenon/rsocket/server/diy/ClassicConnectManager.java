@@ -33,7 +33,7 @@ public class ClassicConnectManager extends AbstractConnectionManager implements 
                                 .select(ClassTimeTable::getId)
         );
         device.setStatus(Const.Status.ONLINE);
-        AsyncExecutor.runAsyncCPU(() -> {
+        AsyncExecutor.runAsyncIO(() -> {
             deviceMapper.updateById(device);
             log.info("设备:{},已上线", deviceUUID);
             cache.delete(CLASS_TIME_TABLE + SUFFIX + UUID + SUFFIX + deviceUUID + SUFFIX + INFO);
@@ -53,7 +53,7 @@ public class ClassicConnectManager extends AbstractConnectionManager implements 
                                 .select(ClassTimeTable::getId)
         );
         device.setStatus(Const.Status.OFFLINE);
-        AsyncExecutor.runAsyncCPU(()->{
+        AsyncExecutor.runAsyncIO(()->{
             deviceMapper.updateById(device);
             log.info("设备:{},已离线",deviceUUID);
             cache.delete(CLASS_TIME_TABLE + SUFFIX + UUID + SUFFIX + deviceUUID + SUFFIX + INFO);
