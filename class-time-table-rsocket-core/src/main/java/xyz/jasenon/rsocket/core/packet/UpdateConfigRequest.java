@@ -39,6 +39,11 @@ public class UpdateConfigRequest extends Message implements ServerSend {
     private Long version;
 
     /**
+     * 服务端登记的关联实验室（与设备表 laboratory_id 一致，设备端可据此对齐档案）
+     */
+    private Long laboratoryId;
+
+    /**
      * 请求时间
      */
     private Long requestTime;
@@ -47,6 +52,13 @@ public class UpdateConfigRequest extends Message implements ServerSend {
      * 创建配置更新请求 Message
      */
     public static UpdateConfigRequest create(Config config, Boolean immediate, Long version) {
+        return create(config, immediate, version, null);
+    }
+
+    /**
+     * 创建配置更新请求（含服务端登记的实验室 ID）
+     */
+    public static UpdateConfigRequest create(Config config, Boolean immediate, Long version, Long laboratoryId) {
         UpdateConfigRequest request = new UpdateConfigRequest();
         // client -> server 使用 route
         request.setRoute(Const.Route.DEVICE_CONFIG_UPDATE);
@@ -54,6 +66,7 @@ public class UpdateConfigRequest extends Message implements ServerSend {
         request.setConfig(config);
         request.setImmediate(immediate);
         request.setVersion(version);
+        request.setLaboratoryId(laboratoryId);
         request.setRequestTime(System.currentTimeMillis());
         request.setTimestamp(System.currentTimeMillis());
         return request;

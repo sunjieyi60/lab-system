@@ -88,6 +88,7 @@ public class ClassTimeTableService {
             RegisterResponse response = new RegisterResponse();
             response.setUuid(device.getUuid());
             response.setConfig(device.getConfig() != null ? device.getConfig() : Config.Default());
+            response.setLaboratoryId(device.getLaboratoryId());
 
             return response;
 

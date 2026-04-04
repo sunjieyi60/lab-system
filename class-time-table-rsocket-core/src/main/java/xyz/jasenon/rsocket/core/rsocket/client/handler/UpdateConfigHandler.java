@@ -37,8 +37,9 @@ public class UpdateConfigHandler implements Handler {
         UpdateConfigRequest request = (UpdateConfigRequest) message;
         Long version = request.getVersion();
         Boolean immediate = request.getImmediate();
+        Long laboratoryId = request.getLaboratoryId();
 
-        log.info("处理配置更新请求: version={}, immediate={}", version, immediate);
+        log.info("处理配置更新请求: version={}, immediate={}, laboratoryId={}", version, immediate, laboratoryId);
 
         try {
             // 参数校验

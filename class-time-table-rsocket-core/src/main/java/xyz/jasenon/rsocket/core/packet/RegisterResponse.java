@@ -30,6 +30,11 @@ public class RegisterResponse extends Message implements ServerSend<RegisterResp
     private Config config;
 
     /**
+     * 服务端登记的关联实验室（与设备表 laboratory_id 一致）
+     */
+    private Long laboratoryId;
+
+    /**
      * 创建注册成功响应
      */
     public static RegisterResponse success(String uuid, Config config) {
