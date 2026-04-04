@@ -22,9 +22,11 @@ import xyz.jasenon.lab.service.strategy.task.TaskSendStrategy;
 public class SocketTaskSendStrategy implements TaskSendStrategy {
 
     private final String Host;
+    private final ObjectMapper objectMapper;
 
-    public SocketTaskSendStrategy(TaskSendProperties taskSendProperties){
+    public SocketTaskSendStrategy(TaskSendProperties taskSendProperties, ObjectMapper objectMapper){
         this.Host = taskSendProperties.getSocketTaskHost();
+        this.objectMapper = objectMapper;
     }
 
     @PostConstruct
@@ -35,7 +37,6 @@ public class SocketTaskSendStrategy implements TaskSendStrategy {
 
     @Override
     public void send(Task task) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             String body = objectMapper.writeValueAsString(task);
             HttpResponse response = HttpUtil.createPost(Host).body(body).execute();
