@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.common.entity.class_time_table;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,9 +23,10 @@ public class CourseSchedule extends Schedule {
     private Long teacherId;
 
     /**
-     * 开课部门id
+     * 开课部门名称（非数据库字段，通过 dept_id 关联查询）
      */
-    private Long deptId;
+    @TableField(exist = false)
+    private String deptName;
 
     /**
      * 专业班级

@@ -27,9 +27,9 @@ public class CreateCourseSchedule extends CreateSchedule {
     private Long teacherId;
 
     /**
-     * 所属部门id
+     * 所属部门名称
      */
-    private Long belongToDeptId;
+    private String belongToDeptName;
 
     /**
      * 专业班级
