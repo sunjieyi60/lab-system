@@ -1,0 +1,34 @@
+package xyz.jasenon.lab.service.quartz.model;
+
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+public class CourseScheduleTaskGenerator {
+    /**
+     * 实验室ids
+     */
+    @NotEmpty(message = "实验室id不能为空")
+    private List<Long> laboratoryId;
+    /**
+     * 检查间隔
+     */
+    private String cron = "0 0/5 * * * ? ";
+    /**
+     * 提前执行的时间  默认7分钟
+     */
+    private Integer earlyStart = 7;
+    /**
+     * 延迟结束的时间  默认7分钟
+     */
+    private Integer delayEnd = 7;
+    /**
+     * 是否启用
+     */
+    private Boolean enable = true;
+
+}

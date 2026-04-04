@@ -25,10 +25,12 @@ import xyz.jasenon.lab.service.strategy.task.TaskSendStrategy;
 public class MqttTaskSendStrategy implements TaskSendStrategy {
 
     private final String Host;
+    private final ObjectMapper objectMapper;
 
 
-    public MqttTaskSendStrategy(TaskSendProperties taskSendProperties){
+    public MqttTaskSendStrategy(TaskSendProperties taskSendProperties, ObjectMapper objectMapper){
         this.Host = taskSendProperties.getMqttTaskHost();
+        this.objectMapper = objectMapper;
     }
 
     @PostConstruct
@@ -42,7 +44,6 @@ public class MqttTaskSendStrategy implements TaskSendStrategy {
         Device device = DeviceFactory.getDeviceQMethod(task.getDeviceType()).getDeviceById(task.getDeviceId());
         Assert.notNull(device,"设备不存在");
         task.setDevice(device);
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             String body = objectMapper.writeValueAsString(task);
             HttpResponse response = HttpUtil.createPost(Host).body(body).execute();

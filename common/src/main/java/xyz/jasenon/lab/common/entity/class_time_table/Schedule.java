@@ -58,4 +58,5 @@ public class Schedule extends BaseEntity {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Integer> weekdays;
 
+
 }

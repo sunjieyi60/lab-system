@@ -20,7 +20,7 @@ public class DeviceManagerController {
 
     @GetMapping("/list")
     public R<List<ClassTimeTable>> listAll(@RequestParam(value = "status", required = false) String status){
-
+        return null;
     }
 
 }

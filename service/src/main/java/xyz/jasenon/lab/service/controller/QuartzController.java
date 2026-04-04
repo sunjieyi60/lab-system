@@ -5,7 +5,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import xyz.jasenon.lab.service.quartz.model.CourseScheduleTaskGenerator;
+import xyz.jasenon.lab.service.quartz.service.TaskGeneratorService;
+import xyz.jasenon.lab.service.quartz.service.TaskUpdateService;
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
 import xyz.jasenon.lab.common.utils.R;
@@ -35,6 +39,8 @@ public class QuartzController {
     private final QuartzRegister quartzRegister;
     private final TaskRuntimeService taskRuntimeService;
     private final TaskQueryService taskQueryService;
+    private final TaskGeneratorService taskGeneratorService;
+    private final TaskUpdateService taskUpdateService;
 
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
@@ -120,6 +126,29 @@ public class QuartzController {
         );
 
         return R.success(result);
+    }
+
+    @PostMapping("/generate-from-course-schedule")
+    @ApiOperation("根据课表生成定时任务")
+    public R<Boolean> generateFromCourseSchedule(@Validated @RequestBody CourseScheduleTaskGenerator target) {
+        return taskGeneratorService.generateScheduleTask(target);
+    }
+
+    @PutMapping("/update")
+    @ApiOperation("更新定时任务配置")
+    @LogPoint(title = "'报警联动设置-更新'", sqEl = "#root", clazz = ScheduleConfigRoot.class)
+    public R<Boolean> updateTask(@RequestBody @Validated ScheduleConfigRoot root) {
+        R<Boolean> res = taskUpdateService.updateTask(root);
+        if (!Boolean.TRUE.equals(res.getData())) {
+            return res;
+        }
+        // 更新成功后重新注册到 Quartz 调度器
+        try {
+            quartzRegister.scheduleTask(root);
+        } catch (org.quartz.SchedulerException e) {
+            return R.fail("任务更新成功，但注册到调度器失败: " + e.getMessage());
+        }
+        return R.success(true, "更新成功");
     }
 
 }

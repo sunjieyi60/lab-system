@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("course_schedule")
+@TableName(value = "course_schedule", autoResultMap = true)
 public class CourseSchedule extends Schedule {
 
     /**
