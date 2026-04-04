@@ -19,20 +19,30 @@ import xyz.jasenon.classtimetable.ui.dialog.DoorOpeningType
 
 /**
  * 右侧列组件
- * 
- * 功能区域说明：
- * 包含三个垂直排列的功能面板：
- * 1. 通知公告面板：显示系统通知和公告信息
- * 2. 校历面板：显示学校校历信息
- * 3. 开门方式面板：提供四种开门方式的按钮（人脸识别、密码、二维码、刷卡）
- * 
- * 使用的 Compose 组件：
- * - Column: 垂直布局容器，用于垂直排列子组件
- * - Card: Material3 卡片组件，用于创建信息面板
- * - Button: Material3 按钮组件，用于开门操作
- * - Text: 文本显示组件
- * - Spacer: 间距组件，用于添加垂直间距
- * - LazyVerticalGrid: 网格布局，用于排列开门方式按钮（可选，当前使用Row+Column组合）
+ *
+ * 实验室辅助功能区，包含三个垂直排列的功能面板：
+ * 1. [NoticesCard] 通知公告面板：显示系统通知和公告信息
+ * 2. [AcademicCalendarCard] 校历面板：显示学校校历信息
+ * 3. [DoorOpeningMethodsCard] 开门方式面板：提供四种开门方式的按钮
+ *
+ * ## 布局特点
+ *
+ * - 使用 [Column] 垂直排列三个面板
+ * - 每个面板使用 [Modifier.weight(1f)] 均分可用高度
+ * - 面板之间使用 [Arrangement.spacedBy] 设置间距
+ *
+ * ## 数据来源
+ *
+ * 当前为静态 Mock 数据，后续可从 [RemoteDataObservable] 获取：
+ * - 通知公告：从服务器获取
+ * - 校历：从服务器获取
+ * - 开门方式：本地功能
+ *
+ * @param modifier Compose 修饰符，用于外部传入的布局调整
+ *
+ * @see NoticesCard
+ * @see AcademicCalendarCard
+ * @see DoorOpeningMethodsCard
  */
 @Composable
 fun RightColumn(
@@ -46,12 +56,12 @@ fun RightColumn(
         NoticesCard(
             modifier = Modifier.weight(1f)
         )
-        
+
         // 校历面板 - 均分高度
         AcademicCalendarCard(
             modifier = Modifier.weight(1f)
         )
-        
+
         // 开门方式面板 - 均分高度
         DoorOpeningMethodsCard(
             modifier = Modifier.weight(1f)
@@ -61,8 +71,16 @@ fun RightColumn(
 
 /**
  * 通知公告卡片
- * 
- * 显示系统通知和公告信息
+ *
+ * 显示系统通知和公告信息。
+ *
+ * ## UI 设计
+ *
+ * - 标题居中显示"通知公告"
+ * - 内容区域预留，当前显示"暂无通知公告"
+ * - 后续可替换为可滚动的列表
+ *
+ * @param modifier Compose 修饰符，用于外部传入的布局调整
  */
 @Composable
 fun NoticesCard(
@@ -87,9 +105,9 @@ fun NoticesCard(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // 通知内容（实际应用中应从数据源获取）
             Text(
                 text = "暂无通知公告",
@@ -102,8 +120,16 @@ fun NoticesCard(
 
 /**
  * 校历卡片
- * 
- * 显示学校校历信息
+ *
+ * 显示学校校历信息。
+ *
+ * ## UI 设计
+ *
+ * - 标题居中显示"校历"
+ * - 内容区域预留，当前显示"暂无校历信息"
+ * - 后续可替换为日历组件
+ *
+ * @param modifier Compose 修饰符，用于外部传入的布局调整
  */
 @Composable
 fun AcademicCalendarCard(
@@ -128,9 +154,9 @@ fun AcademicCalendarCard(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // 校历内容（实际应用中应从数据源获取）
             Text(
                 text = "暂无校历信息",
@@ -143,12 +169,29 @@ fun AcademicCalendarCard(
 
 /**
  * 开门方式卡片
- * 
+ *
  * 提供四种开门方式的按钮：
  * - 人脸识别开门
  * - 密码开门
  * - 二维码开门
  * - 刷卡开门
+ *
+ * ## UI 设计
+ *
+ * - 2x2 网格布局，使用 Row + Column 实现
+ * - 每个按钮使用 [DoorOpeningButton] 组件
+ * - 点击按钮弹出对应的开门对话框
+ *
+ * ## 交互逻辑
+ *
+ * 1. 点击"人脸识别开门" → 弹出人脸识别对话框
+ * 2. 点击"密码开门" → 弹出密码输入对话框
+ * 3. 点击"二维码开门"/"刷卡开门" → 预留功能
+ *
+ * @param modifier Compose 修饰符，用于外部传入的布局调整
+ *
+ * @see DoorOpeningButton
+ * @see DoorOpeningDialog
  */
 @Composable
 fun DoorOpeningMethodsCard(
@@ -173,10 +216,13 @@ fun DoorOpeningMethodsCard(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
+
+            // 对话框状态
             var showPwdDialog by remember { mutableStateOf(false) }
             var showFaceDialog by remember { mutableStateOf(false) }
+
             // 开门方式按钮网格（2x2布局）
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -198,7 +244,7 @@ fun DoorOpeningMethodsCard(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                
+
                 // 第二行：二维码和刷卡开门
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -216,12 +262,14 @@ fun DoorOpeningMethodsCard(
                     )
                 }
 
+                // 密码开门对话框
                 DoorOpeningDialog(
                     visible = showPwdDialog,
                     onClose = { showPwdDialog = false },
                     type = DoorOpeningType.PASSWORD,
                 )
 
+                // 人脸识别开门对话框
                 DoorOpeningDialog(
                     visible = showFaceDialog,
                     onClose = { showFaceDialog = false },
@@ -234,8 +282,19 @@ fun DoorOpeningMethodsCard(
 
 /**
  * 开门方式按钮组件
- * 
- * 统一的开门方式按钮样式
+ *
+ * 统一的开门方式按钮样式，使用 Material3 [Button]。
+ *
+ * ## UI 设计
+ *
+ * - 固定高度 80dp
+ * - 主色背景，白色文字
+ * - 圆角 8dp
+ * - 20sp 字体大小
+ *
+ * @param text 按钮文本
+ * @param onClick 点击回调
+ * @param modifier Compose 修饰符
  */
 @Composable
 fun DoorOpeningButton(
@@ -262,6 +321,8 @@ fun DoorOpeningButton(
         )
     }
 }
+
+// ============== 预览 ==============
 
 @Preview(showBackground = true, widthDp = 300, heightDp = 800)
 @Composable

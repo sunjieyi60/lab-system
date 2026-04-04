@@ -11,7 +11,7 @@ import java.io.InputStream
  *
  * 流程：
  * 1. 设备启动时调用 [loadFallbackAndPush]：载入兜底 JSON（本地 SP 或 assets/config.json）→ 推送 [ConfigObservable]，视为完成配置
- * 2. T-io 收到 REGISTER_ACK 且 payload 非空时，由 [RegisterAckPacketHandler] 解密后调用 [saveConfigFromServer]：写入兜底本地 JSON 并更新 Observer
+ * 2. 服务器配置下发时调用 [saveConfigFromServer]：写入本地 JSON 并更新 Observer
  */
 class AppConfigManager(private val context: Context) {
 

@@ -21,7 +21,7 @@ object ConfigObservable {
     /** 当前配置状态流，观察者 collect 即可响应配置加载/更新 */
     val config: StateFlow<AppConfig?> = _config.asStateFlow()
 
-    /** 当前配置快照（用于 TioClientManager 等需要同步读取的场景） */
+    /** 当前配置快照（用于需要同步读取配置的场景） */
     fun getCurrent(): AppConfig? = _config.value
 
     /** 推送新配置（兜底加载完成 / REGISTER_ACK 解密写入后调用） */
