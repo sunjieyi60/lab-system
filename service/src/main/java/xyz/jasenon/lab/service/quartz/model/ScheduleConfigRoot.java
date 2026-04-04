@@ -1,5 +1,6 @@
 package xyz.jasenon.lab.service.quartz.model;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,7 @@ public class ScheduleConfigRoot {
     /**
      * 任务主体
      */
+    @NotNull(message = "任务主体不能是空")
     private ScheduleTask task;
 
     /**

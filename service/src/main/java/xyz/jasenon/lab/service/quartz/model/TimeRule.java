@@ -62,7 +62,7 @@ public class TimeRule {
     @TimeOrder(order = 1)
     private LocalTime endTime;
 
-    public TimeRule courseSchedule2TimeRule(Schedule schedule){
+    public static TimeRule courseSchedule2TimeRule(Schedule schedule){
         TimeRule timeRule = new TimeRule();
         String id = IdUtil.getSnowflakeNextIdStr();
         timeRule.setId(id);

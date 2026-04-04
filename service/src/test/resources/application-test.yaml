@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: lab-service-test
+  
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL;NON_KEYWORDS=VALUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  sql:
+    init:
+      schema-locations: classpath:schema-h2.sql
+      data-locations: classpath:data-h2.sql
+      mode: always
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # 禁用 Quartz 自动配置（测试时不需要）
+  quartz:
+    job-store-type: memory
+    auto-startup: false
+
+# MyBatis Plus 配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Sa-Token 配置（禁用）
+sa-token:
+  token-name: satoken
+  timeout: 2592000
+  activity-timeout: -1
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: false
+  is-read-body: false
+  is-read-header: true
+  is-read-cookie: false
+
+# 日志配置
+logging:
+  level:
+    xyz.jasenon.lab.service.quartz: DEBUG
+    org.springframework.jdbc: DEBUG
