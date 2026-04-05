@@ -53,7 +53,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         courseSchedule.setWeekdays(createCourseSchedule.getWeekdays());
         courseSchedule.setCourseId(createCourseSchedule.getCourseId());
         courseSchedule.setTeacherId(createCourseSchedule.getTeacherId());
-        courseSchedule.setDeptId(createCourseSchedule.getBelongToDeptId());
+        courseSchedule.setDeptName(createCourseSchedule.getBelongToDeptName());
         courseSchedule.setMajorClass(createCourseSchedule.getMajorClass());
         courseSchedule.setStartSection(createCourseSchedule.getStartSection());
         courseSchedule.setEndSection(createCourseSchedule.getEndSection());

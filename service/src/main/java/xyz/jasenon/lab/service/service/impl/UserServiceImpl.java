@@ -25,7 +25,9 @@ import xyz.jasenon.lab.service.vo.base.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -270,8 +272,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (user == null) {
             return R.fail("用户不存在");
         }
+        List<LaboratoryUser> laboratoryUsers = laboratoryUserMapper.selectList(
+                new LambdaQueryWrapper<LaboratoryUser>().eq(LaboratoryUser::getUserId, doUserId)
+        );
+        long distinctLabCount = laboratoryUsers.stream()
+                .map(LaboratoryUser::getLaboratoryId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .count();
+        boolean hasDuplicateLabRelation = laboratoryUsers.size() > distinctLabCount;
         UserBizVo userBizVo = userToUserBizVo(user);
-        return R.success(userBizVo,"获取当前用户详情成功");
+        String msg = hasDuplicateLabRelation
+                ? "获取当前用户详情成功，检测到重复实验室数据并已自动去重"
+                : "获取当前用户详情成功";
+        return R.success(userBizVo, msg);
     }
 
     @Override
@@ -337,7 +351,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         .leftJoin(Laboratory.class, on->on.eq(LaboratoryUser::getUserId, user.getId())
                                 .eq(LaboratoryUser::getLaboratoryId, Laboratory::getId))
         );
-        laboratories = laboratories.stream().filter(Objects::nonNull).toList();
+        Map<Long, LaboratoryVo> uniqueLabs = laboratories.stream()
+                .filter(Objects::nonNull)
+                .filter(lab -> lab.getId() != null)
+                .collect(Collectors.toMap(
+                        LaboratoryVo::getId,
+                        lab -> lab,
+                        (first, ignored) -> first,
+                        LinkedHashMap::new
+                ));
+        laboratories = new ArrayList<>(uniqueLabs.values());
         laboratories.forEach(one->{
             var Q = new MPJLambdaWrapper<LaboratoryManager>()
                     .selectAll(User.class)

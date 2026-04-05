@@ -87,7 +87,9 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
 
     @Override
     public R<Map<Long, List<Rs485GatewayVo>>> getRs485GatewayTree() {
-        List<Laboratory> laboratoryList = getVisibleLaboratories();
+        List<Laboratory> laboratoryList = getVisibleLaboratories().stream()
+                .distinct()
+                .toList();
         List<RS485Gateway> rs485GatewayList = new ArrayList<>();
         for (Laboratory laboratory : laboratoryList) {
             List<RS485Gateway> part = rs485GatewayMapper.selectList(
@@ -96,15 +98,34 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             );
             rs485GatewayList.addAll(part);
         }
-        Map<Long, List<Rs485GatewayVo>> map = rs485GatewayList.stream().map(rs485Gateway -> {
-            Rs485GatewayVo vo = new Rs485GatewayVo();
-            vo.setGatewayId(rs485Gateway.getId());
-            vo.setGatewayName(rs485Gateway.getGatewayName());
-            vo.setLaboratoryId(rs485Gateway.getBelongToLaboratoryId());
-            vo.setSendTopic(rs485Gateway.getSendTopic());
-            vo.setAcceptTopic(rs485Gateway.getAcceptTopic());
-            return vo;
-        }).collect(Collectors.groupingBy(Rs485GatewayVo::getLaboratoryId, Collectors.toList()));
+        Map<Long, List<Rs485GatewayVo>> map = rs485GatewayList.stream()
+                .collect(Collectors.toMap(
+                        RS485Gateway::getBelongToLaboratoryId,
+                        rs485Gateway -> {
+                            List<Rs485GatewayVo> list = new ArrayList<>();
+                            Rs485GatewayVo vo = new Rs485GatewayVo();
+                            vo.setGatewayId(rs485Gateway.getId());
+                            vo.setGatewayName(rs485Gateway.getGatewayName());
+                            vo.setLaboratoryId(rs485Gateway.getBelongToLaboratoryId());
+                            vo.setSendTopic(rs485Gateway.getSendTopic());
+                            vo.setAcceptTopic(rs485Gateway.getAcceptTopic());
+                            list.add(vo);
+                            return list;
+                        },
+                        (existing, replacement) -> {
+                            // 去重：根据 gatewayId 去重
+                            existing.addAll(replacement);
+                            return existing.stream()
+                                    .collect(Collectors.collectingAndThen(
+                                            Collectors.toMap(
+                                                    Rs485GatewayVo::getGatewayId,
+                                                    vo -> vo,
+                                                    (old, curr) -> old
+                                            ),
+                                            m -> new ArrayList<>(m.values())
+                                    ));
+                        }
+                ));
         return R.success(map,"获取成功");
     }
 
