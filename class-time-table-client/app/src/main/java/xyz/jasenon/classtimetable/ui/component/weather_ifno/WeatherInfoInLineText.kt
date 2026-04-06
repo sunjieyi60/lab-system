@@ -10,8 +10,15 @@ import androidx.compose.ui.unit.sp
 import xyz.jasenon.classtimetable.network.observe.RemoteDataObservable
 
 /**
- * 天气行内文本：只观察 [RemoteDataObservable.weatherState]。
- * 天气由 [WeatherPusher] 在应用启动时推送，无需 ViewModel。
+ * 天气行内文本组件
+ * <p>
+ * 观察 [RemoteDataObservable.weatherState] 并显示天气信息。
+ * 天气数据通过 RSocket 从服务端获取并推送到 [RemoteDataObservable]。
+ * </p>
+ *
+ * @author Jasenon_ce
+ * @see RemoteDataObservable
+ * @since 1.0.0
  */
 @Composable
 fun WeatherInfoInLineText(modifier: Modifier = Modifier) {

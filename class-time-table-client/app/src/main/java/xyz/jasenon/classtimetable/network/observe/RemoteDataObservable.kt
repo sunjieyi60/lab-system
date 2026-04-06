@@ -165,21 +165,21 @@ object RemoteDataObservable {
      * RemoteDataObservable.updateDoorStatus(DoorStatusData(open = true, message = "已开启"))
      * ```
      */
-    fun updateDoorStatus(data: DoorStatusData?) {
+    fun updateDoorStatus(data: DoorStatusData) {
         _doorStatus.value = data
     }
 
     /**
      * 更新天气状态
      *
-     * **预留接口**：用于后续从天气服务获取真实数据时更新。
+     * 通过 RSocket 从服务端获取天气数据后调用此接口更新 UI。
      * 调用后会触发 [weatherState] 的状态更新。
      *
      * @param state 新的天气状态
      *
      * @sample
      * ```kotlin
-     * // WeatherPusher 中更新天气
+     * // 通过 RSocket 收到天气数据后更新
      * RemoteDataObservable.updateWeather(WeatherState(weatherInfo = newInfo))
      * ```
      */
