@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import xyz.jasenon.classtimetable.config.ConfigObservable
+import xyz.jasenon.classtimetable.config.DeviceRuntimeConfigObservable
 
 class PwdOpenUiProvider(title: String, description : String,
     modifier: Modifier = Modifier.width(800.dp).height(500.dp)
@@ -47,10 +47,10 @@ class PwdOpenUiProvider(title: String, description : String,
         onTimeoutUpdate: (Long) -> Unit,
         setCardVisible: (Boolean) -> Unit
     ) {
-        val config by ConfigObservable.config.collectAsState(initial = null)
-        val pwdCfg = config?.doorOpenConfig?.passwordOpenConfig
-        val targetPwd = pwdCfg?.password ?: "123456"
-        val limitMillis = remember(pwdCfg) { toMillis(pwdCfg?.keepTimeConfig?.keepTime, pwdCfg?.keepTimeConfig?.keepTimeUnit) }
+        // 使用服务端下发的运行时配置
+        val targetPwd = DeviceRuntimeConfigObservable.getPassword()
+        val timeout = DeviceRuntimeConfigObservable.getTimeout()
+        val limitMillis = remember(timeout) { timeout * 1000L }
         var remaining by remember { mutableStateOf(limitMillis) }
         onTimeoutUpdate(remaining)
         var password by remember { mutableStateOf("") }

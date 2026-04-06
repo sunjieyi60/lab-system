@@ -55,8 +55,15 @@ import xyz.jasenon.classtimetable.network.observe.RemoteDataObservable
  * - 通过 [collectAsState] 收集 [RemoteDataObservable.timetableData]
  * - 数据变化时自动触发重组，刷新课程表
  *
+ * ## 回调说明
+ *
+ * - [onSwitchInterface]: 点击"切换界面"按钮时触发
+ * - [onExitSystem]: 点击"退出系统"按钮时触发
+ * - [onOpenSettings]: 点击"设置"按钮时触发，打开设备配置页面
+ *
  * @param onSwitchInterface 切换界面回调，点击"切换界面"按钮时触发
  * @param onExitSystem 退出系统回调，点击"退出系统"按钮时触发
+ * @param onOpenSettings 打开设置回调，点击"设置"按钮时触发，默认空实现
  * @param modifier Compose 修饰符，用于外部传入的布局调整
  *
  * @see TopBar
@@ -68,6 +75,7 @@ import xyz.jasenon.classtimetable.network.observe.RemoteDataObservable
 fun LabDashboardScreen(
     onSwitchInterface: () -> Unit = {},
     onExitSystem: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     /**
@@ -92,6 +100,7 @@ fun LabDashboardScreen(
         TopBar(
             onSwitchInterface = onSwitchInterface,
             onExitSystem = onExitSystem,
+            onOpenSettings = onOpenSettings,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -145,6 +154,7 @@ fun LabDashboardScreenPreview() {
         LabDashboardScreen(
             onSwitchInterface = { },
             onExitSystem = { },
+            onOpenSettings = { },
             modifier = Modifier.fillMaxSize()
         )
     }
