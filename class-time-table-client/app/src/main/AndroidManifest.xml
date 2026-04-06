@@ -26,6 +26,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".config.DeviceProfileConfigActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ClassTimeTable"
+            android:label="设备配置" />
     </application>
 
 </manifest>
