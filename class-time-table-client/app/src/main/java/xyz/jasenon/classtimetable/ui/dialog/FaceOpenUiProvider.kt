@@ -49,8 +49,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import xyz.jasenon.classtimetable.config.ConfigObservable
-import xyz.jasenon.classtimetable.config.FaceOpenConfig
+import xyz.jasenon.classtimetable.config.DeviceRuntimeConfigObservable
 import xyz.jasenon.classtimetable.ui.dialog.FaceOpenUiProvider.Companion.TAG
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -103,9 +102,10 @@ class FaceOpenUiProvider(
     ) {
         val context = LocalContext.current
         val lifecycleOwner = LocalLifecycleOwner.current
-        val config by ConfigObservable.config.collectAsState(initial = null)
-        val timeoutConfig = config?.doorOpenConfig?.faceOpenConfig?.keepTimeConfig
-        val limitMillis = remember(timeoutConfig) { toMillis(timeoutConfig?.keepTime, timeoutConfig?.keepTimeUnit) }
+        // 使用服务端下发的运行时配置
+        val timeout = DeviceRuntimeConfigObservable.getTimeout()
+        val facePrecision = DeviceRuntimeConfigObservable.getFacePrecision()
+        val limitMillis = remember(timeout) { timeout * 1000L }
 
         var remaining by remember { mutableStateOf(limitMillis) }
         var recognitionStatus by remember { mutableStateOf<RecognitionStatus>(RecognitionStatus.Waiting) }
@@ -146,7 +146,7 @@ class FaceOpenUiProvider(
                 FaceRecognitionCameraView(
                     context = context,
                     lifecycleOwner = lifecycleOwner,
-                    faceOpenConfig = config?.doorOpenConfig?.faceOpenConfig ?: FaceOpenConfig(),
+                    facePrecision = facePrecision,
                     onResults = { results ->
                         faceResults = results
                         if (results.isNotEmpty() && recognitionStatus == RecognitionStatus.Waiting) {
@@ -263,7 +263,7 @@ private fun CircularProgressIndicator(progress: Float, modifier: Modifier = Modi
 private fun FaceRecognitionCameraView(
     context: Context,
     lifecycleOwner: LifecycleOwner,
-    faceOpenConfig: FaceOpenConfig,
+    facePrecision: Float,
     onResults: (List<FaceSearchResult>) -> Unit,
     onImageSizeChanged: (Int, Int) -> Unit,
     onRecognitionSuccess: (String, Float) -> Unit,
@@ -276,12 +276,12 @@ private fun FaceRecognitionCameraView(
     val cameraProviderHolder = remember { mutableStateOf<ProcessCameraProvider?>(null) }
     val analyzerExecutorHolder = remember { mutableStateOf<ExecutorService?>(null) }
 
-    LaunchedEffect(faceOpenConfig) {
+    LaunchedEffect(facePrecision) {
         try {
             val searchProcessBuilder = SearchProcessBuilder.Builder(activity)
                 .setLifecycleOwner(lifecycleOwner)
                 .setCameraType(FaceAICameraType.SYSTEM_CAMERA)
-                .setThreshold(faceOpenConfig.precision)
+                .setThreshold(facePrecision)
                 .setSearchType(SearchProcessBuilder.SearchType.N_SEARCH_M)
                 .setMirror(true)
                 .setProcessCallBack(object : SearchProcessCallBack() {

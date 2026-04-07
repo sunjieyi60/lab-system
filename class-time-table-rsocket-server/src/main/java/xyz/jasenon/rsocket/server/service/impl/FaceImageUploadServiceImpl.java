@@ -19,14 +19,48 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * 人脸图像上传服务实现类
+ * <p>
+ * 提供人脸图像分片上传的完整实现，采用三步上传模式：
+ * <ol>
+ *   <li>初始化任务：创建任务记录，通知设备准备接收</li>
+ *   <li>分片传输：通过 RSocket 逐个传输分片数据</li>
+     *   <li>完成上传：通知设备处理，保存人脸特征</li>
+ * </ol>
+ * 使用 RSocket request-response 模式确保可靠传输。
+ * </p>
+ *
+ * @author Jasenon_ce
+ * @see FaceImageUploadService
+ * @see AbstractConnectionManager
+ * @since 1.0.0
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FaceImageUploadServiceImpl implements FaceImageUploadService {
 
+    /** RSocket 连接管理器，用于与班牌设备通信 */
     private final AbstractConnectionManager connectionManager;
+
+    /** 人脸图像数据访问层 */
     private final FaceImageMapper faceImageMapper;
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 初始化上传任务的完整流程：
+     * <ol>
+     *   <li>生成唯一任务ID</li>
+     *   <li>创建数据库记录，保存任务信息</li>
+     *   <li>检查设备在线状态</li>
+     *   <li>通过 RSocket 通知设备准备接收数据</li>
+     * </ol>
+     * </p>
+     *
+     * @throws IllegalStateException 当设备不在线或连接已关闭时抛出
+     */
     @Override
     public Mono<String> initUploadTask(String uuid, String faceFeatureName, int totalChunks, long totalSize) {
         return Mono.fromCallable(() -> {
@@ -69,6 +103,20 @@ public class FaceImageUploadServiceImpl implements FaceImageUploadService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 上传单个分片的完整流程：
+     * <ol>
+     *   <li>获取设备 RSocket 连接</li>
+     *   <li>构建设备分片数据包</li>
+     *   <li>通过 RSocket 发送分片并等待响应</li>
+     *   <li>解析设备响应并返回上传进度</li>
+     * </ol>
+     * </p>
+     *
+     * @throws IllegalStateException 当设备不在线时抛出
+     */
     @Override
     public Mono<FileChunkResponse> uploadChunk(String uuid, String taskId, byte[] chunkData,
                                                int chunkIndex, int totalChunks) {
@@ -106,6 +154,20 @@ public class FaceImageUploadServiceImpl implements FaceImageUploadService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 完成上传任务的完整流程：
+     * <ol>
+     *   <li>获取设备 RSocket 连接</li>
+     *   <li>发送完成通知到设备</li>
+     *   <li>解析设备响应，获取人脸特征数据</li>
+     *   <li>更新数据库中的任务状态和人脸特征</li>
+     * </ol>
+     * </p>
+     *
+     * @throws IllegalStateException 当设备不在线时抛出
+     */
     @Override
     public Mono<Void> completeUpload(String uuid, String taskId) {
         return Mono.fromCallable(() -> {

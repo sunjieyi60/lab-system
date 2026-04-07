@@ -27,16 +27,48 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 班牌设备服务实现类
+ * <p>
+ * 提供班牌设备的核心业务逻辑实现，包括：
+ * <ul>
+ *   <li>设备注册与身份验证</li>
+ *   <li>设备状态管理</li>
+ *   <li>配置更新与推送</li>
+ *   <li>实验室关联管理</li>
+ * </ul>
+ * 继承 MyBatis Plus 的 {@link MPJBaseServiceImpl} 提供基础 CRUD 能力。
+ * </p>
+ *
+ * @author Jasenon_ce
+ * @see DeviceService
+ * @see ClassicConnectManager
+ * @since 1.0.0
+ */
 @Slf4j
 @Service
-public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTimeTable> implements DeviceService,Const.Key{
+public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTimeTable> implements DeviceService, Const.Key {
 
+    /** 缓存服务，用于设备数据缓存 */
     @Autowired
     private Cache cache;
 
+    /** 连接管理器，用于管理设备 RSocket 连接 */
     @Autowired
     private ClassicConnectManager connectionManager;
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 设备注册逻辑：
+     * <ul>
+     *   <li>根据 UUID 查询设备</li>
+     *   <li>设备不存在则自动创建，使用默认配置</li>
+     *   <li>设备存在则更新实验室ID（如有变化）</li>
+     *   <li>返回包含配置信息的注册响应</li>
+     * </ul>
+     * </p>
+     */
     @Override
     public Mono<RegisterResponse> register(RegisterRequest request) {
         return Mono.fromCallable(
@@ -74,11 +106,29 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
         ).subscribeOn(Schedulers.boundedElastic());
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <strong>已弃用</strong>：此方法暂未实现，RSocket 协议级心跳已足够。
+     * </p>
+     */
     @Override
     public Mono<Void> heartbeat(Heartbeat heartbeat) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 根据状态查询设备列表：
+     * <ul>
+     *   <li>status 为 null 或空字符串时查询所有设备</li>
+     *   <li>status 必须为 ONLINE 或 OFFLINE，否则抛出异常</li>
+     * </ul>
+     * </p>
+     *
+     * @throws xyz.jasenon.lab.common.exception.BusinessException 当状态参数不合法时抛出
+     */
     @Override
     public List<ClassTimeTable> listAll(String status) {
         if (status == null || status.isBlank()) {
@@ -91,6 +141,18 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
         return lambdaQuery().eq(ClassTimeTable::getStatus, status).list();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 更新配置并推送到设备的完整流程：
+     * <ol>
+     *   <li>查询设备是否存在</li>
+     *   <li>更新数据库中的配置信息</li>
+     *   <li>清除设备缓存</li>
+     *   <li>如果设备在线，通过 RSocket 推送配置到设备</li>
+     * </ol>
+     * </p>
+     */
     @Override
     public Mono<PushConfigResult> updateConfigAndPush(String uuid, Config config) {
         return Mono.fromCallable(() -> {
@@ -123,6 +185,18 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
                 });
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 更新实验室并推送到设备的完整流程：
+     * <ol>
+     *   <li>查询设备是否存在</li>
+     *   <li>更新数据库中的实验室ID</li>
+     *   <li>清除设备缓存</li>
+     *   <li>如果设备在线，推送完整的设备档案（配置+实验室）到设备</li>
+     * </ol>
+     * </p>
+     */
     @Override
     public Mono<PushConfigResult> updateLaboratoryAndPush(String uuid, Long laboratoryId) {
         return Mono.fromCallable(() -> {
@@ -155,6 +229,18 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
                 });
     }
 
+    /**
+     * 设备数据保存后的档案推送处理
+     * <p>
+     * 检查设备在线状态，如在线则通过 RSocket 推送设备档案。
+     * 推送超时时间为5秒。
+     * </p>
+     *
+     * @param uuid 设备UUID
+     * @param device 设备实体
+     * @param trigger 推送触发类型（配置更新或实验室变更）
+     * @return 推送结果的异步 Mono
+     */
     private Mono<PushConfigResult> afterDeviceRowSavedPushProfile(
             String uuid, ClassTimeTable device, ProfilePushTrigger trigger) {
         List<String> persisted = trigger == ProfilePushTrigger.CONFIG
@@ -190,6 +276,20 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
                 });
     }
 
+    /**
+     * 构建推送结果元数据
+     * <p>
+     * 为推送结果设置详细的元数据信息，包括触发类型、持久化字段、在线状态等。
+     * </p>
+     *
+     * @param r 基础推送结果
+     * @param trigger 推送触发类型
+     * @param persisted 已持久化到数据库的字段列表
+     * @param deviceOnline 设备是否在线
+     * @param pushAttempted 是否尝试推送
+     * @param payloadKeys 推送到设备的字段列表
+     * @return 包含完整元数据的推送结果
+     */
     private static PushConfigResult meta(
             PushConfigResult r,
             ProfilePushTrigger trigger,
@@ -205,6 +305,16 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
         return r;
     }
 
+    /**
+     * 构建设备档案推送请求
+     * <p>
+     * 创建设备配置更新请求，包含配置信息、实验室ID等完整档案数据。
+     * </p>
+     *
+     * @param uuid 设备UUID
+     * @param device 设备实体
+     * @return 配置更新请求对象
+     */
     private static UpdateConfigRequest buildProfilePushRequest(String uuid, ClassTimeTable device) {
         Config cfg = device.getConfig() != null ? device.getConfig() : Config.Default();
         UpdateConfigRequest request = UpdateConfigRequest.create(

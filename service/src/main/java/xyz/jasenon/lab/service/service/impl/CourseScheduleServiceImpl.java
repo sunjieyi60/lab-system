@@ -209,7 +209,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         }
         boolean timeOverlap = a.getStartTime().isBefore(b.getEndTime()) && b.getStartTime().isBefore(a.getEndTime());
         boolean sectionOverlap = a.getStartSection() <= b.getEndSection() && b.getStartSection() <= a.getEndSection();
-        return timeOverlap || sectionOverlap;
+        return timeOverlap && sectionOverlap;
     }
 
     /**
