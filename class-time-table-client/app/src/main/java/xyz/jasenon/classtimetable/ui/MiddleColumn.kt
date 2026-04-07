@@ -33,7 +33,22 @@ import xyz.jasenon.classtimetable.constants.WeekType
 
 /**
  * 课程表布局常量配置
- * 用于统一管理课程表渲染相关的魔法值
+ *
+ * 统一管理课程表渲染相关的所有常量，避免在代码中分散使用魔法值。
+ *
+ * ## 常量分类
+ *
+ * | 分类 | 常量示例 | 说明 |
+ * |------|---------|------|
+ * | 表格结构 | [TOTAL_SECTIONS], [TOTAL_COLUMNS] | 表格行列数 |
+ * | 尺寸 | [SECTION_COLUMN_WIDTH], [CELL_HEIGHT] | 单元格尺寸 |
+ * | 文本 | [COURSE_NAME_FONT_SIZE] | 字体大小 |
+ * | 索引 | [SECTION_START_NUMBER] | 循环索引起始值 |
+ * | 默认值 | [DEFAULT_ROW_SPAN] | 属性默认值 |
+ * | 计算 | [SECTION_INDEX_OFFSET] | 索引转换偏移量 |
+ *
+ * @see MiddleColumn
+ * @see MergedTableLayout
  */
 object CourseScheduleConstants {
     // ========== 表格结构常量 ==========
@@ -131,12 +146,60 @@ object CourseScheduleConstants {
 }
 
 /**
- * 中间列组件 - 课程表网格布局（支持真正的单元格合并）
- * 
- * 参考传统课程表样式，实现网格布局：
- * - 表头：节次、星期一至星期日
- * - 行：第1节到第12节，每节显示时间范围
- * - 单元格：显示课程详细信息，支持真正的跨行合并
+ * 中间列组件 - 课程表网格布局（支持单元格合并）
+ *
+ * 实验室课表主展示区，采用传统课程表布局：
+ * - 表头：节次 + 星期一至星期日
+ * - 行：第1节到第11节，每节显示时间范围
+ * - 单元格：显示课程详细信息，支持跨行合并（多节连上课程）
+ *
+ * ## 布局结构
+ *
+ * ```
+ * ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┬────────┐
+ * │  节次  │ 星期一 │ 星期二 │ 星期三 │ 星期四 │ 星期五 │ 星期六 │ 星期日 │
+ * ├────────┼────────┼────────┼────────┼────────┼────────┼────────┼────────┤
+ * │第1节   │        │ 课程A  │        │        │        │        │        │
+ * │08:00  │        │ 跨2节  │        │        │        │        │        │
+ * ├────────┼────────┤        ├────────┼────────┼────────┼────────┼────────┤
+ * │第2节   │        │        │        │        │        │        │        │
+ * │08:55   │        │        │        │        │        │        │        │
+ * ├────────┼────────┼────────┼────────┼────────┼────────┼────────┼────────┤
+ * │ ...    │        │        │        │        │        │        │        │
+ * └────────┴────────┴────────┴────────┴────────┴────────┴────────┴────────┘
+ * ```
+ *
+ * ## 数据流
+ *
+ * ```
+ * RemoteDataObservable.timetableData
+ *              │
+ *              ▼
+ * LabDashboardScreen (collectAsState)
+ *              │
+ *              ▼ (courses 参数)
+ * MiddleColumn
+ *              │
+ *              ▼ (过滤当前周课程)
+ * buildCellData()
+ *              │
+ *              ▼ (CellData 列表)
+ * MergedTableLayout (渲染)
+ * ```
+ *
+ * ## 课程过滤逻辑
+ *
+ * 1. 根据 [currentWeek] 过滤出当前周的课程
+ * 2. 根据 [WeekType] 判断单双周
+ * 3. 使用 [isCourseInCurrentWeek] 进行精确匹配
+ *
+ * @param courses 课程列表，来自 [RemoteDataObservable.timetableData]
+ * @param currentWeek 当前周次，用于过滤显示的课程，默认第1周
+ * @param modifier Compose 修饰符
+ *
+ * @see CourseScheduleTable
+ * @see MergedTableLayout
+ * @see buildCellData
  */
 @Composable
 fun MiddleColumn(
@@ -184,6 +247,24 @@ fun MiddleColumn(
 
 /**
  * 课程表网格组件（支持单元格合并）
+ *
+ * 构建完整的课程表网格，包括：
+ * - 表头：节次 + 星期一到星期日
+ * - 表格内容：节次列 + 课程单元格（支持跨行合并）
+ *
+ * ## 实现细节
+ *
+ * 1. 使用 [BoxWithConstraints] 动态计算列宽
+ * 2. 节次列固定宽度 [SECTION_COLUMN_WIDTH]
+ * 3. 星期列均分剩余宽度
+ * 4. 使用 [buildCellData] 预处理单元格合并信息
+ * 5. 使用 [MergedTableLayout] 实现真正的单元格合并
+ *
+ * @param courses 课程列表
+ * @param currentWeek 当前周次，用于过滤课程
+ *
+ * @see buildCellData
+ * @see MergedTableLayout
  */
 @Composable
 fun CourseScheduleTable(
@@ -238,19 +319,54 @@ fun CourseScheduleTable(
 
 /**
  * 单元格数据类
+ *
+ * 描述课程表中一个单元格的信息，包括位置、大小和内容。
+ *
+ * @property row 行索引（0-based），对应第1-11节
+ * @property col 列索引，0=节次列，1-7=星期一到星期日
+ * @property rowSpan 跨行数，大于1表示该课程跨越多节（连上课程）
+ * @property colSpan 跨列数，当前不使用，默认为1
+ * @property course 课程数据，null 表示空单元格或节次列
+ * @property sectionNumber 节次编号（1-11），用于显示
+ * @property timeRange 时间范围，如"08:00~08:45"
+ *
+ * @see buildCellData
+ * @see MergedTableLayout
  */
 data class CellData(
-    val row: Int,           // 行索引（0-based，对应第1-N节）
-    val col: Int,           // 列索引（0=节次列, 1-7=星期列）
-    val rowSpan: Int = CourseScheduleConstants.DEFAULT_ROW_SPAN,   // 跨行数
-    val colSpan: Int = CourseScheduleConstants.DEFAULT_COL_SPAN,   // 跨列数（当前不使用）
+    val row: Int,
+    val col: Int,
+    val rowSpan: Int = CourseScheduleConstants.DEFAULT_ROW_SPAN,
+    val colSpan: Int = CourseScheduleConstants.DEFAULT_COL_SPAN,
     val course: CourseScheduleDto? = null,
-    val sectionNumber: Int, // 节次编号
-    val timeRange: String  // 时间范围
+    val sectionNumber: Int,
+    val timeRange: String
 )
 
 /**
  * 构建单元格数据（包含合并信息）
+ *
+ * 将课程列表转换为单元格数据列表，处理课程跨行合并逻辑。
+ *
+ * ## 算法步骤
+ *
+ * 1. 过滤课程：使用 [isCourseInCurrentWeek] 过滤当前周课程
+ * 2. 标记占用：为每门课程标记占用的单元格位置
+ * 3. 处理冲突：检查课程时间是否冲突
+ * 4. 计算跨行：根据 [startSection] 和 [endSection] 计算 rowSpan
+ * 5. 填充空白：为没有课程的时间段创建空单元格
+ * 6. 添加节次列：创建节次和时间显示列
+ *
+ * ## 合并逻辑
+ *
+ * - 课程跨越多节时，设置 [CellData.rowSpan] = endSection - startSection + 1
+ * - 被占用的单元格在 [occupiedCells] 集合中标记
+ * - 填充空白时跳过已被占用的单元格
+ *
+ * @param courses 课程列表
+ * @param currentWeek 当前周次
+ * @param sectionTimes 节次时间映射列表，每个元素是(前半节, 后半节)的时间对
+ * @return [List]<[CellData]> 单元格数据列表，供 [MergedTableLayout] 渲染
  */
 fun buildCellData(
     courses: List<CourseScheduleDto>,

@@ -1,42 +1,105 @@
 package xyz.jasenon.classtimetable.ui.component.weather_ifno
 
-import android.content.Context
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import xyz.jasenon.classtimetable.config.ConfigObservable
 import xyz.jasenon.classtimetable.network.observe.RemoteDataObservable
 
 /**
- * 天气推送器（唯一入口，状态推送）
+ * 天气推送器（Mock 数据版本）
  *
- * 在应用启动时调用 [start] 一次；内部观察 [ConfigObservable]，配置就绪后创建数据源并定时拉取，结果推送到 [RemoteDataObservable.weatherState]。
- * UI 只观察 [RemoteDataObservable.weatherState]，不依赖任何 ViewModel。
+ * 负责天气数据的获取和推送，将天气状态推送到 [RemoteDataObservable.weatherState]。
+ *
+ * ## 职责
+ *
+ * - 在应用启动时推送初始 Mock 天气数据
+ * - 后续可扩展为定时从服务器获取天气数据并推送
+ *
+ * ## 架构位置
+ *
+ * ```
+ * WeatherPusher (数据获取)
+ *      │
+ *      ▼ (推送)
+ * RemoteDataObservable.weatherState
+ *      │
+ *      ▼ (StateFlow)
+ * WeatherInfoInLineText (UI 展示)
+ * ```
+ *
+ * ## 协程使用
+ *
+ * 使用外部传入的 [CoroutineScope]，通常来自：
+ * - Activity 的 lifecycleScope
+ * - Application 的全局 Scope
+ * - 自定义的 ApplicationScope
+ *
+ * 协程在 [CoroutineScope.launch] 中启动，生命周期与传入的 Scope 绑定。
+ *
+ * ## 与 ViewModel 的区别
+ *
+ * 本类不使用 ViewModel，直接推送数据到 [RemoteDataObservable]。
+ * UI 组件通过收集 [RemoteDataObservable.weatherState] 获取数据。
+ * 这种设计简化了架构，适合中小型应用。
+ *
+ * ## 使用示例
+ *
+ * ```kotlin
+ * class MainActivity : ComponentActivity() {
+ *     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+ *
+ *     override fun onCreate(savedInstanceState: Bundle?) {
+ *         super.onCreate(savedInstanceState)
+ *
+ *         // 启动天气推送
+ *         WeatherPusher.start(applicationScope)
+ *     }
+ * }
+ * ```
+ *
+ * @see RemoteDataObservable.weatherState
+ * @see WeatherInfoInLineText
  */
 object WeatherPusher {
 
-    fun start(context: Context, scope: CoroutineScope) {
+    /**
+     * 启动天气推送
+     *
+     * 在应用启动时调用一次，推送初始 Mock 天气数据到 [RemoteDataObservable]。
+     *
+     * ## 协程上下文
+     * - 在传入的 [scope] 中启动新协程
+     * - 使用 [Dispatchers.Default] 或传入 Scope 的 Dispatcher
+     * - 不会阻塞调用线程
+     *
+     * ## 多次调用
+     * 多次调用会重复推送数据（当前实现），后续可优化为只推送一次或定时推送。
+     *
+     * @param scope 协程作用域，用于启动推送协程
+     *
+     * @sample
+     * ```kotlin
+     * val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+     * WeatherPusher.start(applicationScope)
+     * ```
+     */
+    fun start(scope: CoroutineScope) {
         scope.launch {
-            val config = ConfigObservable.config.first { it != null } ?: return@launch
-            val appContext = context.applicationContext
-            val dataSource = WeatherDataSourceFactory.create(appContext, config)
-            val intervalMinutes = config.heziConfig.pollIntervalMinutes?.toLong() ?: config.weatherConfig.updateInterval?.toLong() ?: 120L
-
-            while (true) {
-                RemoteDataObservable.updateWeather(WeatherState(isLoading = true, error = null))
-                try {
-                    val info = dataSource.fetchWeather()
-                    RemoteDataObservable.updateWeather(
-                        WeatherState(weatherInfo = info, isLoading = false, error = null)
-                    )
-                } catch (e: Exception) {
-                    RemoteDataObservable.updateWeather(
-                        WeatherState(isLoading = false, error = e.message ?: "获取天气失败")
-                    )
-                }
-                delay(intervalMinutes * 60 * 1000)
-            }
+            // 推送 Mock 天气数据
+            val mockWeatherState = WeatherState(
+                weatherInfo = WeatherInfo(
+                    county = "洪山区",
+                    city = "武汉",
+                    town = "",
+                    description = "晴",
+                    temperature = 24.0,
+                    humidity = 65.0,
+                    weatherIcon = "",
+                    currentHourWeather = null
+                ),
+                isLoading = false,
+                error = null
+            )
+            RemoteDataObservable.updateWeather(mockWeatherState)
         }
     }
 }

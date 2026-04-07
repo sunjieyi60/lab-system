@@ -6,10 +6,10 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * REGISTER_ACK payload 的 AES-GCM 解密
+ * AES-GCM 解密工具
  *
- * 协商 AES 密钥后（REGISTER 时由 [xyz.jasenon.classtimetable.network.register.RegisterPayloadBuilder] 写入 [negotiatedKey]），
- * 服务器下发的配置为 IV(12) + AES-GCM(ciphertext)；解密后反序列化并合并到 [AppConfig]。
+ * 用于解密服务器下发的加密配置数据。
+ * 支持 AES-GCM 模式，密钥通过外部设置 [negotiatedKey]。
  */
 object AesConfigHelper {
 
@@ -19,7 +19,7 @@ object AesConfigHelper {
     private const val GCM_IV_LENGTH = 12
     private const val GCM_TAG_LENGTH = 128
 
-    /** REGISTER 时协商得到的 AES 密钥（16 字节），由 RegisterPayloadBuilder 写入 */
+    /** AES 密钥（16 字节），由外部设置 */
     @Volatile
     var negotiatedKey: ByteArray? = null
         set(value) {
