@@ -144,7 +144,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if (!labOver){
                 throw R.fail("实验室越权").convert();
             }
-            for (Long laboratoryId : laboratoryIds){
+            for (Long laboratoryId : laboratoryIds.stream().distinct().toList()) {
                 LaboratoryUser laboratoryUser = new LaboratoryUser()
                         .setUserId(user.getId())
                         .setLaboratoryId(laboratoryId);
@@ -239,7 +239,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if (!labOver){
                 throw R.fail("实验室越权").convert();
             }
-            for (Long laboratoryId : laboratoryIds){
+            for (Long laboratoryId : laboratoryIds.stream().distinct().toList()) {
                 LaboratoryUser laboratoryUser = new LaboratoryUser()
                         .setUserId(user.getId())
                         .setLaboratoryId(laboratoryId);

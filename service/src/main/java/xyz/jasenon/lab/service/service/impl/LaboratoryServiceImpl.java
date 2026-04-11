@@ -22,7 +22,9 @@ import xyz.jasenon.lab.service.vo.base.LaboratoryVo;
 import xyz.jasenon.lab.service.vo.base.UserVo;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Jasenon_ce
@@ -71,42 +73,46 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         laboratory.setBelongToDepts(createLaboratory.getBelongToDeptIds());
         this.save(laboratory);
 
-        // 负责人：若入参带了 userIds且不为空则关联，否则用当前登录用户
+        Long newLabId = laboratory.getId();
+        List<User> visibleUsers = userService.visible();
+        Set<Long> visibleUserIdSet = new HashSet<>(visibleUsers.stream().map(User::getId).toList());
+
+        // 负责人：若入参带了 userIds 且不为空则关联（去重），否则用当前登录用户
         if (createLaboratory.getUserIds() != null && !createLaboratory.getUserIds().isEmpty()) {
-            List<Long> visibleUserIds = userService.visible().stream().map(User::getId).toList();
+            Set<Long> managerUserIds = new LinkedHashSet<>();
             for (Long userId : createLaboratory.getUserIds()) {
-                if (visibleUserIds.contains(userId)) {
-                    //补充可见性
-                    LaboratoryUser laboratoryUser = new LaboratoryUser()
-                            .setLaboratoryId(laboratory.getId())
-                            .setUserId(userId);
-                    laboratoryUserMapper.insert(laboratoryUser);
-                    //添加管理信息
-                    LaboratoryManager laboratoryManager = new LaboratoryManager()
-                            .setLaboratoryId(laboratory.getId())
-                            .setUserId(userId);
-                    laboratoryManagerMapper.insert(laboratoryManager);
+                if (visibleUserIdSet.contains(userId)) {
+                    managerUserIds.add(userId);
                 }
             }
-        }else{
-            LaboratoryManager laboratoryManager = new LaboratoryManager()
-                    .setLaboratoryId(laboratory.getId())
-                    .setUserId(doUserId);
-            laboratoryManagerMapper.insert(laboratoryManager);
+            for (Long userId : managerUserIds) {
+                laboratoryManagerMapper.insert(new LaboratoryManager()
+                        .setLaboratoryId(newLabId)
+                        .setUserId(userId));
+            }
+        } else {
+            laboratoryManagerMapper.insert(new LaboratoryManager()
+                    .setLaboratoryId(newLabId)
+                    .setUserId(doUserId));
         }
 
-        // 创建该实验室的用户对实验室默认可见
-        LaboratoryUser laboratoryUser = new LaboratoryUser()
-                .setLaboratoryId(laboratory.getId())
-                .setUserId(doUserId);
-        laboratoryUserMapper.insert(laboratoryUser);
-
-        List<User> fathers = userService.visible();
-        for(User father : fathers){
-            LaboratoryUser fzUser = new LaboratoryUser()
-                    .setLaboratoryId(laboratory.getId())
-                    .setUserId(father.getId());
-            laboratoryUserMapper.insert(fzUser);
+        // 实验室可见用户：创建人 + 可见树用户 + 入参中已校验的负责人，(laboratoryId, userId) 仅插入一次
+        Set<Long> laboratoryVisibleUserIds = new LinkedHashSet<>();
+        laboratoryVisibleUserIds.add(doUserId);
+        for (User u : visibleUsers) {
+            laboratoryVisibleUserIds.add(u.getId());
+        }
+        if (createLaboratory.getUserIds() != null && !createLaboratory.getUserIds().isEmpty()) {
+            for (Long userId : createLaboratory.getUserIds()) {
+                if (visibleUserIdSet.contains(userId)) {
+                    laboratoryVisibleUserIds.add(userId);
+                }
+            }
+        }
+        for (Long userId : laboratoryVisibleUserIds) {
+            laboratoryUserMapper.insert(new LaboratoryUser()
+                    .setLaboratoryId(newLabId)
+                    .setUserId(userId));
         }
 
         return laboratory;
