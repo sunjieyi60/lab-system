@@ -17,11 +17,6 @@ public class AccessRecord extends BaseRecord {
     private Integer address;
 
     /**
-     * 门禁id
-     */
-    private Integer selfId;
-
-    /**
      * 门禁状态 1:开,0:关
      */
     private Boolean isOpen;

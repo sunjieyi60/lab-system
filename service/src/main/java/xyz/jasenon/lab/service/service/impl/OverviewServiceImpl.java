@@ -385,7 +385,7 @@ public class OverviewServiceImpl implements IOverviewService, Const.Key, Const.M
                         .eq(LaboratoryUser::getUserId, userId)
                         // groupBy去重
                         .groupBy(LaboratoryUser::getLaboratoryId)
-                        .leftJoin(Laboratory.class, Laboratory::getId, LaboratoryUser::getUserId)
+                        .leftJoin(Laboratory.class, Laboratory::getId, LaboratoryUser::getLaboratoryId)
                         .selectAll(Laboratory.class)
         );
     }
@@ -509,7 +509,7 @@ public class OverviewServiceImpl implements IOverviewService, Const.Key, Const.M
      */
     private DeviceOverviewVo async(DeviceType type, List<Device> devices) {
         // 从缓存获取该类型设备的所有在线心跳记录key
-        Set<String> keys = cache.keys(type.getRedisPrefix())
+        Set<String> keys = cache.keys(type.getRedisPrefix() + "*")
                 .stream()
                 .map(s -> s.replace(type.getRedisPrefix(), ""))
                 .collect(Collectors.toSet());

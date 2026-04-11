@@ -6,6 +6,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import xyz.jasenon.lab.common.exception.BusinessException;
+import xyz.jasenon.lab.common.utils.DiyResponseEntity;
 import xyz.jasenon.lab.common.utils.R;
 
 import java.util.stream.Collectors;
@@ -17,25 +19,34 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * 处理业务异常（由 R.convert() 抛出）
+     * 将 BusinessException 转换为标准响应格式
+     */
+    @ExceptionHandler(BusinessException.class)
+    public DiyResponseEntity<R<?>> handleBusinessException(BusinessException e) {
+        return DiyResponseEntity.of(e.getR());
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
-    public R handle(IllegalArgumentException e) {
-        return R.fail("参数不合法:"+e.getMessage());
+    public DiyResponseEntity<R<Void>> handle(IllegalArgumentException e) {
+        return DiyResponseEntity.of(R.fail("参数不合法:"+e.getMessage()));
     }
 
     /** JSR 380 校验失败：@RequestBody + @Validated */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public R handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    public DiyResponseEntity<R<Void>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
         String msg = e.getBindingResult().getFieldErrors().stream()
                 .map(err -> err.getField() + " " + err.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-        return R.fail("参数校验失败: " + msg);
+        return DiyResponseEntity.of(R.fail("参数校验失败: " + msg));
     }
 
     /** @RequestBody 反序列化失败（如 JSON 格式/类型不匹配），常导致 400 */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public R handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+    public DiyResponseEntity<R<Void>> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
         String msg = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-        return R.fail("请求体解析失败: " + msg);
+        return DiyResponseEntity.of(R.fail("请求体解析失败: " + msg));
     }
 
     /** JSR 380 校验失败：@ModelAttribute + @Validated（如日志查询 DTO） */

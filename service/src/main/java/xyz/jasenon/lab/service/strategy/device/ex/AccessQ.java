@@ -52,14 +52,12 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
         Long duplicated = deviceMapper.selectCount(new LambdaQueryWrapper<Access>()
                 .eq(Access::getDeviceType, DeviceType.Access)
                 .eq(Access::getRs485GatewayId, createAccess.getRs485GatewayId())
-                .eq(Access::getAddress, createAccess.getAddress())
-                .eq(Access::getSelfId, createAccess.getSelfId()));
+                .eq(Access::getAddress, createAccess.getAddress()));
         if (duplicated != null && duplicated > 0) {
-            throw new IllegalArgumentException("同一RS485网关下该地址的selfId已存在");
+            throw new IllegalArgumentException("同一RS485网关下该地址的门禁已存在");
         }
         Access access = (Access) new Access()
                 .setAddress(createAccess.getAddress())
-                .setSelfId(createAccess.getSelfId())
                 .setRs485GatewayId(createAccess.getRs485GatewayId())
                 .setIsLock(false)
                 .setBelongToLaboratoryId(createAccess.getBelongToLaboratoryId())
@@ -89,7 +87,7 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
         task.setPriority(TaskPriority.POLLING);
         task.setDeviceType(DeviceType.Access);
         task.setCommandLine(CommandLine.REQUEST_ACCESS_DATA);
-        task.setArgs(new Integer[] { access.getAddress(), access.getSelfId() });
+        task.setArgs(new Integer[] { access.getAddress() });
         task.setDevice(access);
         Runnable pollingTask = pollingTask(task);
         pollingScheduleExecutorPool.submit(access.getId(), pollingTask);
@@ -100,7 +98,6 @@ public class AccessQ extends DeviceQ<AccessMapper, Access> {
         AccessRecord record = new AccessRecord();
         record.setDeviceId(device.getId());
         record.setAddress(device.getAddress());
-        record.setSelfId(device.getSelfId());
         record.setIsOpen(false);
         record.setIsLock(Boolean.TRUE.equals(device.getIsLock()));
         record.setLockStatus(0);

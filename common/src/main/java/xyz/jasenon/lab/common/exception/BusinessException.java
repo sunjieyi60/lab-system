@@ -13,6 +13,7 @@ public class BusinessException extends RuntimeException {
     private final Integer code;
     private final boolean ok;
     private final Object data;
+    private final R<?> r;
 
     /**
      * 从 R 构造业务异常
@@ -22,6 +23,7 @@ public class BusinessException extends RuntimeException {
         this.code = r.getCode();
         this.ok = r.isOk();
         this.data = r.getData();
+        this.r = r;
     }
 
     /**
@@ -32,6 +34,7 @@ public class BusinessException extends RuntimeException {
         this.code = code;
         this.ok = false;
         this.data = null;
+        this.r = null;
     }
 
     /**
@@ -42,5 +45,6 @@ public class BusinessException extends RuntimeException {
         this.code = code;
         this.ok = false;
         this.data = data;
+        this.r = null;
     }
 }

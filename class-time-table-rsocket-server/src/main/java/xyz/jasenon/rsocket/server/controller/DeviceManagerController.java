@@ -61,7 +61,8 @@ public class DeviceManagerController {
      */
     @PostMapping("/device/config")
     public Mono<R<DeviceProfilePushResultVo>> pushDeviceConfig(@Valid @RequestBody PushDeviceConfig body) {
-        return deviceService.updateConfigAndPush(body.getUuid(), body.getConfig()).map(PushConfigResult::toR);
+//        return deviceService.updateConfigAndPush(body.getUuid(), body.getConfig()).map(PushConfigResult::toR);
+        return null;
     }
 
     /**
@@ -76,7 +77,9 @@ public class DeviceManagerController {
      */
     @PatchMapping("/device/laboratory")
     public Mono<R<DeviceProfilePushResultVo>> updateDeviceLaboratory(@Valid @RequestBody EditDeviceLaboratory body) {
-        return deviceService.updateLaboratoryAndPush(body.getUuid(), body.getLaboratoryId()).map(PushConfigResult::toR);
+//        return deviceService.updateLaboratoryAndPush(body.getUuid(), body.getLaboratoryId()).map(PushConfigResult::toR);
+        return null;
     }
+
 
 }

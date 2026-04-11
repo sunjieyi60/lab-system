@@ -25,13 +25,15 @@ public class SensorMessageHandler extends MqttMessageHandler<SensorMapper, Senso
     SensorRecord decryptPayload(byte[] payload, Long deviceId) {
         Integer address = payload[0] & 0xff;
         Integer selfId = payload[2] & 0xff;
-        Double temperature = Integer.parseInt(Integer.toHexString(payload[3] & 0xff) + Integer.toHexString(payload[4] & 0xff), 16)
+        String hex = String.format("%02x", payload[3]) + String.format("%02x", payload[4]);
+        String hex1 = String.format("%02x", payload[3] & 0xff) + String.format("%02x", payload[4] & 0xff);
+        Double temperature = Integer.parseInt(String.format("%02x", payload[3] & 0xff) + String.format("%02x", payload[4] & 0xff), 16)
                 / 10.0;
-        Double humidity = Integer.parseInt(Integer.toHexString(payload[5] & 0xff) + Integer.toHexString(payload[6] & 0xff), 16)
+        Double humidity = Integer.parseInt(String.format("%02x", payload[5] & 0xff) + String.format("%02x", payload[6] & 0xff), 16)
                 / 10.0;
-        Double light = Integer.parseInt(Integer.toHexString(payload[7] & 0xff) + Integer.toHexString(payload[8] & 0xff)
-                + Integer.toHexString(payload[9] & 0xff) + Integer.toHexString(payload[10] & 0xff), 16) / 10.0;
-        Integer smoke = Integer.parseInt(Integer.toHexString(payload[11] & 0xff) + Integer.toHexString(payload[12] & 0xff), 16);
+        Double light = Integer.parseInt(String.format("%02x", payload[7] & 0xff) + String.format("%02x", payload[8] & 0xff)
+                + String.format("%02x", payload[9] & 0xff) + String.format("%02x", payload[10] & 0xff), 16) / 10.0;
+        Integer smoke = Integer.parseInt(String.format("%02x", payload[11] & 0xff) + String.format("%02x", payload[12] & 0xff), 16);
 
         SensorRecord sensorRecord = (SensorRecord) new SensorRecord()
                 .setTemperature(temperature)

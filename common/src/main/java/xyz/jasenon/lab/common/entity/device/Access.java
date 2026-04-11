@@ -20,11 +20,6 @@ public class Access extends Device {
     private Integer address;
 
     /**
-     * 门禁ID
-     */
-    private Integer selfId;
-
-    /**
      * rs485网关ID
      */
     private Long rs485GatewayId;

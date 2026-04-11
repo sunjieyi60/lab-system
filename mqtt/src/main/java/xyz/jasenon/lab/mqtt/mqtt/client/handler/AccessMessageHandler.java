@@ -27,7 +27,6 @@ public class AccessMessageHandler extends MqttMessageHandler<AccessMapper,Access
         Integer selfId = payloads[2] & 0xff;
 
         Access access = new LambdaQueryChainWrapper<>(super.deviceMapper)
-                .eq(Access::getSelfId, selfId)
                 .eq(Access::getAddress, address)
                 .eq(Access::getRs485GatewayId, rs485Id)
                 .one();
@@ -52,7 +51,6 @@ public class AccessMessageHandler extends MqttMessageHandler<AccessMapper,Access
 
         AccessRecord accessRecord = (AccessRecord) new AccessRecord()
                 .setAddress(address)
-                .setSelfId(selfId)
                 .setIsOpen(isOpen)
                 .setIsLock(isLcok)
                 .setLockStatus(lockStatus)

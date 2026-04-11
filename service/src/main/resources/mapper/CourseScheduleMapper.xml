@@ -25,26 +25,26 @@
     <select id="getAllClassingCourse" resultType="xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule">
         select * from course_schedule
         <include refid="base-with-time-range"></include>
-        and laboratory_id = #{laboratoryId}
+        and id = #{laboratoryId}
     </select>
 
     <select id="getAllClassingCourseVo" resultType="xyz.jasenon.lab.service.vo.base.CourseScheduleVo">
-        select * from course_schedule cs left join course c on c.id = cs.course_id
+        select cs.*, c.course_name from course_schedule cs left join course c on c.id = cs.course_id
         <include refid="base-with-time-range"></include>
+        group by cs.id, cs.semester_id, cs.course_id, cs.teacher_id, cs.laboratory_id, cs.start_week, cs.end_week, cs.weekdays, cs.start_time, cs.end_time, cs.week_type, cs.create_time, cs.update_time, c.course_name
         order by cs.start_time asc
-        group by cs.laboratory_id
     </select>
 
     <select id="existCourse" resultType="boolean">
         select count(*) > 0 from course_schedule cs
         <include refid="base"></include>
-        and cs.laboratory_id = #{laboratoryId}
+        and cs.id = #{laboratoryId}
     </select>
 
     <select id="getSoonCourseVo" resultType="xyz.jasenon.lab.service.vo.base.CourseScheduleVo">
-        select * from course_schedule cs left join course c on c.id = cs.course_id
+        select cs.*, c.course_name from course_schedule cs left join course c on c.id = cs.course_id
         <include refid="base-with-time-range"></include>
+        group by cs.id, cs.semester_id, cs.course_id, cs.teacher_id, cs.laboratory_id, cs.start_week, cs.end_week, cs.weekdays, cs.start_time, cs.end_time, cs.week_type, cs.create_time, cs.update_time, c.course_name
         order by cs.start_time asc
-        group by cs.laboratory_id
     </select>
 </mapper>
