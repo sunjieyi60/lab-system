@@ -1,9 +1,11 @@
 package xyz.jasenon.lab.cache.config;
 
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -26,6 +28,7 @@ import java.io.IOException;
 /**
  * 缓存自动配置类
  * 自动配置 Redis 连接、JedisTemplate、SerializationUtil 等 Bean
+ * 从 Spring 环境读取 Redis 配置 (spring.data.redis.*)
  *
  * @author Jasenon
  */
@@ -41,6 +44,21 @@ public class CacheAutoConfiguration {
     public CacheAutoConfiguration(CacheProperties cacheProperties) {
         this.cacheProperties = cacheProperties;
     }
+
+    @Value("${spring.data.redis.host:localhost}")
+    private String host;
+
+    @Value("${spring.data.redis.port:6379}")
+    private Integer port;
+
+    @Value("${spring.data.redis.database:0}")
+    private Integer database;
+
+    @Value("${spring.data.redis.password:}")
+    private String password;
+
+    @Value("${spring.data.redis.timeout:2000}")
+    private Integer timeout;
 
     /**
      * Jedis 连接池配置
@@ -60,34 +78,46 @@ public class CacheAutoConfiguration {
 
     /**
      * Jedis 连接池
+     * 从 Spring 环境读取 Redis 配置
      */
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(JedisPool.class)
     public JedisPool jedisPool(JedisPoolConfig jedisPoolConfig) {
-        // 从 Spring Data Redis 配置中获取连接信息
-        // 默认使用 localhost:6379
-        return new JedisPool(jedisPoolConfig, "localhost", 6379, 2000);
+        // 密码为空时，不使用密码连接
+        if (StrUtil.isBlank(password)) {
+            return new JedisPool(jedisPoolConfig, host, port, timeout, null, database);
+        }
+        return new JedisPool(jedisPoolConfig, host, port, timeout, password, database);
     }
 
     /**
      * Redisson 客户端
+     * 从 Spring 环境读取 Redis 配置
      */
     @Bean(destroyMethod = "shutdown")
     @ConditionalOnMissingBean(RedissonClient.class)
     public RedissonClient redissonClient() throws IOException {
-        // 优先加载自定义配置
+        // 优先加载自定义配置 redisson.yaml
         ClassPathResource resource = new ClassPathResource("redisson.yaml");
         if (resource.exists()) {
             return Redisson.create(Config.fromYAML(resource.getInputStream()));
         }
 
-        // 使用默认单节点配置
+        // 使用 Spring 配置的 Redis 地址
         Config config = new Config();
+        String redisUrl = String.format("redis://%s:%d", host, port);
+        
         config.useSingleServer()
-                .setAddress("redis://localhost:6379")
-                .setDatabase(0)
+                .setAddress(redisUrl)
+                .setDatabase(database)
                 .setConnectionMinimumIdleSize(10)
                 .setConnectionPoolSize(64);
+        
+        // 设置密码（如果配置了）
+        if (StrUtil.isNotBlank(password)) {
+            config.useSingleServer().setPassword(password);
+        }
+        
         return Redisson.create(config);
     }
 
