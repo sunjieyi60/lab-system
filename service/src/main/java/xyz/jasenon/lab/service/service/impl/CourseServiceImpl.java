@@ -28,32 +28,31 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private IAcademicAnalysisService analysisService;
 
     @Override
-    public R<CourseCreatedVo> createCourse(CreateCourse createCourse) {
+    public CourseCreatedVo createCourse(CreateCourse createCourse) {
         // 创建课程：参考项目风格，使用流式DTO取值进行字段注入
         Course course = new Course();
         course.setCourseName(createCourse.getCourseName());
         course.setVolumn(createCourse.getVolume());
         course.setGrade(createCourse.getGrade());
         this.save(course);
-        return R.success(new CourseCreatedVo().setCourseId(course.getId()), "课程创建成功");
+        return new CourseCreatedVo().setCourseId(course.getId());
     }
 
     @Override
-    public R deleteCourse(DeleteCourse deleteCourse) {
+    public void deleteCourse(DeleteCourse deleteCourse) {
         Course course = this.getById(deleteCourse.getCourseId());
         if (course == null) {
-            return R.fail("课程不存在");
+            throw R.fail("课程不存在").convert();
         }
         this.removeById(deleteCourse.getCourseId());
         analysisService.invalidateChartCache();
-        return R.success("课程删除成功");
     }
 
     @Override
-    public R editCourse(EditCourse editCourse) {
+    public Course editCourse(EditCourse editCourse) {
         Course course = this.getById(editCourse.getCourseId());
         if (course == null) {
-            return R.fail("课程不存在");
+            throw R.fail("课程不存在").convert();
         }
         // 编辑课程：参考 LaboratoryServiceImpl，使用 Hutool BeanUtil + CopyOptions 忽略空值与只读字段
         CopyOptions copyOptions = CopyOptions.create()
@@ -67,11 +66,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
         BeanUtil.copyProperties(edit, course, copyOptions);
         this.updateById(course);
-        return R.success("课程修改成功");
+        return course;
     }
 
     @Override
-    public R<List<Course>> listCourse() {
-        return R.success(list());
+    public List<Course> listCourse() {
+        return list();
     }
 }

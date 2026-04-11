@@ -2,10 +2,10 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.laboratory.CreateLaboratory;
 import xyz.jasenon.lab.service.dto.laboratory.DeleteLaboratory;
 import xyz.jasenon.lab.service.dto.laboratory.EditLaboratory;
+import xyz.jasenon.lab.service.vo.base.LaboratoryVo;
 
 import java.util.List;
 
@@ -15,14 +15,14 @@ import java.util.List;
  */
 public interface ILaboratoryService extends IService<Laboratory> {
 
-    R createLaboratory(CreateLaboratory createLaboratory);
+    Laboratory createLaboratory(CreateLaboratory createLaboratory);
 
-    R editLaboratory(EditLaboratory editLaboratory);
+    Laboratory editLaboratory(EditLaboratory editLaboratory);
 
-    R deleteLaboratory(DeleteLaboratory deleteLaboratory);
+    void deleteLaboratory(DeleteLaboratory deleteLaboratory);
 
-    R editManagers(Long laboratoryId, List<Long> userIds);
+    void editManagers(Long laboratoryId, List<Long> userIds);
 
-    R getLaboratoryDetailById(Long laboratoryId);
+    LaboratoryVo getLaboratoryDetailById(Long laboratoryId);
 
 }

@@ -38,7 +38,7 @@ public class BuildingServiceImpl extends ServiceImpl<BuildingMapper, Building> i
     private LaboratoryMapper laboratoryMapper;
 
     @Override
-    public R createBuilding(CreateBuilding createBuilding) {
+    public Building createBuilding(CreateBuilding createBuilding) {
 
         Building building = new Building();
         building.setBuildingName(createBuilding.getBuildingName());
@@ -50,43 +50,42 @@ public class BuildingServiceImpl extends ServiceImpl<BuildingMapper, Building> i
             deptBuilding.setBuildingId(building.getId());
             deptBuildingMapper.insert(deptBuilding);
         }
-        return R.success("楼栋创建成功");
+        return building;
     }
 
     @Override
-    public R editBuilding(EditBuilding editBuilding) {
+    public Building editBuilding(EditBuilding editBuilding) {
         // TODO 应当限制用户只能修改自己所属部门下的楼栋  交给后人实现
         Building building = this.getById(editBuilding.getBuildingId());
         if (building == null) {
-            return R.fail("楼栋不存在");
+            throw R.fail("楼栋不存在").convert();
         }
         if (!isBuildingInOperatorDepts(editBuilding.getBuildingId())) {
-            return R.fail("部门越权");
+            throw R.fail("部门越权").convert();
         }
         building.setBuildingName(editBuilding.getBuildingName());
         this.updateById(building);
-        return R.success("楼栋修改成功");
+        return building;
     }
 
     @Override
-    public R deleteBuilding(DeleteBuilding deleteBuilding) {
+    public void deleteBuilding(DeleteBuilding deleteBuilding) {
         // TODO 应当限制用户只能删除自己所属部门下的楼栋  交给后人实现
         if (!this.lambdaQuery().eq(Building::getId, deleteBuilding.getBuildingId()).exists()) {
-            return R.fail("楼栋不存在");
+            throw R.fail("楼栋不存在").convert();
         }
         if (!isBuildingInOperatorDepts(deleteBuilding.getBuildingId())) {
-            return R.fail("部门越权");
+            throw R.fail("部门越权").convert();
         }
         Long buildingId = deleteBuilding.getBuildingId();
         laboratoryMapper.delete(new LambdaQueryWrapper<Laboratory>().eq(Laboratory::getBelongToBuilding, buildingId));
         deptBuildingMapper.delete(new LambdaQueryWrapper<DeptBuilding>().eq(DeptBuilding::getBuildingId, buildingId));
         this.removeById(buildingId);
-        return R.success();
     }
 
     @Override
-    public R listBuilding() {
-        return R.success(this.list(), "获取楼栋列表成功");
+    public List<Building> listBuilding() {
+        return this.list();
     }
 
     /**

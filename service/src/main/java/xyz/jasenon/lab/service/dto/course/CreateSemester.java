@@ -22,7 +22,7 @@ public class CreateSemester {
     /**
      * 学期名称
      */
-    @Pattern(regexp = "(\\d{4})-(\\d{4}) 第(\\d+)学年", message = "学期名称  存在正则(\\d{4})-(\\d{4}) 第(\\d+)学年")
+    @Pattern(regexp = "(\\d{4})-(\\d{4}) 第(\\d+)学期", message = "学期名称  存在正则(\\d{4})-(\\d{4}) 第(\\d+)学期")
     @NotBlank(message = "学期名称不为空")
     private String name;
 

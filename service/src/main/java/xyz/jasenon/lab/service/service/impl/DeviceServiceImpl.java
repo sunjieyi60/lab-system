@@ -51,19 +51,18 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     private PollingScheduleExecutorPool pollingScheduleExecutorPool;
 
     @Override
-    public R deleteDevice(DeleteDevice deleteDevice) {
+    public void deleteDevice(DeleteDevice deleteDevice) {
         Long deviceId = deleteDevice.getDeviceId();
         pollingScheduleExecutorPool.cancelPolling(deviceId);
         baseMapper.deleteById(deviceId);
-        return R.success("删除成功");
     }
 
     @Override
-    public R updateDevice(UpdateDevice updateDevice) {
+    public Device updateDevice(UpdateDevice updateDevice) {
         Long deviceId = updateDevice.getDeviceId();
         Device device = baseMapper.selectById(deviceId);
         if (device == null) {
-            return R.fail("设备不存在");
+            throw R.fail("设备不存在").convert();
         }
         Boolean oldPolling = device.getPollingEnabled();
         if (oldPolling == null) {
@@ -82,11 +81,11 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             }
         }
         baseMapper.updateById(device);
-        return R.success("更新成功");
+        return device;
     }
 
     @Override
-    public R<Map<Long, List<Rs485GatewayVo>>> getRs485GatewayTree() {
+    public Map<Long, List<Rs485GatewayVo>> getRs485GatewayTree() {
         List<Laboratory> laboratoryList = getVisibleLaboratories().stream()
                 .distinct()
                 .toList();
@@ -126,11 +125,11 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
                                     ));
                         }
                 ));
-        return R.success(map,"获取成功");
+        return map;
     }
 
     @Override
-    public R<Map<Long, List<SocketGatewayVo>>> getSocketGatewayTree() {
+    public Map<Long, List<SocketGatewayVo>> getSocketGatewayTree() {
         List<Laboratory> laboratoryList = getVisibleLaboratories();
         List<SocketGateway> socketGatewayList = new ArrayList<>();
         for (Laboratory laboratory : laboratoryList) {
@@ -149,7 +148,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             vo.setLaboratoryId(socketGateway.getBelongToLaboratoryId());
             return vo;
         }).collect(Collectors.groupingBy(SocketGatewayVo::getGatewayId, Collectors.toList()));
-        return R.success(map,"获取成功");
+        return map;
     }
 
     private List<Laboratory> getVisibleLaboratories() {
@@ -166,15 +165,15 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
-    public R<Map<Long,List<DeviceVo>>> listDevice(List<Long> laboratoryIds, DeviceType deviceType) {
+    public Map<Long,List<DeviceVo>> listDevice(List<Long> laboratoryIds, DeviceType deviceType) {
         List<Long> laboratoryIdsVisible = getVisibleLaboratories().stream().map(l->l.getId()).toList();
         boolean isOver = !new HashSet<>(laboratoryIdsVisible).containsAll(laboratoryIds);
         if(isOver){
-            return R.fail("查询越权!");
+            throw R.fail("查询越权!").convert();
         }
         List<? extends Device> res = DeviceFactory.getDeviceQMethod(deviceType).list(laboratoryIds);
         if(res.isEmpty()){
-            return R.fail("查询无结果");
+            throw R.fail("查询无结果").convert();
         }
         List<DeviceVo> devices = res.stream().filter(r->r.getId()!=null).map(device -> {
             DeviceVo vo = new DeviceVo();
@@ -186,30 +185,29 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         Map<Long,List<DeviceVo>> map = devices.stream()
                 .filter(vo->vo.getDevice()!=null)
                 .collect(Collectors.groupingBy(DeviceVo::getDeviceId, Collectors.toList()));
-        return R.success(map,"获取成功");
+        return map;
     }
 
     @Override
-    public R enablePolling(Long deviceId) {
+    public void enablePolling(Long deviceId) {
         Device device = baseMapper.selectById(deviceId);
         if (device == null) {
-            return R.fail("设备不存在");
+            throw R.fail("设备不存在").convert();
         }
         Boolean pollingEnabled = device.getPollingEnabled();
         if (Boolean.TRUE.equals(pollingEnabled)) {
-            return R.success("轮询已开启");
+            return;
         }
         device.setPollingEnabled(Boolean.TRUE);
         baseMapper.updateById(device);
         DeviceFactory.getDeviceQMethod(device.getDeviceType()).startPollingById(deviceId);
-        return R.success("开启轮询成功");
     }
 
     @Override
-    public R disablePolling(Long deviceId) {
+    public void disablePolling(Long deviceId) {
         Device device = baseMapper.selectById(deviceId);
         if (device == null) {
-            return R.fail("设备不存在");
+            throw R.fail("设备不存在").convert();
         }
         Boolean pollingEnabled = device.getPollingEnabled();
         if (pollingEnabled == null) {
@@ -218,12 +216,11 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         if (Boolean.FALSE.equals(pollingEnabled)) {
             // 已经是关闭状态，确保调度中没有残留任务
             pollingScheduleExecutorPool.cancelPolling(deviceId);
-            return R.success("轮询已关闭");
+            return;
         }
         device.setPollingEnabled(Boolean.FALSE);
         baseMapper.updateById(device);
         pollingScheduleExecutorPool.cancelPolling(deviceId);
-        return R.success("关闭轮询成功");
     }
 
 }

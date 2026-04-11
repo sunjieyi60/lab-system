@@ -2,10 +2,11 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.class_time_table.Teacher;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateTeacher;
 import xyz.jasenon.lab.service.dto.course.DeleteTeacher;
 import xyz.jasenon.lab.service.dto.course.EditTeacher;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -13,11 +14,11 @@ import xyz.jasenon.lab.service.dto.course.EditTeacher;
  */
 public interface ITeacherService extends IService<Teacher> {
 
-    R createTeacher(CreateTeacher createTeacher);
+    Teacher createTeacher(CreateTeacher createTeacher);
 
-    R deleteTeacher(DeleteTeacher deleteTeacher);
+    void deleteTeacher(DeleteTeacher deleteTeacher);
 
-    R editTeacher(EditTeacher editTeacher);
+    Teacher editTeacher(EditTeacher editTeacher);
 
-    R getAllTeacher();
+    List<Teacher> getAllTeacher();
 }

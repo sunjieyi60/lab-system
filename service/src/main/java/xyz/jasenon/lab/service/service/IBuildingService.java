@@ -2,10 +2,11 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.base.Building;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.building.CreateBuilding;
 import xyz.jasenon.lab.service.dto.building.DeleteBuilding;
 import xyz.jasenon.lab.service.dto.building.EditBuilding;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -13,14 +14,14 @@ import xyz.jasenon.lab.service.dto.building.EditBuilding;
  */
 public interface IBuildingService extends IService<Building> {
 
-    R createBuilding(CreateBuilding createBuilding);
+    Building createBuilding(CreateBuilding createBuilding);
 
-    R editBuilding(EditBuilding editBuilding);
+    Building editBuilding(EditBuilding editBuilding);
 
-    R deleteBuilding(DeleteBuilding deleteBuilding);
+    void deleteBuilding(DeleteBuilding deleteBuilding);
 
     /**
      * 获取楼栋列表
      */
-    R listBuilding();
+    List<Building> listBuilding();
 }

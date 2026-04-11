@@ -1,6 +1,5 @@
 package xyz.jasenon.lab.service.service;
 
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.AirConditionRunningQueryDto;
 import xyz.jasenon.lab.service.vo.analysis.AirConditionRunningResultVo;
 
@@ -16,5 +15,5 @@ public interface IAirConditionRunningAnalysisService {
      * @param query 时间范围、楼栋、单位、实验室、设备（均可选）
      * @return 总时长、列表行、饼图扇区
      */
-    R<AirConditionRunningResultVo> getRunningStats(AirConditionRunningQueryDto query);
+    AirConditionRunningResultVo getRunningStats(AirConditionRunningQueryDto query);
 }

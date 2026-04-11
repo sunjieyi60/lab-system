@@ -8,7 +8,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.jasenon.lab.common.entity.base.Laboratory;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
 import xyz.jasenon.lab.service.mapper.AnalysisMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
@@ -57,7 +56,7 @@ public class AcademicAnalysisServiceImpl implements IAcademicAnalysisService {
      * @return 总数（课程数/学时数/人学时数）及 byWeek / byWeekday / bySection 分布
      */
     @Override
-    public R<AnalysisChartVo> getChartData(AnalysisQueryDto query) {
+    public AnalysisChartVo getChartData(AnalysisQueryDto query) {
         List<Long> labIds = resolveLabIds(query);
         String cacheKey = CACHE_KEY_PREFIX + buildCacheKey(query.getSemesterId(), query.getDeptId(), labIds);
 
@@ -66,7 +65,7 @@ public class AcademicAnalysisServiceImpl implements IAcademicAnalysisService {
         if (cached != null && !cached.isEmpty()) {
             try {
                 AnalysisChartVo vo = objectMapper.readValue(cached, AnalysisChartVo.class);
-                return R.success(vo, "获取成功(缓存)");
+                return vo;
             } catch (JsonProcessingException e) {
                 // 反序列化失败则忽略缓存，继续查库
             }
@@ -78,7 +77,7 @@ public class AcademicAnalysisServiceImpl implements IAcademicAnalysisService {
         } catch (JsonProcessingException e) {
             // 缓存写入失败不影响返回
         }
-        return R.success(vo, labIds != null && labIds.isEmpty() ? "无数据" : "获取成功");
+        return vo;
     }
 
     /**

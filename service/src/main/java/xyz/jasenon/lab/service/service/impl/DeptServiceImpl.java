@@ -14,6 +14,8 @@ import xyz.jasenon.lab.service.mapper.DeptMapper;
 import xyz.jasenon.lab.service.mapper.DeptUserMapper;
 import xyz.jasenon.lab.service.service.IDeptService;
 
+import java.util.List;
+
 /**
  * @author Jasenon_ce
  * @date 2025/11/26
@@ -25,7 +27,7 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements ID
     private DeptUserMapper deptUserMapper;
 
     @Override
-    public R createDept(CreateDept createDept) {
+    public Dept createDept(CreateDept createDept) {
         Long userId = StpUtil.getLoginIdAsLong();
 
         // 创建部门
@@ -39,33 +41,31 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements ID
         deptUser.setDeptId(deptId);
         deptUser.setUserId(userId);
         deptUserMapper.insert(deptUser);
-
-        return R.success("创建部门成功");
+        return dept;
     }
 
     @Override
-    public R editDept(EditDept editDept) {
+    public Dept editDept(EditDept editDept) {
         Dept dept = this.getById(editDept.getDeptId());
         if (dept == null) {
-            return R.fail("部门不存在");
+            throw R.fail("部门不存在").convert();
         }
         dept.setDeptName(editDept.getDeptName());
         this.updateById(dept);
-        return R.success("编辑部门成功");
+        return dept;
     }
 
     @Override
-    public R deleteDept(DeleteDept deleteDept) {
+    public void deleteDept(DeleteDept deleteDept) {
         Dept dept = this.getById(deleteDept.getDeptId());
         if (dept == null) {
-            return R.fail("部门不存在");
+            throw R.fail("部门不存在").convert();
         }
         this.removeById(deleteDept.getDeptId());
-        return R.success("删除部门成功");
     }
 
     @Override
-    public R listDept() {
-        return R.success(this.list(), "获取部门列表成功");
+    public List<Dept> listDept() {
+        return this.list();
     }
 }

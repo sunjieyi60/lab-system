@@ -41,7 +41,7 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
     private IAcademicAnalysisService analysisService;
 
     @Override
-    public R createCourseSchedule(CreateCourseSchedule createCourseSchedule) {
+    public CourseSchedule createCourseSchedule(CreateCourseSchedule createCourseSchedule) {
         CourseSchedule courseSchedule = new CourseSchedule();
         courseSchedule.setSemesterId(createCourseSchedule.getSemesterId());
         courseSchedule.setLaboratoryId(createCourseSchedule.getLaboratoryId());
@@ -67,31 +67,30 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         // 冲突检测：存在任意一个冲突即阻止创建
         for (CourseSchedule ex : schedules) {
             if (hasConflict(courseSchedule, ex)) {
-                return R.fail("课程安排冲突");
+                throw R.fail("课程安排冲突").convert();
             }
         }
 
         this.save(courseSchedule);
         analysisService.invalidateChartCache();
-        return R.success("课程安排创建成功");
+        return courseSchedule;
     }
 
     @Override
-    public R deleteCourseSchedule(DeleteCourseSchedule deleteCourseSchedule) {
+    public void deleteCourseSchedule(DeleteCourseSchedule deleteCourseSchedule) {
         CourseSchedule courseSchedule = this.getById(deleteCourseSchedule.getCourseScheduleId());
         if (courseSchedule == null) {
-            return R.fail("课程表不存在");
+            throw R.fail("课程表不存在").convert();
         }
         this.removeById(deleteCourseSchedule.getCourseScheduleId());
         analysisService.invalidateChartCache();
-        return R.success("课程表删除成功");
     }
 
     @Override
-    public R editCourseScheduleWeekdays(EditCourseSchedule editCourseSchedule) {
+    public CourseSchedule editCourseScheduleWeekdays(EditCourseSchedule editCourseSchedule) {
         CourseSchedule courseSchedule = this.getById(editCourseSchedule.getCourseScheduleId());
         if (courseSchedule == null) {
-            return R.fail("课程表不存在");
+            throw R.fail("课程表不存在").convert();
         }
 
         courseSchedule.setWeekdays(editCourseSchedule.getWeekdays());
@@ -103,29 +102,29 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
 
         for (CourseSchedule ex : schedules) {
             if (ex.getId() != null && ex.getId().equals(updated.getId())) {
-                continue; // 跳过自身记录，避免把“旧数据”当作冲突对比对象
+                continue; // 跳过自身记录，避免把"旧数据"当作冲突对比对象
             }
             if (hasConflict(updated, ex)) {
-                return R.fail("课程安排冲突");
+                throw R.fail("课程安排冲突").convert();
             }
         }
 
         this.updateById(updated);
         analysisService.invalidateChartCache();
-        return R.success("课程表编辑成功");
+        return updated;
     }
 
     @Override
-    public R deleteCourseScheduleByLaboratoryId(Long laboratoryId) {
+    public void deleteCourseScheduleByLaboratoryId(Long laboratoryId) {
         if (laboratoryId == null) {
-            return R.fail("实验室ID不能为空");
+            throw R.fail("实验室ID不能为空").convert();
         }
 
         List<CourseSchedule> schedules = this.lambdaQuery()
                 .eq(CourseSchedule::getLaboratoryId, laboratoryId)
                 .list();
         if (schedules.isEmpty()) {
-            return R.fail("该实验室下无课程表");
+            throw R.fail("该实验室下无课程表").convert();
         }
 
         List<Long> ids = schedules.stream()
@@ -137,11 +136,10 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
             this.removeByIds(ids);
             analysisService.invalidateChartCache();
         }
-        return R.success("实验室课程删除成功");
     }
 
     @Override
-    public R<Map<Long, List<CourseScheduleVo>>> listCourseSchedule(List<Long> laboratoryIds) {
+    public Map<Long, List<CourseScheduleVo>> listCourseSchedule(List<Long> laboratoryIds) {
         List<CourseScheduleVo> all = new ArrayList<>();
         for (Long laboratoryId : laboratoryIds) {
             List<CourseScheduleVo> list = baseMapper.selectJoinList(CourseScheduleVo.class,
@@ -167,13 +165,13 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         // 将相同实验室ID的课程表聚合到同一个列表中，避免重复 key 异常
         Map<Long, List<CourseScheduleVo>> map = all.stream()
                 .collect(Collectors.groupingBy(CourseScheduleVo::getLaboratoryId));
-        return R.success(map,"获取成功");
+        return map;
     }
 
     @Override
-    public R<List<Laboratory>> listLaboratory() {
+    public List<Laboratory> listLaboratory() {
         List<Laboratory> lists = laboratoryMapper.selectList(new LambdaQueryWrapper<Laboratory>());
-        return R.success(lists, "获取成功");
+        return lists;
     }
 
     /**

@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import xyz.jasenon.lab.common.utils.DiyResponseEntity;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
 import xyz.jasenon.lab.service.constants.Permissions;
@@ -36,21 +37,21 @@ public class AnalysisController {
     @RequestPermission(allowed = {Permissions.ACADEMIC_AFFAIRS_ANALYSIS})
     @PostMapping("/chart")
     @ApiOperation("获取教务数据")
-    public R<AnalysisChartVo> getChartData(@RequestBody AnalysisQueryDto query) {
-        return analysisService.getChartData(query != null ? query : new AnalysisQueryDto());
+    public DiyResponseEntity<R<AnalysisChartVo>> getChartData(@RequestBody AnalysisQueryDto query) {
+        return DiyResponseEntity.of(R.success(analysisService.getChartData(query != null ? query : new AnalysisQueryDto())));
     }
 
     @RequestPermission(allowed = {Permissions.LABORATORY_CENTRAL_AIRCONDITION})
     @PostMapping("/air-condition/running")
     @ApiOperation("空调运行时长统计")
-    public R<AirConditionRunningResultVo> getAirConditionRunningStats(@RequestBody(required = false) AirConditionRunningQueryDto query) {
-        return airConditionRunningAnalysisService.getRunningStats(query != null ? query : new AirConditionRunningQueryDto());
+    public DiyResponseEntity<R<AirConditionRunningResultVo>> getAirConditionRunningStats(@RequestBody(required = false) AirConditionRunningQueryDto query) {
+        return DiyResponseEntity.of(R.success(airConditionRunningAnalysisService.getRunningStats(query != null ? query : new AirConditionRunningQueryDto())));
     }
 
     @RequestPermission(allowed = {Permissions.LABORATORY_POWER_CONSUMPTION})
     @PostMapping("/energy-consumption")
     @ApiOperation("能耗统计")
-    public R<EnergyConsumptionResultVo> getEnergyConsumption(@RequestBody(required = false) EnergyConsumptionQueryDto query) {
-        return energyConsumptionAnalysisService.getEnergyConsumption(query != null ? query : new EnergyConsumptionQueryDto());
+    public DiyResponseEntity<R<EnergyConsumptionResultVo>> getEnergyConsumption(@RequestBody(required = false) EnergyConsumptionQueryDto query) {
+        return DiyResponseEntity.of(R.success(energyConsumptionAnalysisService.getEnergyConsumption(query != null ? query : new EnergyConsumptionQueryDto())));
     }
 }

@@ -24,40 +24,40 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
      * 创建教师：使用DTO提供的字段进行注入，保持与项目统一风格
      */
     @Override
-    public R createTeacher(CreateTeacher createTeacher) {
+    public Teacher createTeacher(CreateTeacher createTeacher) {
         Teacher teacher = new Teacher();
         teacher.setTeacherName(createTeacher.getTeacherName());
         this.save(teacher);
-        return R.success("教师创建成功");
+        return teacher;
     }
 
     /**
      * 删除教师：不存在则返回失败
      */
     @Override
-    public R deleteTeacher(DeleteTeacher deleteTeacher) {
+    public void deleteTeacher(DeleteTeacher deleteTeacher) {
         Teacher teacher = this.getById(deleteTeacher.getTeacherId());
         if (teacher == null) {
-            return R.fail("教师不存在");
+            throw R.fail("教师不存在").convert();
         }
         this.removeById(deleteTeacher.getTeacherId());
-        return R.success("教师删除成功");
     }
 
     @Override
-    public R editTeacher(EditTeacher editTeacher) {
+    public Teacher editTeacher(EditTeacher editTeacher) {
         Teacher teacher = this.getById(editTeacher.getTeacherId());
         if (Objects.nonNull(teacher)){
             teacher.setTeacherName(editTeacher.getTeacherName());
             updateById(teacher);
-            return R.success("操作成功");
+            return teacher;
+        } else {
+            throw R.fail("相关教师不存在").convert();
         }
-        return R.fail("相关教师不存在");
     }
 
     @Override
-    public R getAllTeacher() {
+    public List<Teacher> getAllTeacher() {
         List<Teacher> teachers = this.list();
-        return R.success(teachers);
+        return teachers;
     }
 }

@@ -57,7 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R createUser(CreateUser createUser) {
+    public User createUser(CreateUser createUser) {
 
         String username = createUser.getUsername();
         String password = createUser.getPassword();
@@ -68,7 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         User target = baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
         if (target != null) {
-            return R.fail("用户已存在");
+            throw R.fail("用户已存在").convert();
         }
 
         User doUser = baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, createBy));
@@ -106,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             // 是否越权，当前用户只能将自己拥有的权限赋予给其他用户
             boolean pmOver = new HashSet<>(doUserPermissions).containsAll(permissions);
             if (!pmOver){
-                return R.fail("权限越权");
+                throw R.fail("权限越权").convert();
             }
             for (Permissions permission : permissions){
                 UserPermission userPermission = new UserPermission()
@@ -124,7 +124,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     .list().stream().map(DeptUser::getDeptId).toList();
             boolean deptOver = new HashSet<>(doDeptIds).containsAll(deptIds);
             if (!deptOver){
-                return R.fail("部门越权");
+                throw R.fail("部门越权").convert();
             }
             for (Long deptId : deptIds){
                 DeptUser deptUser = new DeptUser()
@@ -142,7 +142,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     .list().stream().map(LaboratoryUser::getLaboratoryId).toList();
             boolean labOver = new HashSet<>(doLaboratoryIds).containsAll(laboratoryIds);
             if (!labOver){
-                return R.fail("实验室越权");
+                throw R.fail("实验室越权").convert();
             }
             for (Long laboratoryId : laboratoryIds){
                 LaboratoryUser laboratoryUser = new LaboratoryUser()
@@ -151,23 +151,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 laboratoryUserMapper.insert(laboratoryUser);
             }
         }
-        return R.success("新建用户成功");
+
+        return user;
     }
 
     @Override
-    public R editUser(EditUser editUser) {
+    public User editUser(EditUser editUser) {
 
         Long doUserId = StpUtil.getLoginIdAsLong();
         List<User> visible = visible();
         boolean isVisible = visible.stream().anyMatch(user -> user.getId().equals(editUser.getUserId()));
 
         if (!isVisible){
-            return R.fail("无权编辑该用户");
+            throw R.fail("无权编辑该用户").convert();
         }
 
         User user = baseMapper.selectById(editUser.getUserId());
         if (user == null) {
-            return R.fail("用户不存在");
+            throw R.fail("用户不存在").convert();
         }
         User edit = new User()
                 .setPassword(editUser.getPassword())
@@ -200,7 +201,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             // 是否越权，当前用户只能将自己拥有的权限赋予给其他用户
             boolean pmOver = new HashSet<>(doUserPermissions).containsAll(permissions);
             if (!pmOver){
-                return R.fail("权限越权");
+                throw R.fail("权限越权").convert();
             }
             for (Permissions permission : permissions){
                 UserPermission userPermission = new UserPermission()
@@ -218,7 +219,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     .list().stream().map(DeptUser::getDeptId).toList();
             boolean deptOver = new HashSet<>(doDeptIds).containsAll(deptIds);
             if (!deptOver){
-                return R.fail("部门越权");
+                throw R.fail("部门越权").convert();
             }
             for (Long deptId : deptIds){
                 DeptUser deptUser = new DeptUser()
@@ -236,7 +237,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     .list().stream().map(LaboratoryUser::getLaboratoryId).toList();
             boolean labOver = new HashSet<>(doLaboratoryIds).containsAll(laboratoryIds);
             if (!labOver){
-                return R.fail("实验室越权");
+                throw R.fail("实验室越权").convert();
             }
             for (Long laboratoryId : laboratoryIds){
                 LaboratoryUser laboratoryUser = new LaboratoryUser()
@@ -246,31 +247,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
         }
 
-        return R.success("编辑用户成功");
+        return user;
     }
 
     @Override
-    public R deleteUser(DeleteUser deleteUser) {
+    public void deleteUser(DeleteUser deleteUser) {
         Long doUserId = StpUtil.getLoginIdAsLong();
         List<User> visible = visible();
         boolean isVisible = visible.stream().anyMatch(user -> user.getId().equals(deleteUser.getUserId()));
         if (!isVisible){
-            return R.fail("无权删除该用户");
+            throw R.fail("无权删除该用户").convert();
         }
         User user = baseMapper.selectById(deleteUser.getUserId());
         if (user == null) {
-            return R.fail("用户不存在");
+            throw R.fail("用户不存在").convert();
         }
         this.removeById(user.getId());
-        return R.success("删除用户成功");
     }
 
     @Override
-    public R getCurrentUserDetail() {
+    public UserBizVo getCurrentUserDetail() {
         Long doUserId = StpUtil.getLoginIdAsLong();
         User user = baseMapper.selectById(doUserId);
         if (user == null) {
-            return R.fail("用户不存在");
+            throw R.fail("用户不存在").convert();
         }
         List<LaboratoryUser> laboratoryUsers = laboratoryUserMapper.selectList(
                 new LambdaQueryWrapper<LaboratoryUser>().eq(LaboratoryUser::getUserId, doUserId)
@@ -282,45 +282,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .count();
         boolean hasDuplicateLabRelation = laboratoryUsers.size() > distinctLabCount;
         UserBizVo userBizVo = userToUserBizVo(user);
-        String msg = hasDuplicateLabRelation
-                ? "获取当前用户详情成功，检测到重复实验室数据并已自动去重"
-                : "获取当前用户详情成功";
-        return R.success(userBizVo, msg);
+        // Note: 如果需要返回重复实验室检测信息，可以通过其他方式处理
+        // String msg = hasDuplicateLabRelation
+        //         ? "获取当前用户详情成功，检测到重复实验室数据并已自动去重"
+        //         : "获取当前用户详情成功";
+        return userBizVo;
     }
 
     @Override
-    public R login(UserLogin userLogin) {
+    public void login(UserLogin userLogin) {
         User user = baseMapper.selectOne(
                 new LambdaQueryWrapper<User>().eq(User::getUsername, userLogin.getUsername())
         );
         if (user == null) {
-            return R.fail("用户不存在");
+            throw R.fail("用户不存在").convert();
         }
         if (!user.getPassword().equals(MD5.create()
                 .digestHex(userLogin.getPassword()))){
-            return R.fail("密码错误");
+            throw R.fail("密码错误").convert();
         }
         StpUtil.login(user.getId());
-        return R.success("登录成功");
     }
 
     @Override
-    public R logout() {
+    public void logout() {
         StpUtil.logout();
-        return R.success("登出成功");
     }
 
     @Override
-    public R visibleTreeVo() {
+    public List<UserBizVo> visibleTreeVo() {
         Long doUserId = StpUtil.getLoginIdAsLong();
         List<User> visible = visible();
         List<UserBizVo> userBizVos = visible.stream().map(this::userToUserBizVo).toList();
-        return R.success(userBizVos,"获取可见用户树成功");
+        return userBizVos;
     }
 
     @Override
-    public R permissionTree() {
-        return R.success(Permissions.tree, "获取权限树成功");
+    public Permissions.PermissionTree permissionTree() {
+        return Permissions.tree;
     }
 
     private UserBizVo userToUserBizVo(User user){

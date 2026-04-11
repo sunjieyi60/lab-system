@@ -46,14 +46,14 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
     private CircuitBreakQ circuitBreakQ;
 
     @Override
-    public R<EnergyConsumptionResultVo> getEnergyConsumption(EnergyConsumptionQueryDto query) {
+    public EnergyConsumptionResultVo getEnergyConsumption(EnergyConsumptionQueryDto query) {
         if (query.getStartTime() == null || query.getEndTime() == null || !query.getStartTime().isBefore(query.getEndTime())) {
-            return R.fail("请填写有效的开始、结束时间");
+            throw R.fail("请填写有效的开始、结束时间").convert();
         }
         List<Long> labIds = resolveLabIds(query);
         List<CircuitBreak> devices = listDevices(labIds, query.getDeviceIds());
         if (devices.isEmpty()) {
-            return R.success(buildEmptyResult(), "无符合条件的智能空开");
+            return buildEmptyResult();
         }
 
         Map<Long, Laboratory> labMap = loadLabMap(devices);
@@ -80,7 +80,7 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
 
         BigDecimal totalKwh = list.stream().map(EnergyConsumptionRowVo::getEnergyKwh).reduce(BigDecimal.ZERO, BigDecimal::add);
         if (totalKwh.compareTo(BigDecimal.ZERO) == 0) {
-            return R.success(buildEmptyResult(), "该时间范围内无能耗数据");
+            return buildEmptyResult();
         }
         for (EnergyConsumptionRowVo row : list) {
             BigDecimal p = row.getEnergyKwh().divide(totalKwh, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
@@ -101,7 +101,7 @@ public class EnergyConsumptionAnalysisServiceImpl implements IEnergyConsumptionA
                 .setList(list)
                 .setChartSegments(chartSegments)
                 .setSummaryRow(summaryRow);
-        return R.success(vo);
+        return vo;
     }
 
     /**

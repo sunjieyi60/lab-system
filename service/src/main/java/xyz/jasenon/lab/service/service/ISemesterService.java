@@ -2,7 +2,6 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.class_time_table.Semester;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateSemester;
 import xyz.jasenon.lab.service.dto.course.DeleteSemester;
 import xyz.jasenon.lab.service.dto.course.EditSemester;
@@ -15,11 +14,11 @@ import java.util.List;
  */
 public interface ISemesterService extends IService<Semester> {
 
-    R createSemester(CreateSemester createSemester);
+    Semester createSemester(CreateSemester createSemester);
 
-    R deleteSemester(DeleteSemester deleteSemester);
+    void deleteSemester(DeleteSemester deleteSemester);
 
-    R editSemester(EditSemester editSemester);
+    Semester editSemester(EditSemester editSemester);
 
-    R<List<Semester>> listSemester();
+    List<Semester> listSemester();
 }

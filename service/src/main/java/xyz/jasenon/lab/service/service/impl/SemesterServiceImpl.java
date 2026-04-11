@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import xyz.jasenon.lab.cache.spi.Cache;
+import xyz.jasenon.lab.common.Const;
 import xyz.jasenon.lab.common.entity.class_time_table.Semester;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateSemester;
@@ -19,34 +21,41 @@ import java.util.List;
  * @date 2025/11/27
  */
 @Service
-public class SemesterServiceImpl extends ServiceImpl<SemesterMapper, Semester> implements ISemesterService {
+public class SemesterServiceImpl extends ServiceImpl<SemesterMapper, Semester> implements ISemesterService, Const.Key {
+
+    private final Cache cache;
+
+    public SemesterServiceImpl(Cache cache) {
+        this.cache = cache;
+    }
 
     @Override
-    public R createSemester(CreateSemester createSemester) {
+    public Semester createSemester(CreateSemester createSemester) {
         // 创建学期：参考项目风格，使用流式DTO取值
         Semester semester = new Semester();
         semester.setName(createSemester.getName());
         semester.setStartDate(createSemester.getStartDate());
         semester.setEndDate(createSemester.getEndDate());
         this.save(semester);
-        return R.success("学期创建成功");
+        return semester;
     }
 
     @Override
-    public R deleteSemester(DeleteSemester deleteSemester) {
+    public void deleteSemester(DeleteSemester deleteSemester) {
         Semester semester = this.getById(deleteSemester.getSemesterId());
         if (semester == null) {
-            return R.fail("学期不存在");
+            throw R.fail("学期不存在").convert();
         }
         this.removeById(deleteSemester.getSemesterId());
-        return R.success("学期删除成功");
+        // 回收缓存
+        cache.delete(semesterInfo(deleteSemester.getSemesterId()));
     }
 
     @Override
-    public R editSemester(EditSemester editSemester) {
+    public Semester editSemester(EditSemester editSemester) {
         Semester semester = this.getById(editSemester.getSemesterId());
         if (semester == null) {
-            return R.fail("学期不存在");
+            throw R.badRequest("学期不存在").convert();
         }
         // 编辑学期：使用 Hutool BeanUtil + CopyOptions 忽略空值与只读字段，保证风格与 LaboratoryServiceImpl 一致
         CopyOptions copyOptions = CopyOptions.create()
@@ -60,11 +69,13 @@ public class SemesterServiceImpl extends ServiceImpl<SemesterMapper, Semester> i
 
         BeanUtil.copyProperties(edit, semester, copyOptions);
         this.updateById(semester);
-        return R.success("学期修改成功");
+        // 清除缓存
+        cache.delete(semesterInfo(semester.getId()));
+        return semester;
     }
 
     @Override
-    public R<List<Semester>> listSemester() {
-        return R.success(list());
+    public List<Semester> listSemester() {
+        return list();
     }
 }

@@ -17,7 +17,7 @@ import xyz.jasenon.lab.service.service.IDeptUserService;
 public class DeptUserServiceImpl extends ServiceImpl<DeptUserMapper, DeptUser> implements IDeptUserService {
 
     @Override
-    public R userBindDept(BindUserToDept bindUserToDept) {
+    public DeptUser userBindDept(BindUserToDept bindUserToDept) {
         Long doUserId = StpUtil.getLoginIdAsLong();
 
         boolean doesDoUserInThisDept = this.lambdaQuery()
@@ -26,7 +26,7 @@ public class DeptUserServiceImpl extends ServiceImpl<DeptUserMapper, DeptUser> i
                 .exists();
 
         if (!doesDoUserInThisDept) {
-            return R.fail("你无权向该部门添加成员");
+            throw R.fail("你无权向该部门添加成员").convert();
         }
 
         // 创建部门用户关系
@@ -34,7 +34,6 @@ public class DeptUserServiceImpl extends ServiceImpl<DeptUserMapper, DeptUser> i
         deptUser.setDeptId(bindUserToDept.getDeptId());
         deptUser.setUserId(bindUserToDept.getUserId());
         this.save(deptUser);
-
-        return R.success("添加成功");
+        return deptUser;
     }
 }

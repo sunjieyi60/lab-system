@@ -90,14 +90,14 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
     private final ExecutorService executor = Executors.newFixedThreadPool(PARALLEL_THREADS);
 
     @Override
-    public R<AirConditionRunningResultVo> getRunningStats(AirConditionRunningQueryDto query) {
+    public AirConditionRunningResultVo getRunningStats(AirConditionRunningQueryDto query) {
         if (query.getStartTime() == null || query.getEndTime() == null || !query.getStartTime().isBefore(query.getEndTime())) {
-            return R.fail("请填写有效的开始、结束时间");
+            throw R.fail("请填写有效的开始、结束时间").convert();
         }
         List<Long> labIds = resolveLabIds(query);
         List<AirCondition> devices = listDevices(labIds, query.getDeviceIds());
         if (devices.isEmpty()) {
-            return R.success(buildEmptyResult(query), "无符合条件的空调设备");
+            return buildEmptyResult(query);
         }
 
         Map<Long, AirConditionRecord> redisStateByDeviceId = traverseRedisForOnlineState();
@@ -147,7 +147,7 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                 .map(AirConditionRunningRowVo::getDurationHours)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (totalHours.compareTo(BigDecimal.ZERO) == 0) {
-            return R.success(buildEmptyResult(query), "该时间范围内无运行记录");
+            return buildEmptyResult(query);
         }
         for (AirConditionRunningRowVo row : list) {
             BigDecimal p = row.getDurationHours().divide(totalHours, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
@@ -160,7 +160,7 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                         .setProportion(r.getDurationHours().divide(totalHours, 4, RoundingMode.HALF_UP)
                                 .multiply(BigDecimal.valueOf(100))
                                 .setScale(1, RoundingMode.HALF_UP)))
-                        .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         AirConditionRunningSummaryVo summaryRow = buildSummaryRow(timeRangeStr, list, totalHours);
 
@@ -172,7 +172,7 @@ public class AirConditionRunningAnalysisServiceImpl implements IAirConditionRunn
                 .setChartSegments(chartSegments)
                 .setSummaryRow(summaryRow)
                 .setWarningMessage(warningMessage);
-        return R.success(vo);
+        return vo;
     }
 
     /**

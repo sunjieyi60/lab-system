@@ -1,6 +1,5 @@
 package xyz.jasenon.lab.service.service;
 
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.analysis.AnalysisQueryDto;
 import xyz.jasenon.lab.service.vo.analysis.AnalysisChartVo;
 
@@ -15,7 +14,7 @@ public interface IAcademicAnalysisService {
      * @param query 学年学期、楼栋、部门、实验室（均为可选）
      * @return 总数 + byWeek / byWeekday / bySection 分布
      */
-    R<AnalysisChartVo> getChartData(AnalysisQueryDto query);
+    AnalysisChartVo getChartData(AnalysisQueryDto query);
 
     /**
      * 使图表缓存失效。排课/课程表增删改后调用，保证下次图表请求从数据库重新聚合。

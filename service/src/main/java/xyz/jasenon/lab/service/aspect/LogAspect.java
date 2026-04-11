@@ -202,11 +202,10 @@ public class LogAspect {
      */
     private void fillOperatorNameAndRole(OperationLog entity) {
         try {
-            R<?> r = userService.getCurrentUserDetail();
-            if (r == null || !r.isOk() || r.getData() == null) {
+            UserBizVo vo = userService.getCurrentUserDetail();
+            if (vo == null ) {
                 return;
             }
-            UserBizVo vo = (UserBizVo) r.getData();
             if (vo.getRealName() != null) {
                 entity.setOperatorName(vo.getRealName());
             }

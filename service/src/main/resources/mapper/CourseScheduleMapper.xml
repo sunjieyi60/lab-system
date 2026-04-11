@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.jasenon.lab.service.mapper.CourseScheduleMapper">
+    <!-- 在此处添加SQL映射语句 -->
+    <!-- 基础查询条件片段（对应 base 方法） -->
+    <sql id="base">
+        WHERE semester_id = #{semesterId}
+        AND week_type IN
+        <foreach collection="weekTypes" item="type" open="(" separator="," close=")">
+            #{type}
+        </foreach>
+        AND start_week &gt;= #{passedWeeks}
+        AND #{weekNow} member of (weekdays)
+    </sql>
+
+    <!-- 扩展：包含时间范围的基础查询（用于正在上课的场景） -->
+    <sql id="base-with-time-range">
+        <include refid="base"/>
+        AND start_time &lt;= #{now}
+        AND end_time &gt; #{now}
+    </sql>
+
+    <select id="getAllClassingCourse" resultType="xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule">
+        select * from course_schedule
+        <include refid="base-with-time-range"></include>
+        and laboratory_id = #{laboratoryId}
+    </select>
+
+    <select id="getAllClassingCourseVo" resultType="xyz.jasenon.lab.service.vo.base.CourseScheduleVo">
+        select * from course_schedule cs left join course c on c.id = cs.course_id
+        <include refid="base-with-time-range"></include>
+        order by cs.start_time asc
+        group by cs.laboratory_id
+    </select>
+
+    <select id="existCourse" resultType="boolean">
+        select count(*) > 0 from course_schedule cs
+        <include refid="base"></include>
+        and cs.laboratory_id = #{laboratoryId}
+    </select>
+
+    <select id="getSoonCourseVo" resultType="xyz.jasenon.lab.service.vo.base.CourseScheduleVo">
+        select * from course_schedule cs left join course c on c.id = cs.course_id
+        <include refid="base-with-time-range"></include>
+        order by cs.start_time asc
+        group by cs.laboratory_id
+    </select>
+</mapper>

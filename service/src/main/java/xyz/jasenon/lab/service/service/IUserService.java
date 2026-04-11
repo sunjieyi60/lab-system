@@ -2,11 +2,12 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.base.User;
-import xyz.jasenon.lab.common.utils.R;
+import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.user.CreateUser;
 import xyz.jasenon.lab.service.dto.user.DeleteUser;
 import xyz.jasenon.lab.service.dto.user.EditUser;
 import xyz.jasenon.lab.service.dto.user.UserLogin;
+import xyz.jasenon.lab.service.vo.base.UserBizVo;
 
 import java.util.List;
 
@@ -16,21 +17,21 @@ import java.util.List;
  */
 public interface IUserService extends IService<User> {
 
-    R createUser(CreateUser createUser);
+    User createUser(CreateUser createUser);
 
-    R editUser(EditUser editUser);
+    User editUser(EditUser editUser);
 
-    R deleteUser(DeleteUser deleteUser);
+    void deleteUser(DeleteUser deleteUser);
 
-    R getCurrentUserDetail();
+    UserBizVo getCurrentUserDetail();
 
-    R login(UserLogin userLogin);
+    void login(UserLogin userLogin);
 
-    R logout();
+    void logout();
 
-    R visibleTreeVo();
+    List<UserBizVo> visibleTreeVo();
 
-    R permissionTree();
+    Permissions.PermissionTree permissionTree();
 
     List<User> visible();
 

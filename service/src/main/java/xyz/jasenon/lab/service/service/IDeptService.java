@@ -2,10 +2,11 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.base.Dept;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.dept.CreateDept;
 import xyz.jasenon.lab.service.dto.dept.DeleteDept;
 import xyz.jasenon.lab.service.dto.dept.EditDept;
+
+import java.util.List;
 
 /**
  * @author Jasenon_ce
@@ -13,15 +14,15 @@ import xyz.jasenon.lab.service.dto.dept.EditDept;
  */
 public interface IDeptService extends IService<Dept> {
 
-    R createDept(CreateDept createDept);
+    Dept createDept(CreateDept createDept);
 
-    R editDept(EditDept editDept);
+    Dept editDept(EditDept editDept);
 
-    R deleteDept(DeleteDept deleteDept);
+    void deleteDept(DeleteDept deleteDept);
 
     /**
      * 获取部门列表
      */
-    R listDept();
+    List<Dept> listDept();
 
 }

@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.jasenon.lab.common.entity.log.AlarmLog;
 import xyz.jasenon.lab.common.entity.log.OperationLog;
+import xyz.jasenon.lab.common.utils.DiyResponseEntity;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.log.AlarmLogQueryDto;
 import xyz.jasenon.lab.service.dto.log.OperationLogQueryDto;
@@ -32,22 +33,22 @@ public class LogController {
 
     @GetMapping("/operation/page")
     @ApiOperation("操作日志分页查询")
-    public R<Page<OperationLog>> pageOperationLog(
+    public DiyResponseEntity<R<Page<OperationLog>>> pageOperationLog(
             @Validated OperationLogQueryDto query,
             @RequestParam(defaultValue = "1") Long pageNum,
             @RequestParam(defaultValue = "10") Long pageSize) {
         Page<OperationLog> page = operationLogService.pageOperationLog(query, pageNum, pageSize);
-        return R.success(page);
+        return DiyResponseEntity.of(R.success(page));
     }
 
     @GetMapping("/alarm/page")
     @ApiOperation("报警日志分页查询")
-    public R<Page<AlarmLog>> pageAlarmLog(
+    public DiyResponseEntity<R<Page<AlarmLog>>> pageAlarmLog(
             @Validated AlarmLogQueryDto query,
             @RequestParam(defaultValue = "1") Long pageNum,
             @RequestParam(defaultValue = "10") Long pageSize) {
         Page<AlarmLog> page = alarmLogService.pageAlarmLog(query, pageNum, pageSize);
-        return R.success(page);
+        return DiyResponseEntity.of(R.success(page));
     }
 
     /**
@@ -57,9 +58,8 @@ public class LogController {
      */
     @PostMapping("/alarm")
     @ApiOperation("【内部】写入报警日志")
-    public R<Void> createAlarmLog(@RequestBody AlarmLog alarmLog) {
+    public DiyResponseEntity<R<Void>> createAlarmLog(@RequestBody AlarmLog alarmLog) {
         logTaskManager.submitAlarmLog(alarmLog);
-        return R.success(null, "报警日志已提交");
+        return DiyResponseEntity.of(R.success(null, "报警日志已提交"));
     }
 }
-

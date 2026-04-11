@@ -122,7 +122,7 @@ public enum Permissions {
 
     @Getter
     @Setter
-    static class PermissionTree {
+    public static class PermissionTree {
         Permissions parent;
         List<PermissionTree> children;
     }

@@ -50,7 +50,7 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
      * @return
      */
     @Override
-    public R createLaboratory(CreateLaboratory createLaboratory) {
+    public Laboratory createLaboratory(CreateLaboratory createLaboratory) {
 
         Long doUserId = StpUtil.getLoginIdAsLong();
         Laboratory laboratory = new Laboratory()
@@ -65,7 +65,7 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         for(Long deptId : createLaboratory.getBelongToDeptIds()){
             Dept dept = deptMapper.selectById(deptId);
             if(dept == null){
-                return R.fail("部门不存在");
+                throw R.fail("部门不存在").convert();
             }
         }
         laboratory.setBelongToDepts(createLaboratory.getBelongToDeptIds());
@@ -108,22 +108,23 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
                     .setUserId(father.getId());
             laboratoryUserMapper.insert(fzUser);
         }
-        return R.success("创建成功");
+
+        return laboratory;
     }
 
     @Override
-    public R editLaboratory(EditLaboratory editLaboratory) {
+    public Laboratory editLaboratory(EditLaboratory editLaboratory) {
         Long doUserId = StpUtil.getLoginIdAsLong();
         Laboratory laboratory = this.getById(editLaboratory.getId());
         if (laboratory == null) {
-            return R.fail("实验室不存在");
+            throw R.fail("实验室不存在").convert();
         }
         List<Long> allowedDepts = deptUserMapper.selectList(new LambdaQueryWrapper<DeptUser>()
                 .eq(DeptUser::getUserId, doUserId)).stream().map(DeptUser::getDeptId).toList();
 
         boolean allMatch = !new HashSet<>(allowedDepts).containsAll(editLaboratory.getBelongToDeptIds());
         if (allMatch){
-            return R.fail("你无权调整实验室的所属部门，因为你不属于该部门");
+            throw R.fail("你无权调整实验室的所属部门，因为你不属于该部门").convert();
         }
 
         CopyOptions copyOptions = CopyOptions.create()
@@ -142,24 +143,23 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
         BeanUtil.copyProperties(edit, laboratory, copyOptions);
         this.updateById(laboratory);
 
-        return R.success("编辑成功");
+        return laboratory;
     }
 
     @Override
-    public R deleteLaboratory(DeleteLaboratory deleteLaboratory) {
+    public void deleteLaboratory(DeleteLaboratory deleteLaboratory) {
         this.removeById(deleteLaboratory.getId());
-        return R.success("删除成功");
     }
 
     @Override
-    public R editManagers(Long laboratoryId, List<Long> userIds) {
+    public void editManagers(Long laboratoryId, List<Long> userIds) {
 
         Long doUserId = StpUtil.getLoginIdAsLong();
         LaboratoryUser laboratoryUser = laboratoryUserMapper.selectOne(new LambdaQueryWrapper<LaboratoryUser>()
                 .eq(LaboratoryUser::getUserId, doUserId)
                 .eq(LaboratoryUser::getLaboratoryId, laboratoryId));
         if (laboratoryUser == null){
-            return R.fail("你没有权限编辑该实验室的管理员");
+            throw R.fail("你没有权限编辑该实验室的管理员").convert();
         }
 
         if (userIds !=null && !userIds.isEmpty()){
@@ -174,7 +174,7 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
                 boolean allUserVisible = new HashSet<>(visible.stream().map(User::getId).toList()).containsAll(userIds);
                 if (!allUserVisible){
                     List<Long> unvisibleUserIds = userIds.stream().filter(u -> !visible.stream().map(User::getId).toList().contains(u)).toList();
-                    return R.fail(HttpStatus.HTTP_BAD_REQUEST,"你无权调整实验室的负责人，因为该用户不由你管辖", unvisibleUserIds);
+                    throw R.fail(HttpStatus.HTTP_BAD_REQUEST,"你无权调整实验室的负责人，因为该用户不由你管辖", unvisibleUserIds).convert();
                 }
                 laboratoryManagerMapper.deleteByIds(managers);
                 List<LaboratoryManager> newManagers = userIds.stream().map(userId -> new LaboratoryManager()
@@ -183,17 +183,17 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
                 laboratoryManagerMapper.insert(newManagers);
             }
         }
-        return R.fail("负责人不能为空");
+        throw R.fail("负责人不能为空").convert();
     }
 
     @Override
-    public R getLaboratoryDetailById(Long laboratoryId) {
+    public LaboratoryVo getLaboratoryDetailById(Long laboratoryId) {
         Long doUserId = StpUtil.getLoginIdAsLong();
         LaboratoryUser laboratoryUser = laboratoryUserMapper.selectOne(new LambdaQueryWrapper<LaboratoryUser>()
                 .eq(LaboratoryUser::getUserId, doUserId)
                 .eq(LaboratoryUser::getLaboratoryId, laboratoryId));
         if (laboratoryUser == null){
-            return R.fail("你没有权限查看该实验室的详情");
+            throw R.fail("你没有权限查看该实验室的详情").convert();
         }
 
 
@@ -209,7 +209,7 @@ public class LaboratoryServiceImpl extends ServiceImpl<LaboratoryMapper, Laborat
                         .eq(Laboratory::getId, laboratoryId)
                         .selectAll(Laboratory.class));
         vo.setManagers(managersVo);
-        return R.success(vo,"查询成功");
+        return vo;
     }
 
 }

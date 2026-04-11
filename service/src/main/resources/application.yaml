@@ -15,6 +15,18 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
 
+lab:
+  cache:
+    # 是否启用缓存
+    enabled: true
+    # 默认过期时间
+    default-expiration: 30m
+    # 缓存空值（防止缓存穿透）
+    cache-null-values: true
+    # 空值缓存过期时间（秒）
+    null-value-expiration: 60
+    # 序列化方式：jackson/jdk
+    serializer: jackson
 
 server:
   port: 8088

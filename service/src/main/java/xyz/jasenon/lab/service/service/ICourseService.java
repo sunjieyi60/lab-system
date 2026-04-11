@@ -2,7 +2,6 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.class_time_table.Course;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.course.CreateCourse;
 import xyz.jasenon.lab.service.dto.course.DeleteCourse;
 import xyz.jasenon.lab.service.dto.course.EditCourse;
@@ -16,12 +15,12 @@ import java.util.List;
  */
 public interface ICourseService extends IService<Course> {
 
-    R<CourseCreatedVo> createCourse(CreateCourse createCourse);
+    CourseCreatedVo createCourse(CreateCourse createCourse);
 
-    R deleteCourse(DeleteCourse deleteCourse);
+    void deleteCourse(DeleteCourse deleteCourse);
 
-    R editCourse(EditCourse editCourse);
+    Course editCourse(EditCourse editCourse);
 
-    R<List<Course>> listCourse();
+    List<Course> listCourse();
 
 }

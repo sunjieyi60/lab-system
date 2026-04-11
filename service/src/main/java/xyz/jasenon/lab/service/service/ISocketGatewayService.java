@@ -2,7 +2,6 @@ package xyz.jasenon.lab.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.jasenon.lab.common.entity.device.gateway.SocketGateway;
-import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.gateway.CreateSocketGateway;
 import xyz.jasenon.lab.service.dto.gateway.DeleteSocketGateway;
 
@@ -12,8 +11,8 @@ import xyz.jasenon.lab.service.dto.gateway.DeleteSocketGateway;
  */
 public interface ISocketGatewayService extends IService<SocketGateway> {
 
-    R createSocketGateway(CreateSocketGateway createSocketGateway);
+    SocketGateway createSocketGateway(CreateSocketGateway createSocketGateway);
 
-    R deleteSocketGateway(DeleteSocketGateway deleteSocketGateway);
+    void deleteSocketGateway(DeleteSocketGateway deleteSocketGateway);
 
 }
