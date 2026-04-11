@@ -22,4 +22,6 @@ public interface IOverviewService {
 
     Map<DeviceType, DeviceOverviewVo> getLeftbarDetail();
 
+    String NowSemesterDetailInfo(Long semesterId);
+
 }

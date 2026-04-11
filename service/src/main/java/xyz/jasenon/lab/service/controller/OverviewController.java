@@ -110,4 +110,10 @@ public class OverviewController {
         return DiyResponseEntity.of(R.success(result));
     }
 
+    @ApiOperation(value = "当前学期周次星期节次信息")
+    @GetMapping("/semester_info")
+    public DiyResponseEntity<R<String>> getNowSemesterInfo(@RequestParam("semesterId") Long semesterId ){
+        return DiyResponseEntity.of(R.success(overviewService.NowSemesterDetailInfo(semesterId)));
+    }
+
 }

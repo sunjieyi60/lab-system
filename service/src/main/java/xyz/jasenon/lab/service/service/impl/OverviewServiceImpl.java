@@ -29,6 +29,7 @@ import xyz.jasenon.lab.service.vo.device.DeviceRecordVo;
 import xyz.jasenon.lab.service.vo.overview.DeviceOverviewVo;
 import xyz.jasenon.lab.service.vo.overview.middle.MiddleOverviewVo;
 
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -278,6 +279,94 @@ public class OverviewServiceImpl implements IOverviewService, Const.Key, Const.M
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 课程节次信息
+     * <p>
+     * 记录每节课的开始和结束时间
+     * </p>
+     *
+     * @param section 节次编号（1-11）
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     */
+    private record SectionInfo(int section, LocalTime startTime, LocalTime endTime) {
+        @Override
+        public String toString() {
+            return String.format("第%d节(%02d:%02d~%02d:%02d)", 
+                    section, startTime.getHour(), startTime.getMinute(), 
+                    endTime.getHour(), endTime.getMinute());
+        }
+    }
+
+    /**
+     * 课程时间表（全天11节课）
+     * <p>
+     * 根据学校课程安排，定义了全天11节课的时间段：
+     * <ul>
+     *     <li>第1节: 08:00~08:45</li>
+     *     <li>第2节: 08:55~09:40</li>
+     *     <li>第3节: 10:00~10:45</li>
+     *     <li>第4节: 10:55~11:40</li>
+     *     <li>第5节: 14:10~14:55</li>
+     *     <li>第6节: 15:05~15:50</li>
+     *     <li>第7节: 16:00~16:45</li>
+     *     <li>第8节: 16:55~17:40</li>
+     *     <li>第9节: 18:40~19:25</li>
+     *     <li>第10节: 19:30~20:15</li>
+     *     <li>第11节: 20:20~21:05</li>
+     * </ul>
+     * </p>
+     */
+    private static final List<SectionInfo> COURSE_SCHEDULE = List.of(
+            new SectionInfo(1, LocalTime.of(8, 0), LocalTime.of(8, 45)),
+            new SectionInfo(2, LocalTime.of(8, 55), LocalTime.of(9, 40)),
+            new SectionInfo(3, LocalTime.of(10, 0), LocalTime.of(10, 45)),
+            new SectionInfo(4, LocalTime.of(10, 55), LocalTime.of(11, 40)),
+            new SectionInfo(5, LocalTime.of(14, 10), LocalTime.of(14, 55)),
+            new SectionInfo(6, LocalTime.of(15, 5), LocalTime.of(15, 50)),
+            new SectionInfo(7, LocalTime.of(16, 0), LocalTime.of(16, 45)),
+            new SectionInfo(8, LocalTime.of(16, 55), LocalTime.of(17, 40)),
+            new SectionInfo(9, LocalTime.of(18, 40), LocalTime.of(19, 25)),
+            new SectionInfo(10, LocalTime.of(19, 30), LocalTime.of(20, 15)),
+            new SectionInfo(11, LocalTime.of(20, 20), LocalTime.of(21, 5))
+    );
+
+    /**
+     * 节次检测器（指定时间）
+     * <p>
+     * 根据指定时间判断处于第几节课。
+     * </p>
+     *
+     * @param time 指定时间
+     * @return 当前节次（1-11），非上课时间返回0
+     */
+    private int sectionDetector(LocalTime time) {
+        for (SectionInfo section : COURSE_SCHEDULE) {
+            // 检查时间是否在该节课的时间段内（包含开始时间，不包含结束时间）
+            if (!time.isBefore(section.startTime()) && time.isBefore(section.endTime())) {
+                return section.section();
+            }
+        }
+        return 0; // 非上课时间
+    }
+
+    /**
+     * 获取当前学期详细信息
+     * <p>
+     * 返回格式：第X周星期X第X节
+     * </p>
+     *
+     * @param semesterId 学期ID
+     * @return 学期详细信息字符串
+     */
+    @Override
+    public String NowSemesterDetailInfo(Long semesterId) {
+        return MessageFormat.format("第{0}周星期{1}第{2}节", 
+                weeksDetector(semesterId), 
+                weekDetector(), 
+                sectionDetector(LocalTime.now()));
     }
 
     /**
