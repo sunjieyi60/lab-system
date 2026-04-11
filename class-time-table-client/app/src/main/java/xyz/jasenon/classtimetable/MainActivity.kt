@@ -1,5 +1,6 @@
 package xyz.jasenon.classtimetable
 
+import RegisterRequest
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -36,6 +37,8 @@ import xyz.jasenon.classtimetable.ui.dialog.DoorOpenUiProviderInitializer
 import xyz.jasenon.classtimetable.ui.theme.ClassTimeTableTheme
 import java.io.IOException
 import androidx.core.content.edit
+import xyz.jasenon.classtimetable.network.rsocket.model.RegisterResponse
+import xyz.jasenon.classtimetable.network.rsocket.model.SetUp
 
 /**
  * 应用主 Activity
@@ -249,8 +252,23 @@ class MainActivity : ComponentActivity() {
             val serverAddress = DeviceProfileObservable.getCurrentServerAddress()
             RSocketClientManager.getInstance(applicationContext).connect(
                 customHost = serverAddress?.host,
-                customPort = serverAddress?.port
+                customPort = serverAddress?.port,
+                setup = SetUp(DeviceProfileObservable.getCurrentUuid())
             )
+            val response = RSocketClientManager.getInstance(applicationContext).requestResponse(
+                request = RegisterRequest(uuid = DeviceProfileObservable.getCurrentUuid().orEmpty()).convert(),
+                clazz = RegisterResponse::class.java
+            )
+
+            // 更新设备配置信息
+            if (DeviceProfileObservable.getCurrentUuid().equals(response?.uuid)){
+                if (response?.laboraotryId != null ){
+                    DeviceProfileObservable.updateLaboratoryId(response.laboraotryId)
+                }
+                if (response?.config != null){
+                    DeviceRuntimeConfigObservable.updateConfig(response.config)
+                }
+            }
         }
 
         // 启动日期时间更新

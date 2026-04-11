@@ -3,8 +3,10 @@ package xyz.jasenon.classtimetable.network.rsocket
 import android.content.Context
 import com.elvishew.xlog.XLog
 import com.google.gson.Gson
+import io.rsocket.kotlin.ExperimentalMetadataApi
 import io.rsocket.kotlin.RSocket
 import io.rsocket.kotlin.core.RSocketConnector
+import io.rsocket.kotlin.core.WellKnownMimeType
 import io.rsocket.kotlin.keepalive.KeepAlive
 import io.rsocket.kotlin.payload.PayloadMimeType
 import io.rsocket.kotlin.payload.buildPayload
@@ -17,8 +19,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import xyz.jasenon.classtimetable.config.DeviceProfileObservable
+import xyz.jasenon.classtimetable.network.rsocket.model.RSocketRequest
 import xyz.jasenon.classtimetable.network.rsocket.model.SetUp
-import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -33,10 +36,18 @@ import kotlin.time.Duration.Companion.seconds
  */
 class RSocketClientManager private constructor(private val context: Context) {
 
-    private val managerScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    /**
+     * 协程异常处理器，防止 RSocket 内部异常（如 ClosedSendChannelException）导致应用崩溃
+     */
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        XLog.tag(TAG).e("RSocket 协程中发生未捕获异常: ${throwable.message}", throwable)
+    }
+
+    private val managerScope = CoroutineScope(Dispatchers.IO + SupervisorJob() + exceptionHandler)
     private var connectionScope: CoroutineScope? = null
     private var rsocket: RSocket? = null
     private var requestHandler: RSocketRequestHandler? = null
+    private var responseHandler: RSocketResponseHandler? = null
     private val gson = Gson()
     private val connectMutex = Mutex()
 
@@ -87,9 +98,13 @@ class RSocketClientManager private constructor(private val context: Context) {
                         XLog.tag(TAG).d("服务器地址自动更新: $host:$port")
                         
                         // 如果地址真的变了且已连接，建议重新连接以应用新地址
-                        if (isConnected() && (oldHost != host || oldPort != port)) {
-                            XLog.tag(TAG).i("地址变更，尝试重新连接到新服务器...")
-                            connect()
+                        try {
+                            if (isConnected() && (oldHost != host || oldPort != port)) {
+                                XLog.tag(TAG).i("地址变更，尝试重新连接到新服务器...")
+                                connect()
+                            }
+                        } catch (e: Exception) {
+                            XLog.tag(TAG).e("自动重连失败", e)
                         }
                     }
                 }
@@ -104,8 +119,9 @@ class RSocketClientManager private constructor(private val context: Context) {
         setup: SetUp,
         customHost: String? = null,
         customPort: Int? = null,
-        maxRetries: Long = maxReconnectAttempts
-    ) = connect(customHost, customPort, maxRetries, setup)
+        maxRetries: Long = maxReconnectAttempts,
+        responseHandler: RSocketResponseHandler? = null
+    ) = connect(customHost, customPort, maxRetries, setup, responseHandler)
 
     /**
      * 连接到 RSocket 服务器
@@ -113,16 +129,22 @@ class RSocketClientManager private constructor(private val context: Context) {
      * 该函数会挂起，直到【首次连接成功】或【达到重试上限】。
      * 连接成功后，该函数立即返回，保活任务将在后台持续运行。
      *
+     * 在 CS 对等架构中，连接时可通过 [responseHandler] 设置 Server 端处理器，
+     * 用于接收对端（服务端）主动下发的请求。
+     *
      * @param customHost 自定义服务器地址，如果为 null 则使用档案中配置的地址
      * @param customPort 自定义服务器端口，如果为 null 则使用档案中配置的端口
      * @param maxRetries 最大重连次数
      * @param setup 连接时的 Setup Payload 数据
+     * @param responseHandler Server 端响应处理器，用于处理对端主动下发的请求
      */
+    @OptIn(ExperimentalMetadataApi::class)
     suspend fun connect(
         customHost: String? = null,
         customPort: Int? = null,
         maxRetries: Long = maxReconnectAttempts,
-        setup: SetUp? = null
+        setup: SetUp? = null,
+        responseHandler: RSocketResponseHandler? = null
     ) = connectMutex.withLock {
         if (isConnected()) {
             XLog.tag(TAG).d("当前已处于连接状态，无需重复连接")
@@ -138,7 +160,8 @@ class RSocketClientManager private constructor(private val context: Context) {
 
         cleanupInternal()
         val connectionJob = SupervisorJob()
-        connectionScope = CoroutineScope(Dispatchers.IO + connectionJob)
+        // 将 exceptionHandler 加入连接作用域
+        connectionScope = CoroutineScope(Dispatchers.IO + connectionJob + exceptionHandler)
 
         val targetHost = customHost ?: host
         val targetPort = customPort ?: port
@@ -152,20 +175,27 @@ class RSocketClientManager private constructor(private val context: Context) {
                     socketOptions { keepAlive = true }
                 }.target(targetHost, targetPort)
 
+                // 保存响应处理器引用
+                this@RSocketClientManager.responseHandler = responseHandler
+
                 val connector = RSocketConnector {
                     connectionConfig {
                         keepAlive = KeepAlive(interval = 20.seconds, maxLifetime = 90.seconds)
                         payloadMimeType = PayloadMimeType(
-                            data = "application/json",
-                            metadata = "message/x.rsocket.routing.v0"
+                            data = WellKnownMimeType.ApplicationJson,
+                            metadata = WellKnownMimeType.MessageRSocketRouting
                         )
                         // 使用传入的 setup 对象，如果为空则发送默认的 "hello"
                         setupPayload {
                             buildPayload {
-                                val setupData = setup?.let { gson.toJson(it) } ?: "hello"
+                                val setupData = setup?.let { gson.toJson(it) } ?: ""
                                 data(setupData)
                             }
                         }
+                    }
+                    acceptor {
+                        val server = requester
+                        responseHandler!!
                     }
 
                     reconnectable { cause, attempt ->
@@ -235,6 +265,30 @@ class RSocketClientManager private constructor(private val context: Context) {
         connectionScope = null
         rsocket = null
         requestHandler = null
+        // responseHandler 由外部管理生命周期，这里不清理
+    }
+
+    /**
+     * 获取 ResponseHandler，用于注册服务端主动下发请求的处理逻辑
+     *
+     * @return RSocketResponseHandler? 如果连接时设置了 responseHandler 则返回，否则返回 null
+     */
+    fun getResponseHandler(): RSocketResponseHandler? {
+        return responseHandler
+    }
+
+    /**
+     * 创建并设置新的 ResponseHandler
+     *
+     * 在连接建立后，可通过此方法创建并配置 ResponseHandler。
+     * 注意：如果连接尚未建立，此方法返回的 handler 不会被使用。
+     *
+     * @return RSocketResponseHandler 新的响应处理器实例
+     */
+    fun createResponseHandler(): RSocketResponseHandler {
+        val handler = RSocketResponseHandler(managerScope.coroutineContext)
+        this.responseHandler = handler
+        return handler
     }
 
     /**
@@ -251,7 +305,12 @@ class RSocketClientManager private constructor(private val context: Context) {
             return null
         }
         XLog.tag(TAG).d("发送请求 [$route]: $jsonPayload")
-        return handler.requestResponseJson(route, jsonPayload)
+        return try {
+            handler.requestResponseJson(route, jsonPayload)
+        } catch (e: Exception) {
+            XLog.tag(TAG).e("请求过程中发生异常", e)
+            null
+        }
     }
 
     /**
@@ -267,6 +326,37 @@ class RSocketClientManager private constructor(private val context: Context) {
             XLog.tag(TAG).w("发送失败: 当前未连接 RSocket ($route)")
             return false
         }
-        return handler.fireAndForgetJson(route, jsonPayload)
+        return try {
+            handler.fireAndForgetJson(route, jsonPayload)
+        } catch (e: Exception) {
+            XLog.tag(TAG).e("发送过程中发生异常", e)
+            false
+        }
     }
+
+    /**
+     * 带范型转化的requstResponse
+     * todo 修改为使用  GsonUtil反序列化
+     * {@see xyz.jasenon.classtimetable.util.GsonUtil}
+     */
+    suspend fun <T> requestResponse(request: RSocketRequest, clazz: Class<T>): T? {
+        val handler = requestHandler
+        if (handler == null){
+            XLog.tag(TAG).w("发送失败: 当前未连接 RSocket (${request.route})")
+            return null
+        }
+        return try {
+            val response = handler.requestResponse(request)
+            if (response.isSuccess){
+                gson.fromJson(response.dataAsString(), clazz)
+            } else {
+                XLog.tag(TAG).w("请求失败: ${response}")
+                null
+            }
+        } catch (e: Exception) {
+            XLog.tag(TAG).e("请求并解析过程中发生异常", e)
+            null
+        }
+    }
+
 }

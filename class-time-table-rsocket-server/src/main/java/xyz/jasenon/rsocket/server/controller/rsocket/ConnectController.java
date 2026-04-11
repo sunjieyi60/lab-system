@@ -56,7 +56,7 @@ public class ConnectController {
     @ConnectMapping
     public Mono<Void> logSetup(RSocketRequester requester, @Payload SetUp setUp) {
         log.info("✅ 收到 Setup 帧，Data内容: {}", setUp);
-        log.info("   连接对象: " + requester);
+        log.info("连接对象: " + requester);
         return Mono.empty(); // 返回空表示接受连接
     }
 

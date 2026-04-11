@@ -9,6 +9,7 @@ import xyz.jasenon.rsocket.core.Const;
 import xyz.jasenon.rsocket.core.cache.Cache;
 import xyz.jasenon.rsocket.core.packet.RegisterRequest;
 import xyz.jasenon.rsocket.core.packet.RegisterResponse;
+import xyz.jasenon.rsocket.core.packet.UpdateConfigRequest;
 import xyz.jasenon.rsocket.core.model.ClassTimeTable;
 import xyz.jasenon.rsocket.core.model.Config;
 import xyz.jasenon.rsocket.server.mapper.ClassTimeTableMapper;
@@ -160,20 +161,32 @@ public class ClassTimeTableService {
      * 更新设备配置
      * <p>
      * 更新数据库中的设备配置信息，并清除相关缓存。
+     * 使用 UpdateConfigRequest 作为参数，包含配置信息和版本控制。
      * </p>
      *
-     * @param uuid 设备UUID
-     * @param config 新的设备配置
+     * @param request 配置更新请求，包含设备UUID、配置信息、是否立即生效等
      * @return 是否更新成功的异步 Mono
      */
-    public Mono<Boolean> updateConfig(String uuid, Config config) {
+    public Mono<Boolean> updateConfig(UpdateConfigRequest request) {
         return Mono.fromCallable(() -> {
+            String uuid = request.getTo();
+            if (uuid == null) {
+                log.warn("更新配置失败，请求中未指定设备UUID");
+                return false;
+            }
+            
             ClassTimeTable device = deviceMapper.selectByUuid(uuid);
             if (device == null) {
                 log.warn("更新配置失败，设备 {} 不存在", uuid);
                 return false;
             }
 
+            Config config = request.getConfig();
+            if (config == null) {
+                log.warn("更新配置失败，请求中未包含配置信息");
+                return false;
+            }
+            
             device.setConfig(config);
             int rows = deviceMapper.updateById(device);
 

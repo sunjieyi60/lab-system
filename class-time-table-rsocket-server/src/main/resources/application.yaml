@@ -7,7 +7,6 @@ spring:
     server:
       port: 7001                    # RSocket 服务端口（TCP）
       transport: tcp               # 传输协议：tcp / websocket
-      mapping-path: /rsocket       # WebSocket 路径（仅 websocket 传输有效）
 
   # 数据源配置
   datasource:

@@ -3,12 +3,11 @@ package xyz.jasenon.classtimetable.network.rsocket
 import io.ktor.utils.io.core.readBytes
 import io.rsocket.kotlin.ExperimentalMetadataApi
 import io.rsocket.kotlin.RSocket
-import io.rsocket.kotlin.metadata.CompositeMetadata
 import io.rsocket.kotlin.metadata.RoutingMetadata
+import io.rsocket.kotlin.metadata.metadata
 import io.rsocket.kotlin.payload.Payload
 import io.rsocket.kotlin.payload.buildPayload
 import io.rsocket.kotlin.payload.data
-import io.rsocket.kotlin.payload.metadata
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import xyz.jasenon.classtimetable.network.rsocket.model.RSocketRequest
@@ -123,7 +122,7 @@ class RSocketRequestHandler(private val rsocket: RSocket?) {
         return try {
             val payload = buildPayload {
                 data(request.payload)
-                metadata { CompositeMetadata(RoutingMetadata(request.route)) }
+                metadata(RoutingMetadata(request.route))
             }
 
             val responsePayload = rsocket!!.requestResponse(payload)
@@ -175,7 +174,7 @@ class RSocketRequestHandler(private val rsocket: RSocket?) {
         return try {
             val payload = buildPayload {
                 data(request.payload)
-                metadata { CompositeMetadata(RoutingMetadata(request.route)) }
+                metadata(RoutingMetadata(request.route))
             }
 
             rsocket!!.fireAndForget(payload)
@@ -230,7 +229,7 @@ class RSocketRequestHandler(private val rsocket: RSocket?) {
         try {
             val payload = buildPayload {
                 data(request.payload)
-                metadata { CompositeMetadata(RoutingMetadata(request.route)) }
+                metadata(RoutingMetadata(request.route))
             }
 
             rsocket!!.requestStream(payload).collect { responsePayload ->

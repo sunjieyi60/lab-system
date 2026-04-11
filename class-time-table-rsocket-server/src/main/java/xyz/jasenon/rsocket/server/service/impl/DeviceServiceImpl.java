@@ -20,8 +20,8 @@ import xyz.jasenon.rsocket.core.protocol.Status;
 import xyz.jasenon.rsocket.server.diy.ClassicConnectManager;
 import xyz.jasenon.rsocket.server.mapper.DeviceMapper;
 import xyz.jasenon.rsocket.server.service.DeviceService;
-import xyz.jasenon.rsocket.server.vo.ProfilePushTrigger;
-import xyz.jasenon.rsocket.server.vo.PushConfigResult;
+
+
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -146,6 +146,7 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
      * <p>
      * 更新配置并推送到设备的完整流程：
      * <ol>
+     *   <li>从请求中提取设备UUID和配置信息</li>
      *   <li>查询设备是否存在</li>
      *   <li>更新数据库中的配置信息</li>
      *   <li>清除设备缓存</li>
@@ -154,7 +155,8 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
      * </p>
      */
     @Override
-    public Mono<PushConfigResult> updateConfigAndPush(String uuid, Config config) {
+    public Mono<UpdateConfigResponse> updateConfigAndPush(UpdateConfigRequest request) {
+        String uuid = request.getTo();
         return Mono.fromCallable(() -> {
             ClassTimeTable device = lambdaQuery()
                     .eq(ClassTimeTable::getUuid, uuid)
@@ -162,15 +164,13 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
 
             if (device == null) {
                 log.warn("更新配置失败，设备 {} 不存在", uuid);
-                return meta(PushConfigResult.notFound(uuid), ProfilePushTrigger.CONFIG,
-                        List.of(), false, false, List.of());
+                return UpdateConfigResponse.fail(404, "设备不存在");
             }
 
-            device.setConfig(config);
+            device.setConfig(request.getConfig());
             if (!updateById(device)) {
                 log.error("更新设备 {} 配置到数据库失败", uuid);
-                return meta(PushConfigResult.error(uuid, "数据库更新失败"), ProfilePushTrigger.CONFIG,
-                        List.of(), false, false, List.of());
+                return UpdateConfigResponse.fail(500, "数据库更新失败");
             }
 
             cache.delete(Const.Key.CACHE_DEVICE_UUID_PREFIX + uuid);
@@ -178,10 +178,10 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
             return device;
         }).subscribeOn(Schedulers.boundedElastic())
                 .flatMap(mixed -> {
-                    if (mixed instanceof PushConfigResult r) {
+                    if (mixed instanceof UpdateConfigResponse r) {
                         return Mono.just(r);
                     }
-                    return afterDeviceRowSavedPushProfile(uuid, (ClassTimeTable) mixed, ProfilePushTrigger.CONFIG);
+                    return afterDeviceRowSavedPushProfile(uuid, (ClassTimeTable) mixed);
                 });
     }
 
@@ -198,7 +198,7 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
      * </p>
      */
     @Override
-    public Mono<PushConfigResult> updateLaboratoryAndPush(String uuid, Long laboratoryId) {
+    public Mono<UpdateConfigResponse> updateLaboratoryAndPush(String uuid, Long laboratoryId) {
         return Mono.fromCallable(() -> {
             ClassTimeTable device = lambdaQuery()
                     .eq(ClassTimeTable::getUuid, uuid)
@@ -206,15 +206,13 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
 
             if (device == null) {
                 log.warn("更新实验室失败，设备 {} 不存在", uuid);
-                return meta(PushConfigResult.notFound(uuid), ProfilePushTrigger.LABORATORY,
-                        List.of(), false, false, List.of());
+                return UpdateConfigResponse.fail(404, "设备不存在");
             }
 
             device.setLaboratoryId(laboratoryId);
             if (!updateById(device)) {
                 log.error("更新设备 {} 实验室到数据库失败", uuid);
-                return meta(PushConfigResult.error(uuid, "数据库更新失败"), ProfilePushTrigger.LABORATORY,
-                        List.of(), false, false, List.of());
+                return UpdateConfigResponse.fail(500, "数据库更新失败");
             }
 
             cache.delete(Const.Key.CACHE_DEVICE_UUID_PREFIX + uuid);
@@ -222,10 +220,10 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
             return device;
         }).subscribeOn(Schedulers.boundedElastic())
                 .flatMap(mixed -> {
-                    if (mixed instanceof PushConfigResult r) {
+                    if (mixed instanceof UpdateConfigResponse r) {
                         return Mono.just(r);
                     }
-                    return afterDeviceRowSavedPushProfile(uuid, (ClassTimeTable) mixed, ProfilePushTrigger.LABORATORY);
+                    return afterDeviceRowSavedPushProfile(uuid, (ClassTimeTable) mixed);
                 });
     }
 
@@ -238,20 +236,13 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
      *
      * @param uuid 设备UUID
      * @param device 设备实体
-     * @param trigger 推送触发类型（配置更新或实验室变更）
-     * @return 推送结果的异步 Mono
+     * @return 推送响应的异步 Mono
      */
-    private Mono<PushConfigResult> afterDeviceRowSavedPushProfile(
-            String uuid, ClassTimeTable device, ProfilePushTrigger trigger) {
-        List<String> persisted = trigger == ProfilePushTrigger.CONFIG
-                ? List.of("config")
-                : List.of("laboratoryId");
-        List<String> downlink = PushConfigResult.profileDownlinkKeys();
-
+    private Mono<UpdateConfigResponse> afterDeviceRowSavedPushProfile(
+            String uuid, ClassTimeTable device) {
         if (!connectionManager.isOnline(uuid)) {
             log.info("设备 {} 当前离线，档案将在设备上线后同步", uuid);
-            PushConfigResult r = PushConfigResult.offline(uuid);
-            return Mono.just(meta(r, trigger, persisted, false, false, downlink));
+            return Mono.just(UpdateConfigResponse.fail(503, "设备离线"));
         }
 
         UpdateConfigRequest request = buildProfilePushRequest(uuid, device);
@@ -260,55 +251,27 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
                 .map(response -> {
                     if (response.isSuccess()) {
                         log.info("设备 {} 成功应用档案", uuid);
-                        return meta(PushConfigResult.success(uuid), trigger, persisted, true, true, downlink);
+                    } else {
+                        log.warn("设备 {} 拒绝应用档案", uuid);
                     }
-                    log.warn("设备 {} 拒绝应用档案: {}", uuid, response.getMsg());
-                    return meta(PushConfigResult.rejected(uuid), trigger, persisted, true, true, downlink);
+                    return response;
                 })
                 .onErrorResume(throwable -> {
                     String errorMsg = throwable.getMessage();
                     if (errorMsg != null && errorMsg.contains("Timeout")) {
                         log.warn("向设备 {} 推送档案超时", uuid);
-                        return Mono.just(meta(PushConfigResult.timeout(uuid), trigger, persisted, true, true, downlink));
+                        return Mono.just(UpdateConfigResponse.fail(408, "推送超时"));
                     }
                     log.error("向设备 {} 推送档案失败: {}", uuid, errorMsg);
-                    return Mono.just(meta(PushConfigResult.error(uuid, errorMsg), trigger, persisted, true, true, downlink));
+                    return Mono.just(UpdateConfigResponse.fail(500, "推送失败"));
                 });
-    }
-
-    /**
-     * 构建推送结果元数据
-     * <p>
-     * 为推送结果设置详细的元数据信息，包括触发类型、持久化字段、在线状态等。
-     * </p>
-     *
-     * @param r 基础推送结果
-     * @param trigger 推送触发类型
-     * @param persisted 已持久化到数据库的字段列表
-     * @param deviceOnline 设备是否在线
-     * @param pushAttempted 是否尝试推送
-     * @param payloadKeys 推送到设备的字段列表
-     * @return 包含完整元数据的推送结果
-     */
-    private static PushConfigResult meta(
-            PushConfigResult r,
-            ProfilePushTrigger trigger,
-            List<String> persisted,
-            boolean deviceOnline,
-            boolean pushAttempted,
-            List<String> payloadKeys) {
-        r.setTrigger(trigger);
-        r.setPersistedInDatabase(persisted == null ? new ArrayList<>() : new ArrayList<>(persisted));
-        r.setDeviceOnline(deviceOnline);
-        r.setPushAttempted(pushAttempted);
-        r.setNotifiedDevicePayloadKeys(payloadKeys == null ? new ArrayList<>() : new ArrayList<>(payloadKeys));
-        return r;
     }
 
     /**
      * 构建设备档案推送请求
      * <p>
      * 创建设备配置更新请求，包含配置信息、实验室ID等完整档案数据。
+     * 使用 UpdateConfigRequest.create() 工厂方法创建请求对象。
      * </p>
      *
      * @param uuid 设备UUID
@@ -316,9 +279,8 @@ public class DeviceServiceImpl extends MPJBaseServiceImpl<DeviceMapper, ClassTim
      * @return 配置更新请求对象
      */
     private static UpdateConfigRequest buildProfilePushRequest(String uuid, ClassTimeTable device) {
-        Config cfg = device.getConfig() != null ? device.getConfig() : Config.Default();
         UpdateConfigRequest request = UpdateConfigRequest.create(
-                cfg,
+                device.getConfig(),
                 true,
                 System.currentTimeMillis(),
                 device.getLaboratoryId()

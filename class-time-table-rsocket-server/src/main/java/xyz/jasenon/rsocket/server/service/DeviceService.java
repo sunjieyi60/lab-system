@@ -3,11 +3,11 @@ package xyz.jasenon.rsocket.server.service;
 import com.github.yulichang.base.MPJBaseService;
 import reactor.core.publisher.Mono;
 import xyz.jasenon.rsocket.core.model.ClassTimeTable;
-import xyz.jasenon.rsocket.core.model.Config;
+import xyz.jasenon.rsocket.core.packet.UpdateConfigRequest;
 import xyz.jasenon.rsocket.core.packet.Heartbeat;
 import xyz.jasenon.rsocket.core.packet.RegisterRequest;
 import xyz.jasenon.rsocket.core.packet.RegisterResponse;
-import xyz.jasenon.rsocket.server.vo.PushConfigResult;
+import xyz.jasenon.rsocket.core.packet.UpdateConfigResponse;
 
 import java.util.List;
 
@@ -70,11 +70,10 @@ public interface DeviceService extends MPJBaseService<ClassTimeTable> {
      * 将配置通过 RSocket 实时推送到设备端。
      * </p>
      *
-     * @param uuid 设备UUID
-     * @param config 新的设备配置
-     * @return 配置推送结果的异步 Mono，包含数据库更新状态和推送结果
+     * @param request 配置更新请求，包含设备UUID、配置信息等
+     * @return 配置推送响应的异步 Mono，包含推送结果状态
      */
-    Mono<PushConfigResult> updateConfigAndPush(String uuid, Config config);
+    Mono<UpdateConfigResponse> updateConfigAndPush(UpdateConfigRequest request);
 
     /**
      * 更新设备关联实验室并推送档案
@@ -87,6 +86,6 @@ public interface DeviceService extends MPJBaseService<ClassTimeTable> {
      * @param laboratoryId 目标实验室ID
      * @return 档案推送结果的异步 Mono，包含更新状态和推送结果
      */
-    Mono<PushConfigResult> updateLaboratoryAndPush(String uuid, Long laboratoryId);
+    Mono<UpdateConfigResponse> updateLaboratoryAndPush(String uuid, Long laboratoryId);
 
 }

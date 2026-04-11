@@ -1,5 +1,6 @@
 package xyz.jasenon.rsocket.core.packet;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.jasenon.rsocket.core.Unique;
@@ -18,5 +19,10 @@ public class SetUp implements Unique {
     @Override
     public String unique() {
         return uuid;
+    }
+
+    @Override
+    public String toString(){
+        return JSON.toJSONString(this);
     }
 }
