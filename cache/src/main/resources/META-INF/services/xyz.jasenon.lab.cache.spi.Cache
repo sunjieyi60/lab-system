@@ -1,0 +1,3 @@
+# Redis Cache Service Provider
+# 用于 SPI 方式加载缓存服务
+xyz.jasenon.lab.cache.service.RedisCache

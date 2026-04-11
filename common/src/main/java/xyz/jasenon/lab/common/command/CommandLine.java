@@ -13,7 +13,7 @@ public enum CommandLine {
 
 
 
-    OPEN_ACCESS_ONCE(new Command("{0} 0B {1} 00 00 00",CheckType.SUM_SG,SendType.MQTT),"单次开门"),
+    OPEN_ACCESS_ONCE(new Command("{0} 0A {1} 00 00 00",CheckType.SUM_SG,SendType.MQTT),"单次开门"),
     CLOSE_ACCESS_ONCE(new Command("{0} 0A {1} 00 FF 00",CheckType.SUM_SG,SendType.MQTT),"单次关门"),
     REQUEST_ACCESS_DATA(new Command("{0} 03 {1} 00 00 00",CheckType.SUM_SG,SendType.MQTT), "请求门禁数据"),
     OPEN_ACCESS_PERSIST_LOCK(new Command("{0} 0A {1} FF FF 00",CheckType.SUM_SG,SendType.MQTT),"长开锁定"),

@@ -43,11 +43,9 @@ TaskExplain<T> {
         CommandLine commandLine = task.getCommandLine();
         Command command = commandLine.getCommand();
         Integer[] args = task.getArgs();
-        Object[] toHexString = Arrays.stream(args).map(arg->{
-            return Integer.toHexString(arg);
-        }).toArray(Object[]::new);
+        Object[] toHexString = Arrays.stream(args).map(Integer::toHexString).toArray(Object[]::new);
         String[] $ = MessageFormat.format(command.getCommandLine(), toHexString).split(" ");
-        Byte[] originalPayload = Arrays.asList($).stream().map(s ->{
+        Byte[] originalPayload = Arrays.stream($).map(s ->{
             Integer value = Integer.parseInt(s,16);
             return value.byteValue();
         }).toArray(Byte[]::new);

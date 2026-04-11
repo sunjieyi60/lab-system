@@ -1,0 +1,40 @@
+# Lab Cache 配置示例
+# 将此配置复制到您的 application.yml 中
+
+lab:
+  cache:
+    # 是否启用缓存
+    enabled: true
+    # 默认过期时间
+    default-expiration: 30m
+    # 缓存空值（防止缓存穿透）
+    cache-null-values: true
+    # 空值缓存过期时间（秒）
+    null-value-expiration: 60
+    # 序列化方式：jackson/jdk
+    serializer: jackson
+
+# Spring Data Redis 配置
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 100
+          max-idle: 50
+          min-idle: 10
+          max-wait: 3000ms
+
+# Redisson 配置（可选，用于分布式锁）
+# 创建 redisson.yaml 文件在 classpath 下
+# 或配置以下内容：
+redisson:
+  singleServerConfig:
+    address: "redis://localhost:6379"
+    database: 0
+    connectionMinimumIdleSize: 10
+    connectionPoolSize: 64
