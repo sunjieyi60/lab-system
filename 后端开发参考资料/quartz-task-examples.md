@@ -70,7 +70,7 @@ args[1] = selfId       // 设备子ID（实际数据：1）
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | id | String | 条件唯一标识（雪花ID） |
-| expr | String | SpEL 表达式，支持 #{data.xxx}.属性 引用数据 |
+| expr | String | SpEL 表达式，支持 #{dataId}.属性 引用数据，如 #{1789569705678901234}.roomTemperature |
 | desc | String | 条件描述说明 |
 | conditionGroupId | String | 所属条件组ID |
 | scheduleTaskId | String | 所属任务ID |
@@ -182,7 +182,7 @@ args[1] = selfId       // 设备子ID（实际数据：1）
       "conditions": [
         {
           "id": "1789569706789012345",     // 雪花ID：条件唯一标识
-          "expr": "#{data.1789569705678901234}.roomTemperature <= 18",  // SpEL：房间温度≤18度
+          "expr": "#{1789569705678901234}.roomTemperature <= 18",  // SpEL：房间温度≤18度
           "desc": "房间温度低于或等于18度，需要关闭空调",  // 条件描述
           "conditionGroupId": "1789569704567890123",  // 所属条件组
           "scheduleTaskId": "1789569701234567890"     // 所属任务
@@ -294,7 +294,7 @@ args[1] = selfId       // 设备子ID（实际数据：1）
       "conditions": [
         {
           "id": "1789569716789012345",     // 雪花ID：条件唯一标识
-          "expr": "#{data.1789569715678901234}.roomTemperature >= 25",  // SpEL：房间温度≥25度
+          "expr": "#{1789569715678901234}.roomTemperature >= 25",  // SpEL：房间温度≥25度
           "desc": "房间温度过高，需要开启制冷",  // 条件描述
           "conditionGroupId": "1789569714567890123",  // 所属条件组
           "scheduleTaskId": "1789569711234567890"     // 所属任务
@@ -387,7 +387,7 @@ args[1] = selfId       // 设备子ID（实际数据：1）
       "conditions": [
         {
           "id": "1789569726789012345",     // 雪花ID：条件唯一标识
-          "expr": "#{data.1789569725678901234}.errorCode > 0",  // SpEL：错误码>0表示故障
+          "expr": "#{1789569725678901234}.errorCode > 0",  // SpEL：错误码>0表示故障
           "desc": "空调存在故障(1=设备故障,2=通信失败)",  // 条件描述
           "conditionGroupId": "1789569724567890123",  // 所属条件组
           "scheduleTaskId": "1789569721234567890"     // 所属任务
@@ -645,14 +645,14 @@ args[1] = selfId       // 设备子ID（实际数据：1）
       "conditions": [
         {
           "id": "1789569756789012345",     // 雪花ID：条件唯一标识
-          "expr": "#{data.1789569755678901234}.roomTemperature > 22",
+          "expr": "#{1789569755678901234}.roomTemperature > 22",
           "desc": "房间温度超过22度",        // 条件描述
           "conditionGroupId": "1789569754567890123",  // 所属条件组
           "scheduleTaskId": "1789569751234567890"     // 所属任务
         },
         {
           "id": "1789569757890123456",     // 雪花ID：条件唯一标识
-          "expr": "#{data.1789569755678901234}.isOpen == false",
+          "expr": "#{1789569755678901234}.isOpen == false",
           "desc": "空调当前处于关闭状态",     // 条件描述（实际数据中isOpen=0表示关闭）
           "conditionGroupId": "1789569754567890123",  // 所属条件组
           "scheduleTaskId": "1789569751234567890"     // 所属任务
@@ -714,14 +714,14 @@ args[1] = selfId       // 设备子ID（实际数据：1）
 
 | 实际数据 | JSON字段名 | 数据类型 | 示例表达式 |
 |----------|-----------|----------|-----------|
-| 31 | address | Integer | `#{data.xxx}.address == 31` |
-| 1 | selfId | Integer | `#{data.xxx}.selfId == 1` |
-| 0/1 | isOpen | Boolean | `#{data.xxx}.isOpen == true` |
-| 制冷 | mode | String | `#{data.xxx}.mode == '制冷'` |
-| 17-26 | temperature | Integer | `#{data.xxx}.temperature >= 20` |
-| 自动/中速 | speed | String | `#{data.xxx}.speed == '中速'` |
-| 17 | roomTemperature | Integer | `#{data.xxx}.roomTemperature <= 18` |
-| 0 | errorCode | Integer | `#{data.xxx}.errorCode > 0` |
+| 31 | address | Integer | `#{1789...}.address == 31` |
+| 1 | selfId | Integer | `#{1789...}.selfId == 1` |
+| 0/1 | isOpen | Boolean | `#{1789...}.isOpen == true` |
+| 制冷 | mode | String | `#{1789...}.mode == '制冷'` |
+| 17-26 | temperature | Integer | `#{1789...}.temperature >= 20` |
+| 自动/中速 | speed | String | `#{1789...}.speed == '中速'` |
+| 17 | roomTemperature | Integer | `#{1789...}.roomTemperature <= 18` |
+| 0 | errorCode | Integer | `#{1789...}.errorCode > 0` |
 
 ---
 
@@ -769,7 +769,7 @@ curl http://localhost:8088/quartz/list?enable=true
 
 1. **ID 唯一性**：所有 ID 字段必须使用全局唯一的雪花ID，不能重复
 2. **关联关系**：子组件的 `scheduleTaskId`、`actionGroupId`、`conditionGroupId` 等必须正确指向父组件
-3. **SpEL 表达式**：条件表达式中的 `#{data.xxx}` 中的 `xxx` 必须是 `dataGroup` 中定义的 `id`
+3. **SpEL 表达式**：条件表达式中的 `#{id}` 中的 `id` 必须是 `dataGroup` 中定义的 `id`
 4. **设备参数**：`args` 参数必须严格按照协议规范填写，实际数据：address=31, selfId=1
 5. **实际数据参考**：
    - laboratoryId = 200
