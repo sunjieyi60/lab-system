@@ -24,7 +24,7 @@ public enum CommandLine {
     CLOSE_ACCESS_PERSIST_KEEP(new Command("{0} 0A 01 00 11 00",CheckType.SUM_UNSG,SendType.MQTT),"长关保持原状"),
     KEEP_ACCESS_STATUS_LOCK(new Command("{0} 0A 01 11 FF 00",CheckType.SUM_UNSG,SendType.MQTT),"保持门禁锁定状态"),
     KEEP_ACCESS_STATUS_UNLOCK(new Command("{0} 0A 01 11 00 00",CheckType.SUM_UNSG,SendType.MQTT),"保持门禁解锁状态"),
-    SET_ACCESS_DELAY(new Command("{0} 0A 03 {2} 00 00",CheckType.SUM_UNSG,SendType.MQTT),"延时设定门禁"),
+    SET_ACCESS_DELAY(new Command("{0} 0A 03 {1} 00 00",CheckType.SUM_UNSG,SendType.MQTT),"延时设定门禁"),
     OPEN_CIRCUITBREAK(new Command("{0} 10 00 19 00 01 02 00 01",CheckType.CRC16,SendType.MQTT),"断路器合闸"),
     CLOSE_CIRCUITBREAK(new Command("{0} 10 00 19 00 01 02 00 00",CheckType.CRC16,SendType.MQTT),"断路器分闸"),
     REQUEST_CIRCUITBREAK_DATA(new Command("{0} 03 00 18 00 74",CheckType.CRC16,SendType.MQTT),"请求断路器数据"),

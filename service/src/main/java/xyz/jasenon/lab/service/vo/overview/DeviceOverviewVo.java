@@ -20,5 +20,9 @@ public class DeviceOverviewVo {
      * 在线数
      */
     private Integer online;
+    /**
+     * 开启数量  (sensor 此条为null)
+     */
+    private Integer isOpen = null;
 
 }

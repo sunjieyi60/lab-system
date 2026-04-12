@@ -77,7 +77,7 @@ public class AccessMessageHandler extends MqttMessageHandler<AccessMapper,Access
 
     @Override
     boolean verify(byte[] payload) {
-        return SumChecker.verifyCheckSum(payload);
+        return SumChecker.verifyUnsignedByteCheckSum(payload);
     }
 
 

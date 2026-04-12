@@ -13,9 +13,11 @@ import xyz.jasenon.lab.common.entity.base.Laboratory;
 import xyz.jasenon.lab.common.entity.base.LaboratoryUser;
 import xyz.jasenon.lab.common.entity.class_time_table.Semester;
 import xyz.jasenon.lab.common.entity.class_time_table.WeekType;
+import xyz.jasenon.lab.common.entity.device.Access;
+import xyz.jasenon.lab.common.entity.device.CircuitBreak;
 import xyz.jasenon.lab.common.entity.device.Device;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
-import xyz.jasenon.lab.common.entity.record.SensorRecord;
+import xyz.jasenon.lab.common.entity.record.*;
 import xyz.jasenon.lab.common.utils.AsyncExecutor;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.mapper.CourseScheduleMapper;
@@ -513,20 +515,39 @@ public class OverviewServiceImpl implements IOverviewService, Const.Key, Const.M
                 .stream()
                 .map(s -> s.replace(type.getRedisPrefix(), ""))
                 .collect(Collectors.toSet());
-        
+
         // 统计在线设备数量
         int online = devices.stream()
                 .filter(d -> keys.contains(Long.toString(d.getId())))
                 .toList()
                 .size();
-        
+
         int total = devices.size();
-        
+
         DeviceOverviewVo vo = new DeviceOverviewVo();
         vo.setDevices(devices);
         vo.setOnline(online);
         vo.setTotal(total);
+
+        List<? extends BaseRecord> records = getDeviceRecords(devices, type);
+        if (type.getRecordClass().equals(AccessRecord.class)) {
+            vo.setIsOpen(records.stream().filter(r-> ((AccessRecord) r).getIsOpen()).toList().size());
+        } else if (type.getRecordClass().equals(AirConditionRecord.class)) {
+            vo.setIsOpen(records.stream().filter(r-> ((AirConditionRecord) r).getIsOpen()).toList().size());
+        } else if (type.getRecordClass().equals(CircuitBreakRecord.class)) {
+            vo.setIsOpen(records.stream().filter(r-> ((CircuitBreakRecord) r).getIsOpen()).toList().size());
+        } else if (type.getRecordClass().equals(LightRecord.class)) {
+            vo.setIsOpen(records.stream().filter(r-> ((LightRecord) r).getIsOpen()).toList().size());
+        }
+
         return vo;
+    }
+
+    private <T extends BaseRecord> List<T> getDeviceRecords(List<Device> devices, DeviceType deviceType){
+        List<T> records = devices.stream().filter(Objects::nonNull).filter(d->d.getDeviceType().equals(deviceType))
+                .map(d-> (T) DeviceRecordFactory.getDeviceRecordMethod(deviceType).getRecord(d.getId()).getData())
+                .toList();
+        return records;
     }
 
 }
