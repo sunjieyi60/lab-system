@@ -5,3 +5,4 @@ mvnw.cmd
 node_modules/
 target/
 .DS_Store
+class_time_table_android/app/build

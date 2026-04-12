@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -106,6 +107,7 @@ public class CacheAutoConfiguration {
         // 使用 Spring 配置的 Redis 地址
         Config config = new Config();
         String redisUrl = String.format("redis://%s:%d", host, port);
+        config.setCodec(new JsonJacksonCodec());
         
         config.useSingleServer()
                 .setAddress(redisUrl)
