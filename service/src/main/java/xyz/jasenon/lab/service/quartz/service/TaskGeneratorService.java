@@ -41,6 +41,11 @@ public class TaskGeneratorService {
      */
     @Transactional(rollbackFor = Exception.class)
     public R<Boolean> generateScheduleTask(CourseScheduleTaskGenerator target) {
+
+        if (target.getLaboratoryId().isEmpty()){
+            throw R.badRequest("实验室id不能为空").convert();
+        }
+
         List<Long> laboratoryIds = target.getLaboratoryId();
         Integer earlyStart = target.getEarlyStart();
         Integer delayEnd = target.getDelayEnd();
@@ -51,6 +56,7 @@ public class TaskGeneratorService {
         List<CourseSchedule> courseSchedules = courseScheduleMapper.selectList(
                 new LambdaQueryWrapper<CourseSchedule>()
                         .in(CourseSchedule::getLaboratoryId, laboratoryIds)
+                        .eq(CourseSchedule::getSemesterId, target.getSemesterId())
         );
 
         if (courseSchedules.isEmpty()) {

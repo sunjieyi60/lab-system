@@ -30,6 +30,8 @@ public interface IDeviceService extends IService<Device> {
 
     List<? extends Device> listAllDevice(Long laboratoryId);
 
+    List<? extends Device> listAllDevice(Long ...laboratoryIds);
+
     /**
      * 开启指定设备的轮询
      */

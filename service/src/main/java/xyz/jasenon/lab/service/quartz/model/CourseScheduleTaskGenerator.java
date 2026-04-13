@@ -1,6 +1,7 @@
 package xyz.jasenon.lab.service.quartz.model;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,5 +31,10 @@ public class CourseScheduleTaskGenerator {
      * 是否启用
      */
     private Boolean enable = true;
+    /**
+     * 学期id
+     */
+    @NotNull
+    private Long semesterId;
 
 }
