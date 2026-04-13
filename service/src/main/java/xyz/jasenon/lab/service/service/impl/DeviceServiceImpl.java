@@ -189,6 +189,21 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
     }
 
     @Override
+    public List<? extends Device> listAllDevice(Long laboratoryId) {
+        List<Long> laboratoryIdsVisible = getVisibleLaboratories().stream().map(l->l.getId()).toList();
+        boolean isOver = !new HashSet<>(laboratoryIdsVisible).contains(laboratoryId);
+        if(isOver){
+            throw R.fail("查询越权!").convert();
+        }
+        List<? extends Device> res = new ArrayList<>();
+        for (DeviceType type : DeviceType.values()){
+            var $ = DeviceFactory.getDeviceQMethod(type).list(laboratoryId);
+            res.addAll($);
+        }
+        return res;
+    }
+
+    @Override
     public void enablePolling(Long deviceId) {
         Device device = baseMapper.selectById(deviceId);
         if (device == null) {

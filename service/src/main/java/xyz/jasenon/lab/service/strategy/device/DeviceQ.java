@@ -8,6 +8,7 @@ import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.dto.device.CreateDevice;
 import xyz.jasenon.lab.service.strategy.task.TaskDispatch;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -69,6 +70,11 @@ public abstract class DeviceQ<M extends BaseMapper<T>,T extends Device > {
     }
 
     public abstract List<T> list(List<Long> laboratoryIds);
+
+    public List<T> list(Long ...laboratoryId){
+        List<Long> laboratoryIds = Arrays.stream(laboratoryId).toList();
+        return list(laboratoryIds);
+    }
 
     public abstract void startPolling(T t);
 

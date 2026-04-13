@@ -28,6 +28,8 @@ public interface IDeviceService extends IService<Device> {
 
     Map<Long,List<DeviceVo>> listDevice(List<Long> laboratoryIds, DeviceType deviceType);
 
+    List<? extends Device> listAllDevice(Long laboratoryId);
+
     /**
      * 开启指定设备的轮询
      */
