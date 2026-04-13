@@ -376,6 +376,8 @@ interface CourseScheduleTaskGenerator {
   delayEnd?: number;
   /** 是否启用（默认true） */
   enable?: boolean;
+  /** 学期ID */
+  semesterId: number;
 }
 ```
 
@@ -524,7 +526,20 @@ interface Page<T> {
 
 ---
 
-### 8. 从课表生成定时任务
+### 8. 批量按实验室查询任务
+
+**接口：** `GET /quartz/list-by-lab/batch`
+
+**参数：**
+| 参数名 | 类型 | 必填 | 说明 |
+|-------|------|-----|------|
+| laboratoryIds | number[] | 是 | 实验室ID列表（可变参数） |
+
+**响应：** `DiyResponseEntity<R<ScheduleConfigRoot[]>>`
+
+---
+
+### 9. 从课表生成定时任务
 
 **接口：** `POST /quartz/generate-from-course-schedule`
 
@@ -536,6 +551,7 @@ interface Page<T> {
   earlyStart?: number;     // 可选，提前执行分钟数，默认7
   delayEnd?: number;       // 可选，延迟结束分钟数，默认7
   enable?: boolean;        // 可选，默认true
+  semesterId: number;      // 必填，学期ID
 }
 ```
 
@@ -587,6 +603,11 @@ interface Page<T> {
 7. **看门狗验证**（如果启用）
    - watchIntervalSec: 必须大于0
    - watchTimeoutSec: 必须大于0
+
+8. **课表任务生成验证**
+   - laboratoryId: 不能为空，至少选择一个实验室
+   - semesterId: 不能为空
+   - earlyStart/delayEnd: 如提供，必须为大于等于0的整数
 
 ---
 
@@ -739,7 +760,8 @@ schedule_task (主表)
 
 ```
 课表任务生成:
-├── 实验室选择 [多选框]
+├── 学期选择 [下拉框，必填]
+├── 实验室选择 [多选框，必填]
 ├── Cron表达式 [默认0 0/5 * * * ?]
 ├── 提前执行 [分钟，默认7]
 ├── 延迟结束 [分钟，默认7]
