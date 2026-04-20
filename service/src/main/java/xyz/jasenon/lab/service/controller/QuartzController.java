@@ -102,6 +102,12 @@ public class QuartzController {
         return DiyResponseEntity.of(R.success(tasks));
     }
 
+    @GetMapping("/list-by-lab/batch")
+    @ApiOperation("获取自己相关的所有实验室下的定时任务")
+    public DiyResponseEntity<R<List<ScheduleConfigRoot>>> batchGetConfigByLaboratoryIds(@RequestParam Long ...laboratoryIds){
+        return DiyResponseEntity.of(R.success(taskQueryService.batchQueryByLaboratoryIds(laboratoryIds)));
+    }
+
     /**
      * 高性能实验室任务查询（支持设备/指令筛选）
      */

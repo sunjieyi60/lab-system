@@ -60,6 +60,12 @@ public class DeviceController {
         return DiyResponseEntity.of(R.success(deviceService.listAllDevice(laboratoryId)));
     }
 
+    @PostMapping("/list/all/batch")
+    @ApiOperation("查询目标实验室下的所有设备数据")
+    public DiyResponseEntity<R<List<? extends Device>>> listAllDeviceBatch(@RequestParam Long ...laboratoryId){
+        return DiyResponseEntity.of(R.success(deviceService.listAllDevice(laboratoryId)));
+    }
+
     @RequestPermission(allowed = { Permissions.DEVICE_ADD })
     @DeleteMapping("/delete")
     @ApiOperation("删除设备")

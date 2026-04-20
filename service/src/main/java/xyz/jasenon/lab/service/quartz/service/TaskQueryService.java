@@ -1,13 +1,17 @@
 package xyz.jasenon.lab.service.quartz.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import xyz.jasenon.lab.common.command.CommandLine;
 import xyz.jasenon.lab.common.entity.device.DeviceType;
+import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.quartz.mapper.ActionMapper;
+import xyz.jasenon.lab.service.quartz.mapper.ScheduleTaskMapper;
 import xyz.jasenon.lab.service.quartz.model.ScheduleConfigRoot;
+import xyz.jasenon.lab.service.quartz.model.ScheduleTask;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,6 +22,7 @@ public class TaskQueryService {
 
     private final ActionMapper actionMapper;
     private final ConfigBatchLoader configBatchLoader;
+    private final ScheduleTaskMapper scheduleTaskMapper;
 
     /**
      * 高性能查询：实验室维度 + 设备/指令筛选
@@ -80,5 +85,22 @@ public class TaskQueryService {
         Page<ScheduleConfigRoot> page = new Page<>(pageNum, pageSize, total);
         page.setRecords(records);
         return page;
+    }
+
+    public List<ScheduleConfigRoot> batchQueryByLaboratoryIds(Long ...laboratoryId){
+        if (laboratoryId == null || laboratoryId.length == 0) {
+            return new ArrayList<>();
+        }
+        List<ScheduleTask> tasks = scheduleTaskMapper.selectList(
+                new LambdaQueryWrapper<ScheduleTask>()
+                        .in(ScheduleTask::getLaboratoryId, List.of(laboratoryId))
+        );
+
+        List<ScheduleConfigRoot> records = configBatchLoader.batchLoadByTaskIds(
+                tasks.stream().filter(Objects::nonNull)
+                        .map(ScheduleTask::getId).toList()
+        );
+        return records;
+
     }
 }
