@@ -15,6 +15,30 @@
 
     <packaging>pom</packaging>
 
+    <profiles>
+        <profile>
+            <id>local</id>
+            <properties>
+                <profileActive>local</profileActive>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>remote-nat</id>
+            <properties>
+                <profileActive>remote-nat</profileActive>
+            </properties>
+        </profile>
+        <profile>
+            <id>remote-scuec</id>
+            <properties>
+                <profileActive>remote-scuec</profileActive>
+            </properties>
+        </profile>
+    </profiles>
+
     <modules>
         <module>common</module>
         <module>cache</module>
@@ -49,6 +73,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
     </dependencies>
 

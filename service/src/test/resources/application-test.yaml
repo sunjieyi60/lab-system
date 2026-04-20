@@ -1,19 +1,19 @@
 spring:
   application:
     name: lab-service-test
-  
+
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL;NON_KEYWORDS=VALUE
+    url: jdbc:h2:file:/Users/Zhuanz/Desktop/lab-system/service/src/test/resources/test;MODE=MySQL;NON_KEYWORDS=VALUE
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
-  
+    password:
+
   sql:
     init:
       schema-locations: classpath:schema-h2.sql
       data-locations: classpath:data-h2.sql
-      mode: always
-  
+      mode: never
+
   h2:
     console:
       enabled: true
@@ -51,5 +51,4 @@ sa-token:
 # 日志配置
 logging:
   level:
-    xyz.jasenon.lab.service.quartz: DEBUG
-    org.springframework.jdbc: DEBUG
+    root: info

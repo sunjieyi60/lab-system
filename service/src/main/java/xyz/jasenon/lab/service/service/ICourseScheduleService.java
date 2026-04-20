@@ -34,4 +34,8 @@ public interface ICourseScheduleService extends IService<CourseSchedule> {
     Map<Long,List<CourseScheduleVo>> listCourseSchedule(List<Long> laboratoryIds);
 
     List<Laboratory> listLaboratory();
+
+    boolean checkConflect(CourseSchedule insertOrUpdate, CourseSchedule ...olds);
+
+    boolean checkConflect(CourseSchedule insertOrUpdate, List<CourseSchedule> olds);
 }

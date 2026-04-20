@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import xyz.jasenon.lab.common.entity.class_time_table.Course;
 import xyz.jasenon.lab.common.entity.class_time_table.CourseSchedule;
 import xyz.jasenon.lab.common.entity.class_time_table.Semester;
@@ -14,6 +15,8 @@ import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.lab.service.annotation.RequestPermission;
 import xyz.jasenon.lab.service.constants.Permissions;
 import xyz.jasenon.lab.service.dto.course.*;
+import xyz.jasenon.lab.service.excel.ImportCourseSchedule;
+import xyz.jasenon.lab.service.excel.ImportResult;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
 import xyz.jasenon.lab.service.vo.base.CourseCreatedVo;
 import xyz.jasenon.lab.service.vo.base.CourseScheduleVo;
@@ -42,6 +45,8 @@ public class CourseController {
     private ICourseScheduleService courseScheduleService;
     @Autowired
     private ITeacherService teacherService;
+    @Autowired
+    private ImportCourseSchedule importCourseSchedule;
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
     @PostMapping("/create/course")
@@ -175,8 +180,15 @@ public class CourseController {
         return DiyResponseEntity.of(R.success(teacherService.getAllTeacher()));
     }
 
-
-
-
+    @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})
+    @PostMapping("/import")
+    @ApiOperation("导入课程")
+    public DiyResponseEntity<R<ImportResult>> importCourse(
+            @RequestParam("excel") MultipartFile excel,
+            @RequestParam Long semesterId,
+            @RequestParam Long laboratoryId){
+        var r = importCourseSchedule.importCourse(excel, semesterId, laboratoryId);
+        return DiyResponseEntity.of(R.success(r));
+    }
 
 }

@@ -2,9 +2,10 @@ package xyz.jasenon.lab.common.entity.class_time_table;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -47,5 +48,18 @@ public class CourseSchedule extends Schedule {
      * 课程备注
      */
     private String mark;
+
+    public interface Convert {
+        CourseScheduleHandle convert(Long semesterId, Long laboratoryId);
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CourseScheduleHandle{
+        CourseSchedule schedule;
+        Boolean success;
+        List<String> errors;
+    }
 
 }

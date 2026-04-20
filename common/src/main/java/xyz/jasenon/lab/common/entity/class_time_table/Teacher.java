@@ -17,4 +17,8 @@ public class Teacher extends BaseEntity {
      */
     private String teacherName;
 
+    public interface Convert {
+        Teacher convert();
+    }
+
 }

@@ -175,6 +175,35 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
     }
 
     /**
+     * 判断插入是否冲突
+     * @param insertOrUpdate 插入或更新的课程表
+     * @param olds 旧的
+     * @return 是否冲突
+     */
+    @Override
+    public boolean checkConflect(CourseSchedule insertOrUpdate, CourseSchedule ...olds) {
+        boolean result = false;
+        for (CourseSchedule cs : olds){
+            if (result){
+                break;
+            }
+            result = hasConflict(insertOrUpdate,cs);
+        }
+        return  result;
+    }
+
+    /**
+     * 判断插入是否冲突
+     * @param insertOrUpdate 插入或更新的课程表
+     * @param olds 旧的
+     * @return 是否冲突
+     */
+    @Override
+    public boolean checkConflect(CourseSchedule insertOrUpdate, List<CourseSchedule> olds) {
+        return checkConflect(insertOrUpdate, olds.toArray(new CourseSchedule[0]));
+    }
+
+    /**
      * 核心冲突检测逻辑
      * 规则：
      * 1) 主体重叠（同实验室或同教师）
