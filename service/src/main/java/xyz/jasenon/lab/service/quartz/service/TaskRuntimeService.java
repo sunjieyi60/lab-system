@@ -23,10 +23,12 @@ import xyz.jasenon.lab.service.strategy.task.TaskDispatch;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -116,11 +118,25 @@ public class TaskRuntimeService {
     }
 
     private boolean runOnceInternal(ScheduleConfigRoot cfg) {
+        ScheduleTask stask = cfg.getTask();
+        if (stask != null){
+            LocalDate now = LocalDate.now();
+            LocalDate startDate = stask.getStartDate();
+            LocalDate endDate = stask.getEndDate();
+            if (!((now.isAfter(startDate) || now.isEqual(startDate))
+                    && (now.isBefore(endDate) || now.isEqual(endDate)))){
+                return false;
+            }
+        }else{
+            return false;
+        }
+
+
         TimeRule timeRule = cfg.getTimeRule();
         if (timeRule != null) {
             Result<Boolean> timeRuleCheckResult = timeRuleChecker.check(timeRule);
             if (!timeRuleCheckResult.getData()) {
-                logConditionAlarm(cfg, "时间规则异常", timeRuleCheckResult.getMessage());
+//                logConditionAlarm(cfg, "时间规则异常", timeRuleCheckResult.getMessage());
                 return false;
             }
         }
@@ -148,8 +164,8 @@ public class TaskRuntimeService {
             for (Condition condition : conditions) {
                 Result<Boolean> conditionCheckResult = ConditionExprChecker.eval(condition.getExpr(), dataMap);
                 if (!conditionCheckResult.getData()) {
-                    logConditionAlarm(cfg, "条件表达式异常",
-                            condition.getExpr() + " 表达式评估失败，错误信息：" + conditionCheckResult.getMessage());
+//                    logConditionAlarm(cfg, "条件表达式异常",
+//                            condition.getExpr() + " 条件不满足，错误信息：" + conditionCheckResult.getMessage());
                 }
                 switch (conditionGroup.getType()) {
                     case ALL -> {
@@ -172,10 +188,24 @@ public class TaskRuntimeService {
         for (ActionGroup actionGroup : actionGroups) {
             Boolean conditionGroupResult = conditionResultMap.getOrDefault(actionGroup.getConditionGroupId(), true);
             if (!conditionGroupResult) {
-                logConditionAlarm(cfg, "条件不满足",
-                        "条件组 " + actionGroup.getConditionGroupId() + " 不满足，不执行动作");
+//                logConditionAlarm(cfg, "条件不满足",
+//                        "条件组 " + actionGroup.getConditionGroupId() + " 不满足，不执行动作");
                 continue;
             }
+            StringBuffer sb = new StringBuffer();
+            ConditionGroup conditionGroup = conditionGroups.stream()
+                    .filter(Objects::nonNull)
+                    .filter(cg -> cg.getId().equals(actionGroup.getConditionGroupId()))
+                    .findFirst()
+                    .orElse(null);
+            if (conditionGroup != null){
+                sb.append(String.format("条件组id:%s 类型为:%s",conditionGroup.getId(), conditionGroup.getType().toString()));
+                for (Condition condition : conditionGroup.getConditions()){
+                    sb.append(String.format("条件:%s 表达式为:%s", condition.getDesc(),condition.getExpr()));
+                }
+                logConditionAlarm(cfg, "条件满足", sb.toString());
+            }
+
             List<Action> actions = actionGroup.getActions();
             for (Action action : actions) {
                 Task task = action.convert2Task();
@@ -229,13 +259,13 @@ public class TaskRuntimeService {
                 for (ActionGroup ag : actionGroups) {
                     if (ag.getActions() == null) continue;
                     for (Action a : ag.getActions()) {
-                        if (sb.length() > 0) {
+                        if (!sb.isEmpty()) {
                             sb.append("; ");
                         }
                         sb.append(a.getDeviceType()).append("-").append(a.getDeviceId());
                     }
                 }
-                deviceSummary = sb.length() > 0 ? sb.toString() : null;
+                deviceSummary = !sb.isEmpty() ? sb.toString() : null;
             }
         } catch (Exception e) {
             log.debug("汇总条件触发报警设备列表失败, taskId={}", taskId, e);
@@ -246,7 +276,7 @@ public class TaskRuntimeService {
                 .setAlarmType(alarmType)
                 .setRoom(room)
                 .setDevice(deviceSummary)
-                .setContent("taskId=" + taskId + " -> " + errorMessage)
+                .setContent("任务名称:" + cfg.getTask().getTaskName() + " -> " + errorMessage)
                 .setAlarmTime(LocalDateTime.now());
         logTaskManager.submitAlarmLog(alarmLog);
     }
