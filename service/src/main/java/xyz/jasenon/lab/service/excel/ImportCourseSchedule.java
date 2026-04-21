@@ -175,6 +175,7 @@ public class ImportCourseSchedule {
                         status.setRollbackOnly();
                     }
                     courseScheduleService.save(handle.getSchedule());
+                    olds.add(handle.getSchedule());
                 } else {
                     status.setRollbackOnly();
                 }

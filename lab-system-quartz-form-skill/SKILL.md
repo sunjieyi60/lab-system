@@ -226,8 +226,12 @@ interface Condition {
 
 **SpEL 表达式格式：**
 ```
-#{dataId}.property operator value
+#{dataId}.{property} operator value
 ```
+
+> **重要：`dataId` 就是 `Data.java` 的 `id` 字段，即数据源（`data` 表）在数据库中的主键 ID。**
+> 
+> `Data.id` 由雪花算法生成（纯数字字符串）。运行时系统会根据 `dataId` 从 `data` 表中查找对应的数据源配置，再读取该设备的实时数据进行判断。
 
 **表达式示例：**
 | 场景 | 表达式 |
@@ -278,7 +282,14 @@ interface Condition {
 
 ```typescript
 interface Data {
-  /** 数据ID（在表达式中引用） */
+  /** 
+   * 数据ID（主键，条件表达式中的 `dataId` 即指此字段）
+   * 
+   * 由雪花算法生成（纯数字字符串）。条件表达式通过 `#{dataId}` 格式引用，例如：
+   * `#{7452020153002520576}.isOpen == false`
+   * 
+   * 课表模板批量生成时，此ID会被重新分配，表达式中的 `dataId` 引用会自动同步更新
+   */
   id?: string;
   /** 调度任务ID */
   scheduleTaskId?: string;
@@ -378,6 +389,12 @@ interface CourseScheduleTaskGenerator {
   enable?: boolean;
   /** 学期ID */
   semesterId: number;
+  /** 条件组模板（可选）- 每个生成的任务都会深度复制 */
+  conditionGroups?: ConditionGroup[];
+  /** 动作组模板（可选）- 每个生成的任务都会深度复制，conditionGroupId 自动映射 */
+  actionGroups?: ActionGroup[];
+  /** 数据源模板（可选）- 每个生成的任务都会深度复制 */
+  dataGroup?: Data[];
 }
 ```
 
@@ -546,12 +563,32 @@ interface Page<T> {
 **请求体：**
 ```typescript
 {
-  laboratoryId: number[];  // 必填，实验室ID列表
-  cron?: string;           // 可选，默认"0 0/5 * * * ?"
-  earlyStart?: number;     // 可选，提前执行分钟数，默认7
-  delayEnd?: number;       // 可选，延迟结束分钟数，默认7
-  enable?: boolean;        // 可选，默认true
-  semesterId: number;      // 必填，学期ID
+  laboratoryId: number[];      // 必填，实验室ID列表
+  cron?: string;               // 可选，默认"0 0/5 * * * ?"
+  earlyStart?: number;         // 可选，提前执行分钟数，默认7
+  delayEnd?: number;           // 可选，延迟结束分钟数，默认7
+  enable?: boolean;            // 可选，默认true
+  semesterId: number;          // 必填，学期ID
+  conditionGroups?: [          // 可选，条件组模板
+    {
+      id: string;              // 模板中的条件组ID（用于动作组关联映射）
+      type: 'ALL' | 'ANY';
+      conditions: [
+        { expr: string; desc?: string }
+      ]
+    }
+  ],
+  actionGroups?: [             // 可选，动作组模板
+    {
+      conditionGroupId: string; // 关联的条件组ID（指向模板中的条件组ID，后端自动映射）
+      actions: [
+        { deviceType: DeviceType; deviceId: number; commandLine: CommandLine; args: number[] }
+      ]
+    }
+  ],
+  dataGroup?: [                // 可选，数据源模板
+    { deviceId: number; deviceType: DeviceType }
+  ]
 }
 ```
 
@@ -562,6 +599,12 @@ interface Page<T> {
 2. 为每个课表生成一个定时任务
 3. 任务名称格式：`{课程名}-实验室{labId}-第{startWeek}-{endWeek}周-第{startSection}-{endSection}节-{星期}`
 4. 时间规则会根据 earlyStart/delayEnd 自动调整
+5. **智能控制模板复制机制**：
+   - 如果传入了 `conditionGroups` / `actionGroups` / `dataGroup`，后端会对每个生成的任务执行**深度复制**
+   - 所有实体的 ID 都会重新生成（Snowflake），避免冲突
+   - **数据源与条件表达式的关联维护**：条件表达式中的 `dataId` 引用的是 `Data.java` 的 `id` 字段（数据源主键）。复制时后端会先复制 Data 建立**旧 dataId → 新 dataId 映射**，然后在复制 Condition 时自动替换表达式中的 `dataId` 引用，确保运行时能正确找到对应的数据源
+   - 动作组通过 `conditionGroupId` 关联条件组时，后端会自动建立**旧ID → 新ID 的映射**，确保关联关系正确
+   - 每个新生成任务都拥有独立的一套条件组、动作组、数据源，互不影响
 
 ---
 
@@ -583,8 +626,8 @@ interface Page<T> {
 
 3. **条件组验证**
    - 每个 Condition 必须有：expr（SpEL表达式）
-   - 表达式格式必须正确：`#{data.{id}}.property operator value`
-   - 表达式引用的 dataId 必须在 dataGroup 中存在
+   - 表达式格式必须正确：`#{dataId}.{property} operator value`（`dataId` 为 Data 表主键）
+   - 表达式引用的 `dataId` 必须在当前配置的 dataGroup 中存在
    - 引用的属性必须在对应设备记录中存在
 
 4. **数据源验证**
@@ -608,6 +651,10 @@ interface Page<T> {
    - laboratoryId: 不能为空，至少选择一个实验室
    - semesterId: 不能为空
    - earlyStart/delayEnd: 如提供，必须为大于等于0的整数
+   - conditionGroups（如提供）: 每个条件组至少包含一个条件，条件表达式格式正确
+   - actionGroups（如提供）: 每个动作至少包含 deviceType、deviceId、commandLine、args
+   - actionGroups 中的 conditionGroupId: 如果提供，必须在当前模板的 conditionGroups 中存在
+   - dataGroup（如提供）: 每个数据源必须包含 deviceId、deviceType
 
 ---
 
@@ -738,7 +785,7 @@ schedule_task (主表)
 [选择数据源] [选择属性] [操作符] [输入值]
      ↓           ↓         ↓        ↓
    下拉选择    下拉选择   下拉选择   输入框
-   (data.id)  (属性列表)  (> >=    (数值/布尔)
+   (dataId)   (属性列表)  (> >=    (数值/布尔)
                          < <=
                          == !=)
 ```
@@ -756,17 +803,30 @@ schedule_task (主表)
 
 ### 4. 课表任务生成向导
 
-专门的弹窗/页面：
+专门的弹窗/页面，支持基础配置 + 智能控制模板：
 
 ```
 课表任务生成:
-├── 学期选择 [下拉框，必填]
-├── 实验室选择 [多选框，必填]
-├── Cron表达式 [默认0 0/5 * * * ?]
-├── 提前执行 [分钟，默认7]
-├── 延迟结束 [分钟，默认7]
+├── 基础配置
+│   ├── 学期选择 [下拉框，必填]
+│   ├── 实验室选择 [多选框，必填]
+│   ├── Cron表达式 [默认0 0/5 * * * ?]
+│   ├── 提前执行 [分钟，默认7]
+│   └── 延迟结束 [分钟，默认7]
+├── 智能控制模板（可选，复用现有卡片组件）
+│   ├── 数据源卡片 [添加/删除 设备数据源]
+│   ├── 条件组卡片 [添加条件组 → 添加条件表达式]
+│   └── 动作组卡片 [添加动作组 → 选择关联条件组 + 添加动作]
 └── [生成预览] [确认生成]
 ```
+
+**智能控制模板设计要点：**
+- 前端可直接复用现有定时任务表单中的**数据源/条件组/动作组卡片组件**
+- 条件组和动作组传入的 `id` / `conditionGroupId` 仅作为**模板内的关联标识**，不需要是数据库真实ID
+- 后端生成任务时会自动完成：
+  - **Data ID 重分配 + 条件表达式 dataId 同步替换**：先给 Data 生成新 ID，再把 Condition.expr 中 `#{oldId}` 批量替换为 `#{newId}`
+  - **ConditionGroup ID 重分配 + ActionGroup 关联映射修正**
+  - **所有子项的 scheduleTaskId 绑定到新任务**
 
 ### 5. 任务列表展示
 
@@ -804,6 +864,11 @@ schedule_task (主表)
    - Cron 控制任务何时被触发
    - TimeRule 在任务执行时校验当前是否在有效时间窗口内
 
-6. **报警触发场景**：
+6. **条件表达式中的 dataId 关联**：
+   - 条件表达式 `#{dataId}.{property}` 中的 `dataId` 就是 `Data.java` 的 `id` 字段（`data` 表主键，雪花ID）
+   - 运行时系统通过 `dataId` 从 `data` 表查找数据源配置，再读取对应设备的实时数据
+   - 课表批量生成时，后端会自动维护表达式中的 `dataId` 与新生成 Data 记录的 `id` 一致
+
+7. **报警触发场景**：
    - 条件触发：时间规则异常、数据源异常、条件表达式评估失败
    - 设备异常：设备离线、数据获取失败
