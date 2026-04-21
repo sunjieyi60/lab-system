@@ -134,7 +134,7 @@ public class CourseController {
     @PutMapping("/edit/courseSchedule")
     @ApiOperation("编辑课程表")
     public DiyResponseEntity<R<CourseSchedule>> editCourseSchedule(@Validated @RequestBody EditCourseSchedule editCourseSchedule){
-        return DiyResponseEntity.of(R.success(courseScheduleService.editCourseScheduleWeekdays(editCourseSchedule)));
+        return DiyResponseEntity.of(R.success(courseScheduleService.editCourseSchedule(editCourseSchedule)));
     }
 
     @RequestPermission(allowed = {Permissions.SCHEDULE_CLASSES})

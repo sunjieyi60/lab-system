@@ -15,6 +15,7 @@ import xyz.jasenon.lab.service.mapper.CourseScheduleMapper;
 import xyz.jasenon.lab.service.mapper.LaboratoryMapper;
 import xyz.jasenon.lab.service.service.IAcademicAnalysisService;
 import xyz.jasenon.lab.service.service.ICourseScheduleService;
+import xyz.jasenon.lab.service.service.ICourseService;
 import xyz.jasenon.lab.service.vo.base.CourseScheduleVo;
 
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
     private LaboratoryMapper laboratoryMapper;
     @Autowired
     private IAcademicAnalysisService analysisService;
+    @Autowired
+    private ICourseService courseService;
 
     @Override
     public CourseSchedule createCourseSchedule(CreateCourseSchedule createCourseSchedule) {
@@ -87,13 +90,27 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
     }
 
     @Override
-    public CourseSchedule editCourseScheduleWeekdays(EditCourseSchedule editCourseSchedule) {
+    public CourseSchedule editCourseSchedule(EditCourseSchedule editCourseSchedule) {
         CourseSchedule courseSchedule = this.getById(editCourseSchedule.getCourseScheduleId());
         if (courseSchedule == null) {
             throw R.fail("课程表不存在").convert();
         }
 
+        // 根据 courseName 查找或创建课程
+        Long courseId = resolveCourseIdByName(editCourseSchedule.getCourseName());
+
+        courseSchedule.setCourseId(courseId);
+        courseSchedule.setTeacherId(editCourseSchedule.getTeacherId());
+        courseSchedule.setWeekType(editCourseSchedule.getWeekType());
+        courseSchedule.setStartWeek(editCourseSchedule.getStartWeek());
+        courseSchedule.setEndWeek(editCourseSchedule.getEndWeek());
+        courseSchedule.setStartTime(editCourseSchedule.getStartTime());
+        courseSchedule.setEndTime(editCourseSchedule.getEndTime());
         courseSchedule.setWeekdays(editCourseSchedule.getWeekdays());
+        courseSchedule.setStartSection(editCourseSchedule.getStartSection());
+        courseSchedule.setEndSection(editCourseSchedule.getEndSection());
+        courseSchedule.setMark(editCourseSchedule.getMark());
+
         CourseSchedule updated = courseSchedule;
 
         List<CourseSchedule> schedules = this.lambdaQuery()
@@ -112,6 +129,23 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleMapper,
         this.updateById(updated);
         analysisService.invalidateChartCache();
         return updated;
+    }
+
+    /**
+     * 根据课程名称查找课程ID，不存在则自动创建
+     */
+    private Long resolveCourseIdByName(String courseName) {
+        Course exist = courseService.lambdaQuery()
+                .eq(Course::getCourseName, courseName)
+                .one();
+        if (exist != null) {
+            return exist.getId();
+        }
+        // 自动创建新课程
+        Course newCourse = new Course();
+        newCourse.setCourseName(courseName);
+        courseService.save(newCourse);
+        return newCourse.getId();
     }
 
     @Override

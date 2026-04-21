@@ -22,9 +22,9 @@ public interface ICourseScheduleService extends IService<CourseSchedule> {
     void deleteCourseSchedule(DeleteCourseSchedule deleteCourseSchedule);
 
     /**
-     * 编辑课程表：仅更新 weekdays（周几）
+     * 编辑课程表：全量更新
      */
-    CourseSchedule editCourseScheduleWeekdays(EditCourseSchedule editCourseSchedule);
+    CourseSchedule editCourseSchedule(EditCourseSchedule editCourseSchedule);
 
     /**
      * 删除指定实验室下的全部课程表记录
