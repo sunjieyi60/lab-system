@@ -1,6 +1,9 @@
 package xyz.jasenon.rsocket.server.diy;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.rsocket.Payload;
+import io.rsocket.util.DefaultPayload;
+import io.rsocket.util.EmptyPayload;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +95,11 @@ public class ClassicConnectManager extends AbstractConnectionManager implements 
         }
         
         log.info("向设备 {} 发送消息，route: {}", uuid, route);
-        
+
+        // mono webflux响应式编程必须 手动告知 doer to do!
+//        Mono<?> response = requester.rsocket().requestResponse(DefaultPayload.create("test"));
+//        response.block();
+
         return requester.route(route)
                 .data(message)
                 .retrieveMono(responseType)

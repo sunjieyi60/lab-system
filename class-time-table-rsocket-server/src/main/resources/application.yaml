@@ -62,3 +62,4 @@ logging:
 # 服务端口（HTTP 管理接口）
 server:
   port: 8084
+  address: 0.0.0.0

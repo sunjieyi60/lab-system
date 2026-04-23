@@ -65,14 +65,14 @@ public class TaskProcessor {
                         // flag 已经在 poll() 时移除，所以这里不需要再次移除
                         
                         if (mqttSendClient.mqttNx.wasPendingSend()) {
-                            AlarmLog alarmLog = new AlarmLog()
-                                    .setCategory("设备异常")
-                                    .setAlarmType("网关应答超时")
-                                    .setRoom(null)
-                                    .setDevice("网关-" + mqttSendClient.getRs485Id())
-                                    .setContent("上一条消息未在超时内收到应答，已超时释放")
-                                    .setGatewayId(mqttSendClient.getRs485Id());
-                            alarmReportClient.reportAlarm(alarmLog);
+//                            AlarmLog alarmLog = new AlarmLog()
+//                                    .setCategory("设备异常")
+//                                    .setAlarmType("网关应答超时")
+//                                    .setRoom(null)
+//                                    .setDevice("网关-" + mqttSendClient.getRs485Id())
+//                                    .setContent("上一条消息未在超时内收到应答，已超时释放")
+//                                    .setGatewayId(mqttSendClient.getRs485Id());
+//                            alarmReportClient.reportAlarm(alarmLog);
                             mqttSendClient.mqttNx.clearPendingSend();
                             log.warn("网关应答超时，rs485Id: {}, 上一条消息未在超时内收到应答", mqttSendClient.getRs485Id());
                         }
@@ -88,14 +88,14 @@ public class TaskProcessor {
                         boolean receivedAck = mqttSendClient.mqttNx.await(timeoutMs, timeoutUnit);
                         if (!receivedAck) {
                             // 超时未收到应答，记录告警
-                            AlarmLog alarmLog = new AlarmLog()
-                                    .setCategory("设备异常")
-                                    .setAlarmType("网关应答超时")
-                                    .setRoom(null)
-                                    .setDevice("网关-" + mqttSendClient.getRs485Id())
-                                    .setContent("消息发送后未在超时内收到应答")
-                                    .setGatewayId(mqttSendClient.getRs485Id());
-                            alarmReportClient.reportAlarm(alarmLog);
+//                            AlarmLog alarmLog = new AlarmLog()
+//                                    .setCategory("设备异常")
+//                                    .setAlarmType("网关应答超时")
+//                                    .setRoom(null)
+//                                    .setDevice("网关-" + mqttSendClient.getRs485Id())
+//                                    .setContent("消息发送后未在超时内收到应答")
+//                                    .setGatewayId(mqttSendClient.getRs485Id());
+//                            alarmReportClient.reportAlarm(alarmLog);
                             log.warn("消息发送后等待应答超时，rs485Id: {}, sendThreadName: {}", 
                                     mqttSendClient.getRs485Id(), task.getSendThreadName());
                         } else {

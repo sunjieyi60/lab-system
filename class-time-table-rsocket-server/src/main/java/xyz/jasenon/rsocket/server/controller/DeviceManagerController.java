@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import xyz.jasenon.lab.common.utils.R;
 import xyz.jasenon.rsocket.core.model.ClassTimeTable;
+import xyz.jasenon.rsocket.core.protocol.Message;
+import xyz.jasenon.rsocket.server.diy.ClassicConnectManager;
 import xyz.jasenon.rsocket.server.dto.EditDeviceLaboratory;
 import xyz.jasenon.rsocket.server.dto.PushDeviceConfig;
 import xyz.jasenon.rsocket.server.service.DeviceService;
@@ -34,6 +36,7 @@ public class DeviceManagerController {
 
     /** 班牌设备服务 */
     private final DeviceService deviceService;
+    private final ClassicConnectManager manager;
 
     /**
      * 查询班牌设备列表
@@ -79,6 +82,15 @@ public class DeviceManagerController {
     public Mono<R<DeviceProfilePushResultVo>> updateDeviceLaboratory(@Valid @RequestBody EditDeviceLaboratory body) {
 //        return deviceService.updateLaboratoryAndPush(body.getUuid(), body.getLaboratoryId()).map(PushConfigResult::toR);
         return null;
+    }
+
+    @GetMapping("/test")
+    public Mono<Void> test(@RequestParam("uuid") String uuid){
+        Message msg = new Message();
+        msg.setRoute("test");
+        Mono<?> response = manager.sendTo(uuid, msg,null);
+        response.block();
+        return Mono.empty();
     }
 
 

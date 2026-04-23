@@ -3,11 +3,13 @@ package xyz.jasenon.classtimetable.network.rsocket
 import android.content.Context
 import com.elvishew.xlog.XLog
 import com.google.gson.Gson
+import io.rsocket.kotlin.ConnectionAcceptorContext
 import io.rsocket.kotlin.ExperimentalMetadataApi
 import io.rsocket.kotlin.RSocket
 import io.rsocket.kotlin.core.RSocketConnector
 import io.rsocket.kotlin.core.WellKnownMimeType
 import io.rsocket.kotlin.keepalive.KeepAlive
+import io.rsocket.kotlin.payload.Payload
 import io.rsocket.kotlin.payload.PayloadMimeType
 import io.rsocket.kotlin.payload.buildPayload
 import io.rsocket.kotlin.payload.data
@@ -185,7 +187,6 @@ class RSocketClientManager private constructor(private val context: Context) {
                             data = WellKnownMimeType.ApplicationJson,
                             metadata = WellKnownMimeType.MessageRSocketRouting
                         )
-                        // 使用传入的 setup 对象，如果为空则发送默认的 "hello"
                         setupPayload {
                             buildPayload {
                                 val setupData = setup?.let { gson.toJson(it) } ?: ""
@@ -194,8 +195,16 @@ class RSocketClientManager private constructor(private val context: Context) {
                         }
                     }
                     acceptor {
-                        val server = requester
-                        responseHandler!!
+                        object : RSocket {
+                            override val coroutineContext: CoroutineContext
+                                get() = connectionScope!!.coroutineContext
+
+                            override suspend fun requestResponse(payload: Payload): Payload {
+                                XLog.tag(TAG).i("接收到请求")
+                                return super.requestResponse(payload)
+                            }
+
+                        }
                     }
 
                     reconnectable { cause, attempt ->

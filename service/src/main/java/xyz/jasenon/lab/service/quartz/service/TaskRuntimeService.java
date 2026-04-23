@@ -174,7 +174,7 @@ public class TaskRuntimeService {
                         conditionResultMap.put(conditionGroup.getId(), now);
                     }
                     case ANY -> {
-                        Boolean now = conditionResultMap.getOrDefault(conditionGroup.getId(), !conditionCheckResult.getData());
+                        Boolean now = conditionResultMap.getOrDefault(conditionGroup.getId(), conditionCheckResult.getData());
                         now = now || conditionCheckResult.getData();
                         conditionResultMap.put(conditionGroup.getId(), now);
                     }
